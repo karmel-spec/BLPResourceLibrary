@@ -52,10 +52,20 @@ if (!c) {
   </div>`;
 }
 
+function fmtDate(iso) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m - 1];
+  return `${mon} ${d}, ${y}`;
+}
+
 function card(r) {
-  const thumb = r.youtube
-    ? `<div class="thumb"><a href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener"><img loading="lazy" src="https://img.youtube.com/vi/${r.youtube}/hqdefault.jpg" alt="${r.title}"><span class="dur">${r.dur || ""}</span></a></div>`
-    : "";
+  let thumb = "";
+  if (r.youtube) {
+    thumb = `<div class="thumb"><a href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener"><img loading="lazy" src="https://img.youtube.com/vi/${r.youtube}/hqdefault.jpg" alt="${r.title}"><span class="dur">${r.dur || ""}</span></a></div>`;
+  } else if (r.thumb) {
+    thumb = `<div class="thumb cad"><a href="${r.fusion}" target="_blank" rel="noopener"><img loading="lazy" src="${r.thumb}" alt="${r.title}"><span class="badge3d">3D MODEL</span></a></div>`;
+  }
   const meta = r.youtube
     ? `<div class="maker">${topicLabel(r.sub)}</div>`
     : `<div class="maker">${r.maker}</div>`;
@@ -71,6 +81,7 @@ function card(r) {
       ${meta}
       ${r.desc ? `<p>${r.desc}</p>` : `<p class="spacer"></p>`}
       <div class="dl">${links}</div>
+      ${r.dateAdded ? `<div class="added">ADDED ${fmtDate(r.dateAdded).toUpperCase()}</div>` : ""}
     </div>
   </div>`;
 }

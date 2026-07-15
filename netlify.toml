@@ -1,0 +1,26 @@
+# Netlify configuration for pianotechnologylibrary.com
+# Static site — no build step; the repo root is published as-is.
+
+[build]
+  publish = "."
+  command = ""
+
+# Long-cache the immutable model/thumbnail images.
+[[headers]]
+  for = "/thumbs/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Security + sensible defaults for the HTML/JS.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Friendly URLs: /contributor/<id> → the profile page.
+[[redirects]]
+  from = "/contributor/*"
+  to = "/contributor.html?id=:splat"
+  status = 200

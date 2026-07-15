@@ -29,16 +29,31 @@ Append an object to `RESOURCES` in `data.js`:
 ```js
 { id: "BLP-114", cat: "parts", title: "Part Name",
   maker: "Maker", desc: "One-sentence description.",
-  formats: ["F3D"], fusion: "https://a360.co/XXXXXXX", by: "brigham-larson" }
+  formats: ["F3D"], fusion: "https://a360.co/XXXXXXX",
+  thumb: "thumbs/BLP-114.jpg", by: "brigham-larson",
+  dateAdded: "2026-07-20" }
 ```
 
 For videos use `youtube: "VIDEO_ID", dur: "12:34", sub: "<topic key>"` instead
-of `fusion`/`formats`. The 100 current training videos were scraped from the
-[BLP YouTube channel](https://www.youtube.com/@brighamspianoservice) training
+of `fusion`/`formats`/`thumb`. The 100 current training videos were scraped from
+the [BLP YouTube channel](https://www.youtube.com/@brighamspianoservice) training
 playlists and categorized into the topics defined in `TOPICS`.
+
+- **`dateAdded`** (`YYYY-MM-DD`) drives the **New Acquisitions** shelf — the
+  home page sorts by it and shows the newest 4 automatically. Every card also
+  prints an "ADDED …" line.
+- **`thumb`** points at a rendered model image in `thumbs/`. These were captured
+  from each Fusion share's 3D viewer (see `Regenerating thumbnails` below).
 
 ID ranges: parts `1xx` · jigs & fixtures `2xx` · player piano `3xx` ·
 cabinet `4xx` · training videos `V001+`.
+
+## Regenerating thumbnails
+
+Each CAD card's image lives in `thumbs/<id>.jpg`, captured from the model's
+Fusion web-viewer canvas (`canvas.toDataURL`) downscaled to a 640×340 JPEG.
+To refresh one, open its `fusion:` share in a browser, let the 3D model render,
+and export the canvas — or re-run the capture flow used to seed the library.
 
 ## Adding a contributor
 

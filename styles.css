@@ -154,6 +154,16 @@ h1 span { color: var(--red); }
   position: absolute; right: 8px; bottom: 8px; background: rgba(20,24,27,.92); color: #fff;
   font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; padding: 2px 7px; border: 1px solid #3a4449;
 }
+.pc .thumb.cad { background: #d7dde0; }
+.pc .thumb.cad img { opacity: 1; }
+.pc .thumb .badge3d {
+  position: absolute; left: 8px; top: 8px; background: var(--red); color: #fff;
+  font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 1px; padding: 2px 7px;
+}
+.pc .added {
+  margin-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px;
+  letter-spacing: 1px; color: var(--ink-faint);
+}
 .pc .body { padding: 12px 16px 16px; display: flex; flex-direction: column; flex: 1; }
 .pc h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 21px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
 .pc .maker { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--red); letter-spacing: 1px; margin-top: 2px; text-transform: uppercase; }
