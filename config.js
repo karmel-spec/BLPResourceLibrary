@@ -8,8 +8,8 @@
 // ============================================================================
 
 const CONFIG = {
-  SUPABASE_URL: "https://YOUR-PROJECT.supabase.co",
-  SUPABASE_ANON_KEY: "YOUR-ANON-PUBLIC-KEY",
+  SUPABASE_URL: "https://tlkbvniiaqwxmgewhxvx.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_CMh8EW_QljOHFzWRhGvGcg_OV2zmNtV",
 
   // The library owner. When signed in with this email you see admin-only
   // features (e.g. the private "trusted by" stat and its make-public toggle).
