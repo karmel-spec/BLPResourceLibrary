@@ -1,24 +1,40 @@
 // BLP Resource Library — rendering + filtering
 let activeCat = "all";
+let activeTopic = "all";
 let query = "";
 
 const grid = document.getElementById("grid");
 const tabs = document.getElementById("library");
+const subtabs = document.getElementById("subtabs");
 
 function count(cat) {
   return cat === "all" ? RESOURCES.length : RESOURCES.filter(r => r.cat === cat).length;
+}
+function topicCount(t) {
+  const vids = RESOURCES.filter(r => r.cat === "video");
+  return t === "all" ? vids.length : vids.filter(r => r.sub === t).length;
 }
 
 function renderTabs() {
   tabs.innerHTML = CATEGORIES.map(c =>
     `<div class="ft${c.key === activeCat ? " on" : ""}" data-cat="${c.key}">${c.label}<span class="n">${count(c.key)}</span></div>`
   ).join("");
+  if (activeCat === "video") {
+    subtabs.style.display = "flex";
+    subtabs.innerHTML = TOPICS.map(t =>
+      `<div class="st${t.key === activeTopic ? " on" : ""}" data-topic="${t.key}">${t.label} <b>${topicCount(t.key)}</b></div>`
+    ).join("");
+  } else {
+    subtabs.style.display = "none";
+  }
 }
 
 function matches(r) {
   if (activeCat !== "all" && r.cat !== activeCat) return false;
+  if (activeCat === "video" && activeTopic !== "all" && r.sub !== activeTopic) return false;
   if (!query) return true;
-  const hay = `${r.id} ${r.title} ${r.maker} ${r.desc}`.toLowerCase();
+  const contrib = CONTRIBUTORS[r.by]?.name || "";
+  const hay = `${r.id} ${r.title} ${r.maker || ""} ${r.desc || ""} ${r.sub || ""} ${contrib}`.toLowerCase();
   return query.toLowerCase().split(/\s+/).every(w => hay.includes(w));
 }
 
@@ -26,11 +42,25 @@ function catLabel(key) {
   const map = { parts: "PART", fixtures: "FIXTURE", player: "PLAYER", cabinet: "CABINET", video: "VIDEO" };
   return map[key] || "ITEM";
 }
+function topicLabel(key) {
+  return (TOPICS.find(t => t.key === key) || {}).label || "";
+}
+
+function byline(r) {
+  const c = CONTRIBUTORS[r.by];
+  if (!c) return "";
+  return `<a class="byline" href="contributor.html?id=${r.by}" title="View contributor profile">
+    <img src="${c.photo}" alt="" loading="lazy">
+    <span>SHARED BY <b>${c.name.toUpperCase()}</b>${c.credential ? " · " + c.credential.split(" — ")[0] : ""}</span></a>`;
+}
 
 function card(r) {
   const thumb = r.youtube
-    ? `<div class="thumb"><a href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener"><img loading="lazy" src="https://img.youtube.com/vi/${r.youtube}/hqdefault.jpg" alt="${r.title}"></a></div>`
+    ? `<div class="thumb"><a href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener"><img loading="lazy" src="https://img.youtube.com/vi/${r.youtube}/hqdefault.jpg" alt="${r.title}"><span class="dur">${r.dur || ""}</span></a></div>`
     : "";
+  const meta = r.youtube
+    ? `<div class="maker">${topicLabel(r.sub)}</div>`
+    : `<div class="maker">${r.maker}</div>`;
   const links = r.youtube
     ? `<a class="r" href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener">▶ WATCH</a>`
     : `<a class="r" href="${r.fusion}" target="_blank" rel="noopener">OPEN IN FUSION</a>` +
@@ -40,9 +70,10 @@ function card(r) {
     ${thumb}
     <div class="body">
       <h3>${r.title}</h3>
-      <div class="maker">${r.maker}</div>
-      <p>${r.desc}</p>
+      ${meta}
+      ${r.desc ? `<p>${r.desc}</p>` : `<p class="spacer"></p>`}
       <div class="dl">${links}</div>
+      ${byline(r)}
     </div>
   </div>`;
 }
@@ -60,6 +91,13 @@ tabs.addEventListener("click", e => {
   const t = e.target.closest(".ft");
   if (!t) return;
   activeCat = t.dataset.cat;
+  activeTopic = "all";
+  render();
+});
+subtabs.addEventListener("click", e => {
+  const t = e.target.closest(".st");
+  if (!t) return;
+  activeTopic = t.dataset.topic;
   render();
 });
 
@@ -68,7 +106,7 @@ q.addEventListener("input", () => { query = q.value.trim(); renderGrid(); });
 document.getElementById("qbtn").addEventListener("click", () => { query = q.value.trim(); renderGrid(); });
 
 document.querySelectorAll("header nav a[data-cat]").forEach(a =>
-  a.addEventListener("click", () => { activeCat = a.dataset.cat; render(); })
+  a.addEventListener("click", () => { activeCat = a.dataset.cat; activeTopic = "all"; render(); })
 );
 
 document.getElementById("stat-files").textContent =
