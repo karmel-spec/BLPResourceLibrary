@@ -14,20 +14,22 @@
 
 <header>
   <div class="header-inner">
-    <a class="mark" href="#">
+    <a class="mark" href="index.html">
       <div>
         <div class="t1">PIANO TECHNOLOGY LIBRARY</div>
         <div class="t2">FREE &amp; OPEN FOR PIANO TECHNICIANS EVERYWHERE</div>
       </div>
     </a>
-    <nav>
-      <a class="on" href="#">INDEX</a>
+    <button class="navtoggle" id="navToggle" aria-label="Menu" aria-expanded="false">☰</button>
+    <nav id="nav">
+      <a class="on" href="index.html">INDEX</a>
       <a href="#library" data-cat="parts">PARTS</a>
-      <a href="#library" data-cat="fixtures">FIXTURES</a>
+      <a href="#library" data-cat="fixtures">JIGS &amp; FIXTURES</a>
       <a href="#library" data-cat="video">VIDEO</a>
       <a href="contributor.html?id=brigham-larson">CONTRIBUTORS</a>
-      <a href="#about">ABOUT</a>
-      <a class="cta" href="#contribute">CONTRIBUTE</a>
+      <a href="about.html">ABOUT</a>
+      <a class="cta" href="contribute.html">CONTRIBUTE</a>
+      <span id="authSlot" class="auth-slot"></span>
     </nav>
   </div>
 </header>
@@ -42,6 +44,10 @@
       <div class="pre">&gt;_</div>
       <input id="q" type="text" placeholder="Look up a part, maker, or technique…" autocomplete="off">
       <button id="qbtn">CONSULT</button>
+    </div>
+    <div class="truststat" id="trustStat" hidden>
+      <span class="ts-text">Trusted by technicians in <b>14 countries</b> · <b>1,204</b> downloads</span>
+      <button class="trust-toggle" id="trustToggle" hidden></button>
     </div>
   </div>
   <div class="tb-r">
@@ -64,29 +70,35 @@
 <div class="subtabs" id="subtabs"></div>
 <div class="grid" id="grid"></div>
 
-<div class="mission" id="about">
-  <div class="block">
-    <h2>The profession's <span>shared memory</span></h2>
-    <p>For more than a century, piano technicians have accumulated extraordinary specialized knowledge — and most of it lives in individual shops, handwritten notes, and the minds of experienced techs. When a technician retires, those insights disappear.</p>
-    <div class="quote">"No piano technician should ever have to solve the same specialized problem twice."</div>
-    <p>This library preserves the geometry, the engineering, and the reasoning behind the parts — CAD models, jigs, manufacturing notes, and technique — as permanent digital assets for the whole profession.</p>
-  </div>
-  <div class="block" id="contribute">
-    <h2>Contribute to the <span>library</span></h2>
-    <p>The library is starting with the Brigham Larson Pianos shop collection and will grow deliberately: first as a public read-only library, then with invited contributors, then broader community participation.</p>
-    <p>Have a model, jig, or technique worth preserving? We'd love to add it — with full credit to you.</p>
-    <a class="cta" href="mailto:karmel@brighamlarsonpianos.com?subject=BLP%20Resource%20Library%20Contribution">Submit a Resource</a>
+<!-- Per-item feedback / comments modal -->
+<div class="modal-backdrop" id="commentModal" hidden>
+  <div class="modal">
+    <button class="modal-close" id="modalClose" aria-label="Close">×</button>
+    <div class="modal-head">
+      <div class="mono mh-id" id="cmId"></div>
+      <h3 id="cmTitle"></h3>
+    </div>
+    <div class="cm-list" id="cmList"></div>
+    <div class="cm-form" id="cmForm"></div>
   </div>
 </div>
 
 <footer>
   <div class="footer-inner">
-    <span>PIANO TECHNOLOGY LIBRARY — A FREE COMMUNITY RESOURCE FOR PIANO TECHNICIANS</span>
-    <span>FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a> · UTAH, USA</span>
+    <span>A permanent, community-owned record of the craft.</span>
+    <span><a href="about.html">About this library</a> · <a href="contribute.html">Contribute</a></span>
   </div>
 </footer>
 
+<!-- Persistent community-resource bar -->
+<div class="redbar">
+  A FREE COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a> — UTAH, USA
+</div>
+
+<script src="config.js"></script>
 <script src="data.js"></script>
+<script src="auth.js"></script>
+<script src="comments.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

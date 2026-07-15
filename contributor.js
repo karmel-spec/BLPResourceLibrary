@@ -27,7 +27,6 @@ if (!c) {
       <div class="prof-grid">
         <div class="prof-photo">
           <img src="${c.photo}" alt="${c.name}">
-          <div class="prof-stamp">CONTRIBUTOR</div>
         </div>
         <div class="prof-info">
           <div class="dwg">CONTRIBUTOR FILE · ${cid.toUpperCase()} · ${c.location.toUpperCase()}</div>
@@ -82,8 +81,12 @@ function card(r) {
       ${r.desc ? `<p>${r.desc}</p>` : `<p class="spacer"></p>`}
       <div class="dl">${links}</div>
       ${r.dateAdded ? `<div class="added">ADDED ${fmtDate(r.dateAdded).toUpperCase()}</div>` : ""}
+      <button class="feedback-btn" data-id="${r.id}" data-title="${String(r.title).replace(/"/g, "&quot;")}">
+        <span class="fb-ic">💬</span> Feedback <span class="fb-n"></span>
+      </button>
     </div>
   </div>`;
 }
 
 document.getElementById("grid").innerHTML = mine.map(card).join("");
+if (window.Comments) window.Comments.refreshBadges();

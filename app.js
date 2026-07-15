@@ -78,9 +78,13 @@ function card(r) {
       <div class="dl">${links}</div>
       ${r.dateAdded ? `<div class="added">ADDED ${fmtDate(r.dateAdded).toUpperCase()}</div>` : ""}
       ${byline(r)}
+      <button class="feedback-btn" data-id="${r.id}" data-title="${attr(r.title)}">
+        <span class="fb-ic">💬</span> Feedback <span class="fb-n"></span>
+      </button>
     </div>
   </div>`;
 }
+function attr(s) { return String(s).replace(/"/g, "&quot;"); }
 
 // Card catalog panel — one row per category, No. ranges like a card drawer
 const CC_RANGES = {
@@ -119,6 +123,7 @@ function renderAcquisitions() {
     .sort((a, b) => b.dateAdded.localeCompare(a.dateAdded))
     .slice(0, ACQUISITION_COUNT);
   document.getElementById("acquisitions").innerHTML = items.map(card).join("");
+  if (window.Comments) window.Comments.refreshBadges();
 }
 
 function renderGrid() {
@@ -126,6 +131,7 @@ function renderGrid() {
   grid.innerHTML = list.length
     ? list.map(card).join("")
     : `<div class="empty">NO MATCHES IN THE CATALOG — TRY A DIFFERENT SEARCH TERM</div>`;
+  if (window.Comments) window.Comments.refreshBadges();
 }
 
 function render() { renderTabs(); renderGrid(); }
@@ -160,3 +166,58 @@ document.getElementById("stat-videos").textContent =
 renderCardCatalog();
 renderAcquisitions();
 render();
+
+// ---- Mobile nav toggle ------------------------------------------------------
+const navToggle = document.getElementById("navToggle");
+const nav = document.getElementById("nav");
+if (navToggle) {
+  navToggle.addEventListener("click", () => {
+    const open = nav.classList.toggle("open");
+    navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  nav.querySelectorAll("a").forEach(a =>
+    a.addEventListener("click", () => { nav.classList.remove("open"); navToggle.setAttribute("aria-expanded", "false"); })
+  );
+}
+
+// ---- Admin-only "trusted by" stat, with make-public toggle ------------------
+// Visible when the public flag is on OR the owner is signed in. The owner also
+// gets a toggle to flip it public once the numbers are worth showing.
+const STAT_KEY = "ptl_stats_public";
+const trustStat = document.getElementById("trustStat");
+const trustToggle = document.getElementById("trustToggle");
+
+async function statsPublic() {
+  if (window.Auth && window.Auth.ready && window.__supabase) {
+    const { data } = await window.__supabase.from("site_settings").select("value").eq("key", "stats_public").maybeSingle();
+    return data && data.value === "true";
+  }
+  return localStorage.getItem(STAT_KEY) === "true";
+}
+async function setStatsPublic(val) {
+  if (window.Auth && window.Auth.ready && window.__supabase) {
+    await window.__supabase.from("site_settings").upsert({ key: "stats_public", value: String(val) });
+  } else {
+    localStorage.setItem(STAT_KEY, String(val));
+  }
+}
+async function refreshTrustStat() {
+  if (!trustStat) return;
+  const isPublic = await statsPublic();
+  const admin = window.Auth && window.Auth.isAdmin();
+  trustStat.hidden = !(isPublic || admin);
+  trustStat.classList.toggle("private", admin && !isPublic);
+  trustToggle.hidden = !admin;
+  if (admin) {
+    trustToggle.textContent = isPublic ? "● PUBLIC — hide again" : "○ PRIVATE — make public";
+  }
+}
+if (trustToggle) {
+  trustToggle.addEventListener("click", async () => {
+    const isPublic = await statsPublic();
+    await setStatsPublic(!isPublic);
+    refreshTrustStat();
+  });
+}
+if (window.Auth) window.Auth.onChange(refreshTrustStat);
+refreshTrustStat();
