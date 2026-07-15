@@ -1,0 +1,8 @@
+# Importer secrets & working files (never commit these)
+tools/importer/.env
+tools/importer/token.json
+tools/importer/manifest.json
+tools/importer/import-output/
+
+# OS noise
+.DS_Store

@@ -1,0 +1,11 @@
+{
+  "_comment": "Maps Fusion folder/file names to library categories. Edit freely: rules run top-to-bottom, first match wins. `ranges` sets the ID number block per category.",
+  "ranges": { "parts": 100, "fixtures": 200, "player": 300, "cabinet": 400 },
+  "default": "parts",
+  "rules": [
+    { "cat": "fixtures", "match": ["jig", "fixture", "setter", "boring", "drilling", "routing", "alignment tool", "gauge", "template"] },
+    { "cat": "player",   "match": ["player", "pneumatic", "elbow", "air motor", "spool", "tracker bar", "duo-art", "ampico", "welte"] },
+    { "cat": "cabinet",  "match": ["cabinet", "music desk", "desk", "column", "lid", "leg", "molding", "fretwork", "hardware", "caster", "prop"] },
+    { "cat": "parts",    "match": ["flange", "hammer", "damper", "butt", "whippen", "bridge", "key", "shank", "action", "comb", "lever", "spring"] }
+  ]
+}
