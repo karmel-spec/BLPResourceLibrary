@@ -80,19 +80,44 @@ You can also run the steps individually (`node import.mjs list`, etc.).
 
 ---
 
-## About the download links
+## Hosting the files (self-hosted downloads — recommended for bulk)
 
 The APS API **cannot create `a360.co` share links** — Autodesk only mints those
-from the Fusion UI (right-click a design → **Share**). So each generated entry
-has a `fusion: "PASTE_a360_SHARE_LINK"` placeholder. Two ways to fill it:
+from the Fusion UI. Instead of linking out, the importer can **download each
+design and host it itself**, so cards get real ⬇ STEP / ⬇ STL / ⬇ F3D buttons
+served by the library, with no dependency on Autodesk keeping links alive.
 
-- **Quick:** paste a share link per file (fine for a handful).
-- **Better for bulk — host the files ourselves:** the importer already has the
-  version IDs, so it can be extended to download each design's F3D + a translated
-  STEP/STL and upload them to **Supabase Storage** (free 1 GB). Then cards get a
-  real "Download STEP/STL" button served by the library, with no dependency on
-  Autodesk keeping share links alive. Say the word and I'll add the `--files`
-  step + wire the download buttons — it fits the "permanent record" goal better.
+**One-time Supabase Storage setup** (same project as the comments backend):
+1. Supabase → **Storage** → **New bucket** → name it `models` → **Public bucket** ✓.
+2. Supabase → **Settings → API** → copy the **`service_role`** key (secret).
+3. In `tools/importer/.env` add:
+   ```
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_SERVICE_KEY=your-service-role-key
+   STORAGE_BUCKET=models
+   EXPORT_FORMATS=step,stl
+   ```
+
+**Run the hosted import:**
+```bash
+node import.mjs all-hosted     # list + thumbs + files + gen
+# (or just `node import.mjs files` after a list)
+```
+For each design this: downloads the source **F3D** from Data Management,
+translates it to **STEP + STL** via the Model Derivative API, uploads all three
+to the `models` bucket, and records their public URLs. `gen` then emits a
+`files: { f3d, step, stl }` field per entry — which the cards turn into download
+buttons automatically. The manifest is checkpointed after every file, so a large
+run can be safely re-run and it skips what's already hosted.
+
+> First live run note: `files` calls several APS endpoints I couldn't test
+> without credentials (OSS signed-download, Model Derivative translate/fetch).
+> If a format doesn't come through for some designs, the tool logs it per-file
+> and keeps going — send me the log and I'll adjust the endpoint handling.
+
+### Quick alternative (a few files only)
+Skip hosting and just paste an `a360.co` share link into each entry's
+`fusion: "PASTE_a360_SHARE_LINK"` placeholder.
 
 ## Safety notes
 

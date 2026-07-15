@@ -49,6 +49,11 @@ function loadEnv() {
 }
 const ENV = loadEnv();
 const CLIENT_ID = ENV.APS_CLIENT_ID;
+// For the optional `files` step (self-hosted downloads): Supabase Storage.
+const SUPABASE_URL = (ENV.SUPABASE_URL || "").replace(/\/$/, "");
+const SUPABASE_SERVICE_KEY = ENV.SUPABASE_SERVICE_KEY || "";
+const STORAGE_BUCKET = ENV.STORAGE_BUCKET || "models";
+const EXPORT_FORMATS = (ENV.EXPORT_FORMATS || "step,stl").split(",").map((s) => s.trim()).filter(Boolean);
 
 function die(msg) { console.error("\n✗ " + msg + "\n"); process.exit(1); }
 function log(...a) { console.log(...a); }
@@ -205,6 +210,121 @@ async function thumbs() {
 }
 
 // ============================================================================
+// files — download each design's F3D + translated STEP/STL, host on Supabase
+// Storage, and record public URLs in the manifest so cards get real download
+// buttons (no dependency on Autodesk share links).
+// ============================================================================
+async function files() {
+  const token = accessToken();
+  if (!fs.existsSync(MANIFEST_FILE)) die("Run `list` first.");
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY)
+    die("Set SUPABASE_URL and SUPABASE_SERVICE_KEY in .env (service_role key). See APS_IMPORT.md 'Hosting the files'.");
+  const items = JSON.parse(fs.readFileSync(MANIFEST_FILE, "utf8"));
+
+  let done = 0, failed = 0;
+  for (const it of items) {
+    it.slug = it.slug || slugify(it.name);
+    it.files = it.files || {};
+    try {
+      // 1) Source F3D straight from Data Management storage.
+      if (!it.files.f3d && it.versionId) {
+        const buf = await downloadF3D(token, it.projectId, it.versionId);
+        if (buf) it.files.f3d = await uploadModel(`${it.slug}.f3d`, buf, "application/octet-stream");
+      }
+      // 2) Translate to neutral CAD formats and host those too.
+      if (it.derivativeUrn) {
+        const urn = b64url(Buffer.from(it.derivativeUrn));
+        await translate(token, urn, EXPORT_FORMATS);
+        for (const fmt of EXPORT_FORMATS) {
+          if (it.files[fmt]) continue;
+          const buf = await fetchDerivative(token, urn, fmt);
+          if (buf) it.files[fmt] = await uploadModel(`${it.slug}.${fmt}`, buf, "application/octet-stream");
+        }
+      }
+      done++;
+      log(`  ✓ ${it.name}  [${Object.keys(it.files).join(", ") || "none"}]`);
+    } catch (e) {
+      failed++;
+      log(`  ✗ ${it.name} — ${e.message.split("\n")[0]}`);
+    }
+    fs.writeFileSync(MANIFEST_FILE, JSON.stringify(items, null, 2)); // checkpoint each file
+  }
+  log(`\n✓ Hosted files for ${done} model(s); ${failed} had issues (see log). URLs saved to manifest.`);
+}
+
+// Download the source F3D via the OSS signed-download for the version's storage.
+async function downloadF3D(token, projectId, versionId) {
+  const v = await api(`/data/v1/projects/${projectId}/versions/${encodeURIComponent(versionId)}`, token);
+  const storageId = v.data?.relationships?.storage?.data?.id; // urn:adsk.objects:os.object:<bucket>/<object>
+  if (!storageId) return null;
+  const m = storageId.match(/os\.object:([^/]+)\/(.+)$/);
+  if (!m) return null;
+  const [, bucket, object] = m;
+  // Preferred: signed S3 download URL.
+  const signed = await api(`/oss/v2/buckets/${bucket}/objects/${encodeURIComponent(object)}/signeds3download`, token);
+  const url = signed.url || (signed.urls && signed.urls[0]);
+  if (!url) return null;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`F3D download ${r.status}`);
+  return Buffer.from(await r.arrayBuffer());
+}
+
+// Kick off (idempotent) a Model Derivative translation to the given formats and
+// wait until the manifest reports success.
+async function translate(token, urn, formats) {
+  await fetch(`${BASE}/modelderivative/v2/designdata/job`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", "x-ads-force": "false" },
+    body: JSON.stringify({
+      input: { urn },
+      output: { formats: formats.map((f) => f === "stl"
+        ? { type: "stl", advanced: { format: "binary" } }
+        : { type: f }) },
+    }),
+  });
+  // Poll (up to ~2 min per file).
+  for (let i = 0; i < 40; i++) {
+    const man = await api(`/modelderivative/v2/designdata/${urn}/manifest`, token);
+    if (man.status === "success" || man.status === "failed") return man;
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+  throw new Error("translation timed out");
+}
+
+// Find the derivative of a given output type in the manifest and download it.
+async function fetchDerivative(token, urn, fmt) {
+  const man = await api(`/modelderivative/v2/designdata/${urn}/manifest`, token);
+  let target = null;
+  const walk = (nodes) => {
+    for (const n of nodes || []) {
+      if (n.role === fmt || (n.outputType === fmt) || (n.type === "resource" && (n.urn || "").toLowerCase().endsWith("." + fmt))) target = n;
+      if (n.children) walk(n.children);
+    }
+  };
+  (man.derivatives || []).forEach((d) => walk(d.children));
+  if (!target || !target.urn) return null;
+  const r = await fetch(`${BASE}/modelderivative/v2/designdata/${urn}/manifest/${encodeURIComponent(target.urn)}`,
+    { headers: { Authorization: `Bearer ${token}` } });
+  if (!r.ok) throw new Error(`${fmt} download ${r.status}`);
+  return Buffer.from(await r.arrayBuffer());
+}
+
+// Upload a buffer to Supabase Storage (public bucket) and return its public URL.
+async function uploadModel(filename, buf, contentType) {
+  const p = `${STORAGE_BUCKET}/${filename}`;
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${p}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+      "Content-Type": contentType, "x-upsert": "true",
+    },
+    body: buf,
+  });
+  if (!r.ok && r.status !== 200) throw new Error(`Supabase upload ${r.status}: ${await r.text()}`);
+  return `${SUPABASE_URL}/storage/v1/object/public/${p}`;
+}
+
+// ============================================================================
 // gen — turn the manifest into ready-to-paste data.js entries
 // ============================================================================
 function gen() {
@@ -229,10 +349,12 @@ function gen() {
     const { cat, why } = guessCategory(it, map);
     const id = `BLP-${nextId[cat]++}`;
     const maker = guessMaker(it.name) || "Piano Rebuilding";
+    const files = it.files && Object.keys(it.files).length ? it.files : null;
+    const formats = files ? Object.keys(files).map((k) => k.toUpperCase()) : ["F3D"];
     lines.push(
 `  { id: "${id}", cat: "${cat}", title: ${JSON.stringify(tidyTitle(it.name))},
     maker: ${JSON.stringify(maker)}, desc: "",
-    formats: ["F3D"], fusion: "PASTE_a360_SHARE_LINK",${it.thumb ? ` thumb: ${JSON.stringify(it.thumb)},` : ""}
+    formats: ${JSON.stringify(formats)},${files ? ` files: ${JSON.stringify(files)},` : ` fusion: "PASTE_a360_SHARE_LINK",`}${it.thumb ? ` thumb: ${JSON.stringify(it.thumb)},` : ""}
     by: "brigham-larson", dateAdded: "${today}" },`);
     review.push(`${id}  [${cat}]  ${it.name}   (folder: ${it.folderPath}) — ${why}${it.thumb ? "" : "  ⚠ NO THUMBNAIL"}`);
   }
@@ -273,16 +395,20 @@ const run = {
   login,
   list,
   thumbs,
+  files,
   gen: async () => gen(),
   all: async () => { await list(); await thumbs(); gen(); },
+  "all-hosted": async () => { await list(); await thumbs(); await files(); gen(); },
   help: async () => log(`
 Piano Technology Library — Fusion importer
 
-  node import.mjs login    one-time Autodesk sign-in (opens your browser)
-  node import.mjs list     inventory the whole account -> manifest.json
-  node import.mjs thumbs   download model thumbnails -> ../../thumbs
-  node import.mjs gen      generate data.js entries -> import-output/
-  node import.mjs all      list + thumbs + gen
+  node import.mjs login       one-time Autodesk sign-in (opens your browser)
+  node import.mjs list        inventory the whole account -> manifest.json
+  node import.mjs thumbs      download model thumbnails -> ../../thumbs
+  node import.mjs files       download F3D + STEP/STL, host on Supabase Storage
+  node import.mjs gen         generate data.js entries -> import-output/
+  node import.mjs all         list + thumbs + gen        (link to Fusion shares)
+  node import.mjs all-hosted  list + thumbs + files + gen (self-hosted downloads)
 
 First time? See APS_IMPORT.md.`),
 };

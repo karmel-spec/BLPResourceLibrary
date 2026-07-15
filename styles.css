@@ -173,6 +173,12 @@ h1 span { color: var(--red); }
 .pc .dl a.r { background: var(--red); border-color: var(--red); color: #fff; }
 .pc .dl a:hover { background: var(--ink); color: #fff; }
 .pc .dl a.r:hover { background: #7c1717; }
+.pc .dl a.dl-file {
+  border: 1px solid var(--ink); background: #eef1f2; color: var(--ink);
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.pc .dl a.dl-file:hover { background: var(--ink); color: #fff; }
+.pc .dl .dl-pending { color: var(--ink-faint); font-style: italic; padding: 5px 0; }
 .pc p.spacer { margin: 0; flex: 1; }
 .empty { grid-column: 1 / -1; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-faint); padding: 40px 0; text-align: center; }
 

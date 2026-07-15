@@ -58,6 +58,28 @@ function fmtDate(iso) {
   return `${mon} ${d}, ${y}`;
 }
 
+const FILE_ORDER = ["step", "stl", "f3d", "3mf"];
+function fileLinks(r) {
+  if (r.youtube) {
+    return `<a class="r" href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener">▶ WATCH</a>`;
+  }
+  const parts = [];
+  const hasFusion = r.fusion && r.fusion !== "PASTE_a360_SHARE_LINK";
+  const files = r.files || {};
+  const hosted = FILE_ORDER.filter(k => files[k]);
+  if (hasFusion) parts.push(`<a class="r" href="${r.fusion}" target="_blank" rel="noopener">OPEN IN FUSION</a>`);
+  for (const k of hosted) {
+    const url = files[k].includes("?") ? files[k] : files[k] + "?download";
+    parts.push(`<a class="dl-file" href="${url}" download>⬇ ${k.toUpperCase()}</a>`);
+  }
+  if (!hosted.length && !hasFusion && r.formats) {
+    parts.push(`<span class="dl-pending">Files coming soon</span>`);
+  } else if (!hosted.length && hasFusion && r.formats) {
+    parts.push(...r.formats.map(f => `<a href="${r.fusion}" target="_blank" rel="noopener">${f}</a>`));
+  }
+  return parts.join("");
+}
+
 function card(r) {
   let thumb = "";
   if (r.youtube) {
@@ -68,10 +90,7 @@ function card(r) {
   const meta = r.youtube
     ? `<div class="maker">${topicLabel(r.sub)}</div>`
     : `<div class="maker">${r.maker}</div>`;
-  const links = r.youtube
-    ? `<a class="r" href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener">▶ WATCH</a>`
-    : `<a class="r" href="${r.fusion}" target="_blank" rel="noopener">OPEN IN FUSION</a>` +
-      r.formats.map(f => `<a href="${r.fusion}" target="_blank" rel="noopener">${f}</a>`).join("");
+  const links = fileLinks(r);
   return `<div class="pc">
     <div class="head"><span><b>${r.id}</b> / ${catLabel(r.cat)}</span><span>${r.youtube ? "YOUTUBE" : "FUSION 360"}</span></div>
     ${thumb}
