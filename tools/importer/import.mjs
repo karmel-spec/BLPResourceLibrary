@@ -28,7 +28,7 @@ const ROOT = path.resolve(DIR, "..", ".."); // repo root (where thumbs/ + data.j
 const BASE = "https://developer.api.autodesk.com";
 const PORT = 8080;
 const REDIRECT = `http://localhost:${PORT}/api/auth/callback`;
-const SCOPE = "data:read";
+const SCOPE = "data:read data:write data:create"; // data:write/create needed for Model Derivative jobs
 
 const TOKEN_FILE = path.join(DIR, "token.json");
 const MANIFEST_FILE = path.join(DIR, "manifest.json");
@@ -49,6 +49,7 @@ function loadEnv() {
 }
 const ENV = loadEnv();
 const CLIENT_ID = ENV.APS_CLIENT_ID;
+const CLIENT_SECRET = ENV.APS_CLIENT_SECRET || ""; // Traditional Web App: unlocks Model Derivative
 // For the optional `files` step (self-hosted downloads): Supabase Storage.
 const SUPABASE_URL = (ENV.SUPABASE_URL || "").replace(/\/$/, "");
 const SUPABASE_SERVICE_KEY = ENV.SUPABASE_SERVICE_KEY || "";
@@ -94,13 +95,17 @@ async function login() {
     });
   });
 
+  const body = {
+    grant_type: "authorization_code", code,
+    code_verifier: verifier, redirect_uri: REDIRECT,
+  };
+  const headers = { "Content-Type": "application/x-www-form-urlencoded" };
+  // Traditional Web App: authenticate via Basic header (client_id must NOT also
+  // be in the body). PKCE-only app: put client_id in the body instead.
+  if (CLIENT_SECRET) headers.Authorization = "Basic " + Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
+  else body.client_id = CLIENT_ID;
   const tokenRes = await fetch(`${BASE}/authentication/v2/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "authorization_code", code, client_id: CLIENT_ID,
-      code_verifier: verifier, redirect_uri: REDIRECT,
-    }),
+    method: "POST", headers, body: new URLSearchParams(body),
   });
   const tok = await tokenRes.json();
   if (!tok.access_token) die("Token exchange failed: " + JSON.stringify(tok));
@@ -192,7 +197,8 @@ async function thumbs() {
   let n = 0, skipped = 0;
   for (const it of items) {
     if (!it.derivativeUrn) { skipped++; continue; }
-    const urn = b64url(Buffer.from(it.derivativeUrn));
+    // derivativeUrn from Data Management is already base64url-encoded
+    const urn = it.derivativeUrn.startsWith("urn:") ? b64url(Buffer.from(it.derivativeUrn)) : it.derivativeUrn;
     it.slug = it.slug || slugify(it.name);
     const dest = path.join(THUMBS_DIR, `${it.slug}.jpg`);
     try {
