@@ -10,7 +10,7 @@ function topicLabel(key) {
   return (TOPICS.find(t => t.key === key) || {}).label || "";
 }
 function catLabel(key) {
-  const map = { parts: "PART", fixtures: "FIXTURE", player: "PLAYER", cabinet: "CABINET", video: "VIDEO" };
+  const map = { parts: "PART", fixtures: "FIXTURE", player: "PLAYER", cabinet: "CABINET", research: "RESEARCH", video: "VIDEO" };
   return map[key] || "ITEM";
 }
 

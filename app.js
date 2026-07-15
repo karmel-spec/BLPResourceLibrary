@@ -39,7 +39,7 @@ function matches(r) {
 }
 
 function catLabel(key) {
-  const map = { parts: "PART", fixtures: "FIXTURE", player: "PLAYER", cabinet: "CABINET", video: "VIDEO" };
+  const map = { parts: "PART", fixtures: "FIXTURE", player: "PLAYER", cabinet: "CABINET", research: "RESEARCH", video: "VIDEO" };
   return map[key] || "ITEM";
 }
 function topicLabel(key) {
@@ -111,8 +111,8 @@ function attr(s) { return String(s).replace(/"/g, "&quot;"); }
 
 // Card catalog panel — one row per category, No. ranges like a card drawer
 const CC_RANGES = {
-  parts: "NO. 100–199", fixtures: "NO. 200–299", player: "NO. 300–399",
-  cabinet: "NO. 400–499", video: "NO. V001+",
+  parts: "NO. 100 / 1000+", fixtures: "NO. 200 / 2000+", player: "NO. 300 / 3000+",
+  cabinet: "NO. 400 / 4000+", research: "NO. 5000+", video: "NO. V001+",
 };
 function renderCardCatalog() {
   document.getElementById("cardcat").innerHTML = CATEGORIES.filter(c => c.key !== "all").map(c => `
