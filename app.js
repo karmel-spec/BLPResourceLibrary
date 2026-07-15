@@ -78,6 +78,33 @@ function card(r) {
   </div>`;
 }
 
+// Card catalog panel — one row per category, No. ranges like a card drawer
+const CC_RANGES = {
+  parts: "NO. 100–199", fixtures: "NO. 200–299", player: "NO. 300–399",
+  cabinet: "NO. 400–499", video: "NO. V001+",
+};
+function renderCardCatalog() {
+  document.getElementById("cardcat").innerHTML = CATEGORIES.filter(c => c.key !== "all").map(c => `
+    <div class="cc-row" data-cat="${c.key}">
+      <span class="cc-name">${c.label.replace("VIDEO", "TRAINING VIDEOS")}</span>
+      <span class="cc-no">${CC_RANGES[c.key] || ""}</span>
+      <span class="cc-count">${count(c.key)}</span>
+    </div>`).join("");
+}
+document.getElementById("cardcat").addEventListener("click", e => {
+  const row = e.target.closest(".cc-row");
+  if (!row) return;
+  activeCat = row.dataset.cat;
+  activeTopic = "all";
+  render();
+  document.getElementById("library").scrollIntoView({ behavior: "smooth" });
+});
+
+function renderAcquisitions() {
+  const items = NEW_ACQUISITIONS.map(id => RESOURCES.find(r => r.id === id)).filter(Boolean);
+  document.getElementById("acquisitions").innerHTML = items.map(card).join("");
+}
+
 function renderGrid() {
   const list = RESOURCES.filter(matches);
   grid.innerHTML = list.length
@@ -114,4 +141,6 @@ document.getElementById("stat-files").textContent =
 document.getElementById("stat-videos").textContent =
   `VIDEOS: ${RESOURCES.filter(r => r.youtube).length}`;
 
+renderCardCatalog();
+renderAcquisitions();
 render();

@@ -48,9 +48,14 @@ header {
   font-weight: 600; letter-spacing: 2.5px; color: #fff;
 }
 .mark .t2 { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #8fa1ad; letter-spacing: 1px; }
-header nav { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; }
+header nav { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; display: flex; align-items: center; }
 header nav a { color: #9db0bc; text-decoration: none; margin-left: 28px; }
 header nav a:hover, header nav a.on { color: #fff; border-bottom: 2px solid var(--red); padding-bottom: 6px; }
+header nav a.cta {
+  background: var(--red); color: #fff; padding: 9px 18px; border: none;
+  font-weight: 600; letter-spacing: 1px;
+}
+header nav a.cta:hover { background: #7c1717; border-bottom: none; padding-bottom: 9px; }
 
 /* ---- Hero title block ---- */
 .hero { max-width: 1240px; margin: 34px auto 0; padding: 0 24px; display: flex; gap: 36px; align-items: stretch; }
@@ -91,6 +96,31 @@ h1 span { color: var(--red); }
   font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-faint);
   border-top: 1px solid var(--line); padding-top: 9px;
 }
+
+/* ---- Card catalog panel ---- */
+.cardcat { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 6px 0; }
+.cc-row {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  padding: 11px 2px; border-bottom: 1px dotted var(--line); cursor: pointer;
+}
+.cc-row:last-child { border-bottom: none; }
+.cc-name { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+.cc-row:hover .cc-name { color: var(--red); }
+.cc-no { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--ink-faint); letter-spacing: 1px; margin-left: auto; }
+.cc-count { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--red); font-weight: 600; min-width: 34px; text-align: right; }
+
+/* ---- Shelf headings (New Acquisitions / Full Catalog) ---- */
+.shelf-head {
+  max-width: 1240px; margin: 34px auto 0; padding: 0 24px;
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.shelf-head h2 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 27px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  border-bottom: 3px solid var(--red); padding-bottom: 4px;
+}
+.shelf-head a { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--red); text-decoration: none; }
+.shelf-head.full { margin-top: 40px; margin-bottom: 4px; }
 
 /* ---- Category tabs ---- */
 .filetabs { max-width: 1240px; margin: 26px auto 0; padding: 0 24px; display: flex; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }

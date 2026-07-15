@@ -17,7 +17,7 @@ function catLabel(key) {
 if (!c) {
   profile.innerHTML = `<div class="prof-wrap"><div class="prof-block"><p class="mono">UNKNOWN CONTRIBUTOR ID: ${cid}</p></div></div>`;
 } else {
-  document.title = `${c.name} — BLP Resource Library`;
+  document.title = `${c.name} — Piano Technology Library`;
   const files = mine.filter(r => !r.youtube).length;
   const vids = mine.filter(r => r.youtube).length;
   profile.innerHTML = `

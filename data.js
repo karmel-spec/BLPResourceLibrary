@@ -306,6 +306,10 @@ const TOPICS = [
   { key: "cnc",         label: "CNC & 3D PRINTING" },
 ];
 
+// Newest additions, shown in the "New Acquisitions" shelf on the home page.
+// Keep this to the 3-4 most recently added resource IDs.
+const NEW_ACQUISITIONS = ["BLP-106", "BLP-201", "BLP-V005", "BLP-302"];
+
 // Contributor registry — every shared resource credits its technician.
 // To add a contributor: add an entry here, then reference their key
 // in a resource's `by` field.

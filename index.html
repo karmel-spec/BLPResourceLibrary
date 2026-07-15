@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BLP Resource Library — Free CAD Files &amp; Training for Piano Technicians</title>
+<title>Piano Technology Library — Free CAD Files &amp; Training for Piano Technicians</title>
 <meta name="description" content="A free library of Fusion 360 models, shop jigs, and restoration training videos for piano technicians worldwide. Founded by Brigham Larson Pianos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
@@ -15,10 +15,9 @@
 <header>
   <div class="header-inner">
     <a class="mark" href="#">
-      <div class="box">BL</div>
       <div>
-        <div class="t1">RESOURCE LIBRARY</div>
-        <div class="t2">FOUNDED BY BRIGHAM LARSON PIANOS — FREE &amp; OPEN</div>
+        <div class="t1">PIANO TECHNOLOGY LIBRARY</div>
+        <div class="t2">FREE &amp; OPEN FOR PIANO TECHNICIANS EVERYWHERE</div>
       </div>
     </a>
     <nav>
@@ -28,7 +27,7 @@
       <a href="#library" data-cat="video">VIDEO</a>
       <a href="contributor.html?id=brigham-larson">CONTRIBUTORS</a>
       <a href="#about">ABOUT</a>
-      <a href="#contribute">CONTRIBUTE</a>
+      <a class="cta" href="#contribute">CONTRIBUTE</a>
     </nav>
   </div>
 </header>
@@ -41,30 +40,26 @@
     <p>An open engineering library for piano technicians — Fusion 360 models of obsolete parts, shop-built jigs and fixtures, and training video from a working restoration shop. Download, reproduce, and keep the craft alive.</p>
     <div class="search">
       <div class="pre">&gt;_</div>
-      <input id="q" type="text" placeholder="search: flange, jig, damper, Knabe, player…" autocomplete="off">
-      <button id="qbtn">RUN</button>
+      <input id="q" type="text" placeholder="Look up a part, maker, or technique…" autocomplete="off">
+      <button id="qbtn">CONSULT</button>
     </div>
   </div>
   <div class="tb-r">
-    <div class="lab"><span>PART: DOUBLE HAMMER FLANGE — <b>BLP-106</b></span><span>QTY/PIANO: 88</span></div>
-    <svg viewBox="0 0 480 196" preserveAspectRatio="xMidYMid meet">
-      <g stroke="#1d2226" stroke-width="1.5" fill="none">
-        <path d="M70 150 L70 70 Q70 52 88 52 L200 52 Q218 52 218 70 L218 96 L330 96"/>
-        <circle cx="352" cy="96" r="24"/><circle cx="352" cy="96" r="9"/>
-        <path d="M70 150 L218 150 L218 122"/>
-      </g>
-      <g stroke="#9e2020" stroke-width="1" fill="none">
-        <path d="M70 168 L218 168 M70 162 L70 174 M218 162 L218 174"/>
-        <path d="M400 96 L440 96 M394 70 L394 122"/>
-        <circle cx="352" cy="96" r="34" stroke-dasharray="4 4"/>
-      </g>
-      <text x="128" y="184" font-family="IBM Plex Mono, monospace" font-size="10" fill="#9e2020">38.10 mm</text>
-      <text x="404" y="88" font-family="IBM Plex Mono, monospace" font-size="10" fill="#9e2020">Ø9.5</text>
-    </svg>
+    <div class="lab"><span>CARD CATALOG — <b>INDEX OF HOLDINGS</b></span><span id="cat-updated">REV B</span></div>
+    <div class="cardcat" id="cardcat"></div>
     <div class="specs"><span id="stat-files">FILES: —</span><span id="stat-videos">VIDEOS: —</span><span>PROCESS: CNC + PRINT</span></div>
   </div>
 </div>
 
+<div class="shelf-head">
+  <h2>New Acquisitions</h2>
+  <a href="#library">View the full catalog →</a>
+</div>
+<div class="grid" id="acquisitions"></div>
+
+<div class="shelf-head full">
+  <h2>The Full Catalog</h2>
+</div>
 <div class="filetabs" id="library"></div>
 <div class="subtabs" id="subtabs"></div>
 <div class="grid" id="grid"></div>
@@ -86,7 +81,7 @@
 
 <footer>
   <div class="footer-inner">
-    <span>BLP RESOURCE LIBRARY — A FREE COMMUNITY RESOURCE FOR PIANO TECHNICIANS</span>
+    <span>PIANO TECHNOLOGY LIBRARY — A FREE COMMUNITY RESOURCE FOR PIANO TECHNICIANS</span>
     <span>FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a> · UTAH, USA</span>
   </div>
 </footer>
