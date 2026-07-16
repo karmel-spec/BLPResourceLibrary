@@ -48,7 +48,7 @@ header {
   font-weight: 600; letter-spacing: 2.5px; color: #fff;
 }
 .mark .t2 { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #8fa1ad; letter-spacing: 1px; }
-header nav { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; display: flex; align-items: center; }
+header nav { flex-basis: 100%; justify-content: flex-end; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; display: flex; align-items: center; }
 header nav a { color: #9db0bc; text-decoration: none; margin-left: 28px; }
 header nav a:hover, header nav a.on { color: #fff; border-bottom: 2px solid var(--red); padding-bottom: 6px; }
 header nav a.cta {
@@ -246,7 +246,8 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 /* ==========================================================================
    Auth widget in header
    ========================================================================== */
-.auth-slot { display: inline-flex; align-items: center; gap: 10px; margin-left: 8px; }
+/* Signed-in widget lives on the title row, right-aligned */
+.auth-slot { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; }
 .au-btn {
   font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 1px;
   border: 1px solid #4a555c; background: transparent; color: #dfe4e8; padding: 7px 12px;
@@ -426,7 +427,8 @@ body { padding-bottom: 40px; }
   .ideas { grid-template-columns: 1fr 1fr; }
   .prof-grid { grid-template-columns: 1fr; }
   .header-inner { flex-wrap: wrap; gap: 12px 20px; }
-  .navtoggle { display: block; }
+  .navtoggle { display: block; margin-left: 0; }
+  .au-name { display: none; }
   header nav {
     display: none; flex-direction: column; align-items: flex-start; gap: 4px;
     width: 100%; margin-left: 0; padding-top: 8px; border-top: 1px solid #2a323a;
@@ -434,7 +436,7 @@ body { padding-bottom: 40px; }
   header nav.open { display: flex; }
   header nav a { margin-left: 0; padding: 8px 0; width: 100%; }
   header nav a.cta { padding: 10px 16px; margin-top: 4px; }
-  .auth-slot { margin-left: 0; margin-top: 8px; flex-wrap: wrap; }
+  .auth-slot { margin-left: auto; }
 }
 @media (max-width: 640px) {
   .page-head h1 { font-size: 34px; }
