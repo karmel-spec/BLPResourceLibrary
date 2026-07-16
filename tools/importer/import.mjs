@@ -128,6 +128,28 @@ function accessToken() {
   return tok.access_token;
 }
 
+// Long runs: transparently refresh the access token when it nears expiry.
+async function freshToken() {
+  const tok = JSON.parse(fs.readFileSync(TOKEN_FILE, "utf8"));
+  const ageMin = (Date.now() - tok.obtained_at) / 60000;
+  if (ageMin < (tok.expires_in / 60) - 5) return tok.access_token;
+  if (!tok.refresh_token) die("Token expired and no refresh token. Run:  node import.mjs login");
+  const headers = { "Content-Type": "application/x-www-form-urlencoded" };
+  if (CLIENT_SECRET) headers.Authorization = "Basic " + Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
+  const body = { grant_type: "refresh_token", refresh_token: tok.refresh_token };
+  if (!CLIENT_SECRET) body.client_id = CLIENT_ID;
+  const r = await fetch(`${BASE}/authentication/v2/token`, {
+    method: "POST", headers, body: new URLSearchParams(body),
+  });
+  const next = await r.json();
+  if (!next.access_token) die("Token refresh failed: " + JSON.stringify(next).slice(0, 200));
+  next.obtained_at = Date.now();
+  if (!next.refresh_token) next.refresh_token = tok.refresh_token;
+  fs.writeFileSync(TOKEN_FILE, JSON.stringify(next, null, 2));
+  log("  (access token refreshed)");
+  return next.access_token;
+}
+
 // ---- APS GET helper --------------------------------------------------------
 async function api(url, token) {
   const r = await fetch(url.startsWith("http") ? url : BASE + url, {
@@ -221,15 +243,25 @@ async function thumbs() {
 // buttons (no dependency on Autodesk share links).
 // ============================================================================
 async function files() {
-  const token = accessToken();
+  accessToken(); // fail fast if not signed in at all
   if (!fs.existsSync(MANIFEST_FILE)) die("Run `list` first.");
   if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY)
     die("Set SUPABASE_URL and SUPABASE_SERVICE_KEY in .env (service_role key). See APS_IMPORT.md 'Hosting the files'.");
   const items = JSON.parse(fs.readFileSync(MANIFEST_FILE, "utf8"));
 
-  let done = 0, failed = 0;
+  // Only host files that were curated into the public library.
+  const keptFile = path.join(DIR, "import-output", "kept-slugs.json");
+  let keep = null;
+  if (fs.existsSync(keptFile)) {
+    keep = new Set(JSON.parse(fs.readFileSync(keptFile, "utf8")).map((s) => s.replace(/\.(jpg|png)$/, "")));
+    log(`Restricting to ${keep.size} curated models (import-output/kept-slugs.json).`);
+  }
+
+  let done = 0, failed = 0, skippedCurate = 0;
   for (const it of items) {
     it.slug = it.slug || slugify(it.name);
+    if (keep && !keep.has(it.slug)) { skippedCurate++; continue; }
+    const token = await freshToken();
     it.files = it.files || {};
     try {
       // 1) Source F3D straight from Data Management storage.
@@ -239,7 +271,8 @@ async function files() {
       }
       // 2) Translate to neutral CAD formats and host those too.
       if (it.derivativeUrn) {
-        const urn = b64url(Buffer.from(it.derivativeUrn));
+        // derivativeUrn from Data Management is already base64url-encoded
+        const urn = it.derivativeUrn.startsWith("urn:") ? b64url(Buffer.from(it.derivativeUrn)) : it.derivativeUrn;
         await translate(token, urn, EXPORT_FORMATS);
         for (const fmt of EXPORT_FORMATS) {
           if (it.files[fmt]) continue;
@@ -255,7 +288,7 @@ async function files() {
     }
     fs.writeFileSync(MANIFEST_FILE, JSON.stringify(items, null, 2)); // checkpoint each file
   }
-  log(`\n✓ Hosted files for ${done} model(s); ${failed} had issues (see log). URLs saved to manifest.`);
+  log(`\n✓ Hosted files for ${done} model(s); ${failed} had issues (see log); ${skippedCurate} not in curated set. URLs saved to manifest.`);
 }
 
 // Download the source F3D via the OSS signed-download for the version's storage.
@@ -316,14 +349,18 @@ async function fetchDerivative(token, urn, fmt) {
 }
 
 // Upload a buffer to Supabase Storage (public bucket) and return its public URL.
+// New-style sb_secret_ keys are NOT JWTs: send them via the apikey header only.
+// Legacy service_role keys (JWTs, "eyJ...") go in the Authorization header.
+function supabaseHeaders(extra = {}) {
+  const h = { apikey: SUPABASE_SERVICE_KEY, ...extra };
+  if (SUPABASE_SERVICE_KEY.startsWith("eyJ")) h.Authorization = `Bearer ${SUPABASE_SERVICE_KEY}`;
+  return h;
+}
 async function uploadModel(filename, buf, contentType) {
   const p = `${STORAGE_BUCKET}/${filename}`;
   const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${p}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
-      "Content-Type": contentType, "x-upsert": "true",
-    },
+    headers: supabaseHeaders({ "Content-Type": contentType, "x-upsert": "true" }),
     body: buf,
   });
   if (!r.ok && r.status !== 200) throw new Error(`Supabase upload ${r.status}: ${await r.text()}`);
