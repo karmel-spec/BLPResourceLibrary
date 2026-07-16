@@ -353,6 +353,25 @@ body { padding-bottom: 40px; }
 .redbar a { color: #fff; text-decoration: underline; }
 .redbar a:hover { color: #ffd3d3; }
 
+/* ---- Auth gate (sign-in on first action) ---- */
+.authgate .ag-modal { max-width: 420px; text-align: center; padding: 30px 34px 26px; }
+.ag-head {
+  font-size: 10px; letter-spacing: 3px; color: var(--red);
+  border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 14px;
+}
+.authgate h3 {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.ag-copy { font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); margin: 10px 0 18px; }
+.au-btn.block { display: block; width: 100%; padding: 12px; font-size: 13px; }
+.ag-later {
+  background: none; border: none; margin-top: 12px; cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-faint);
+  text-decoration: underline;
+}
+.ag-later:hover { color: var(--ink); }
+
 /* ==========================================================================
    About / Contribute content pages
    ========================================================================== */
