@@ -346,9 +346,9 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 body { padding-bottom: 40px; }
 .redbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 150; height: 40px;
-  background: var(--red); color: #fff; display: flex; align-items: center; justify-content: center;
+  background: var(--red); color: #fff; line-height: 40px;
   font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 1px; text-align: center;
-  padding: 0 14px;
+  padding: 0 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .redbar a { color: #fff; text-decoration: underline; }
 .redbar a:hover { color: #ffd3d3; }
