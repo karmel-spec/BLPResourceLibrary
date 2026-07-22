@@ -95,6 +95,9 @@ function fileLinks(r) {
   } else if (!hosted.length && hasFusion && r.formats) {
     parts.push(...r.formats.map(f => `<a href="${r.fusion}" target="_blank" rel="noopener">${f}</a>`));
   }
+  if (files.stl) {
+    parts.unshift(`<button class="preview-btn" data-stl="${files.stl}" data-title="${String(r.title).replace(/"/g, "&quot;")}" data-id="${r.id}">◉ PREVIEW 3D</button>`);
+  }
   return parts.join("");
 }
 

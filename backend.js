@@ -14,6 +14,17 @@
     return window.__supabase || null;
   }
 
+  // auth.js creates window.__supabase after an async CDN import, so at
+  // page-parse time it usually doesn't exist yet. Wait for it (bounded).
+  async function waitForClient(ms = 8000) {
+    const start = Date.now();
+    while (!client()) {
+      if (typeof SUPABASE_READY === "undefined" || !SUPABASE_READY || Date.now() - start > ms) return null;
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    return client();
+  }
+
   function profileFromRow(row) {
     return {
       id: row.id,
@@ -58,7 +69,7 @@
     load() {
       if (loaded) return loaded;
       loaded = (async () => {
-        const sb = client();
+        const sb = await waitForClient();
         if (!sb) return window.Community;
         try {
           const [{ data: contribs }, { data: subs }] = await Promise.all([

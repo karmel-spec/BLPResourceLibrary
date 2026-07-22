@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contributor — Piano Technology Library</title>
+<title>Contributors — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20260722120038">
@@ -41,19 +41,12 @@
   </div>
 </div>
 
-<div id="profile"></div>
-<div class="grid" id="grid"></div>
-
-<div class="modal-backdrop" id="commentModal" hidden>
-  <div class="modal">
-    <button class="modal-close" id="modalClose" aria-label="Close">×</button>
-    <div class="modal-head">
-      <div class="mono mh-id" id="cmId"></div>
-      <h3 id="cmTitle"></h3>
-    </div>
-    <div class="cm-list" id="cmList"></div>
-    <div class="cm-form" id="cmForm"></div>
+<div class="page">
+  <div class="page-head">
+    <div class="dwg">CONTRIBUTOR REGISTRY · THE TECHNICIANS BEHIND THE LIBRARY</div>
+    <h1>The <span>Contributors</span></h1>
   </div>
+  <div class="people-grid" id="peopleGrid"></div>
 </div>
 
 <footer>
@@ -71,16 +64,41 @@
 <script src="data.js?v=20260722120038"></script>
 <script src="auth.js?v=20260722120038"></script>
 <script src="backend.js?v=20260722120038"></script>
-<script src="viewer.js?v=20260722120038"></script>
-<script src="comments.js?v=20260722120038"></script>
-<script src="contributor.js?v=20260722120038"></script>
 <script>
-  // Mobile nav toggle (shared behavior)
-  const nt = document.getElementById("navToggle"), nv = document.getElementById("nav");
-  if (nt) nt.addEventListener("click", () => {
-    const open = nv.classList.toggle("open");
-    nt.setAttribute("aria-expanded", open ? "true" : "false");
-  });
+(async function () {
+  if (window.Community) {
+    await window.Community.load();
+    if (window.Community.resources.length) RESOURCES.push(...window.Community.resources);
+  }
+  const grid = document.getElementById("peopleGrid");
+  const entries = Object.entries(CONTRIBUTORS);
+  grid.innerHTML = entries.map(([slug, c]) => {
+    const shared = RESOURCES.filter(r => r.by === slug).length;
+    const credLine = [c.credential, c.location].filter(Boolean).join(" · ");
+    const site = c.website || (c.links || []).find(l => /website/i.test(l.label))?.url || "";
+    const photo = c.photo
+      ? `<img src="${c.photo}" alt="${c.name}" loading="lazy" onerror="this.parentNode.classList.add('nophoto')">`
+      : "";
+    return `<a class="person-card${c.photo ? "" : " nophoto"}" href="contributor.html?id=${slug}">
+      <div class="person-photo">${photo}<span class="person-initial">${(c.name || "?").trim()[0].toUpperCase()}</span></div>
+      <div class="person-body">
+        <h3>${c.name}</h3>
+        ${credLine ? `<div class="person-cred">${credLine}</div>` : ""}
+        ${site ? `<div class="person-site" title="${site}">${site.replace(/^(https?:\/\/)?(www\.)?/, "").replace(/\/$/, "")}</div>` : ""}
+        <div class="person-meta">
+          <span class="person-count">${shared ? `${shared} ITEM${shared === 1 ? "" : "S"} SHARED` : "NEW CONTRIBUTOR"}</span>
+          <span class="person-view">VIEW FILE →</span>
+        </div>
+      </div>
+    </a>`;
+  }).join("");
+})();
+
+const nt = document.getElementById("navToggle"), nv = document.getElementById("nav");
+if (nt) nt.addEventListener("click", () => {
+  const open = nv.classList.toggle("open");
+  nt.setAttribute("aria-expanded", open ? "true" : "false");
+});
 </script>
 </body>
 </html>
