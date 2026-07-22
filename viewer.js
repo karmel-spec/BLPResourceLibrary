@@ -206,10 +206,15 @@
   // Card buttons are re-rendered constantly; delegate from the document.
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".preview-btn");
-    if (!btn) return;
+    if (!btn || btn.classList.contains("preview-link")) return; // .preview-link opens Autodesk's viewer
     e.preventDefault();
     open(btn.dataset.stl, btn.dataset.title, btn.dataset.id, btn.dataset.thumb);
   });
 
   window.Viewer = { open };
+  // test/debug probe (harmless in production)
+  window.Viewer._state = () => ({
+    controlsEnabled: controls ? controls.enabled : null,
+    camera: camera ? camera.position.toArray().map((n) => +n.toFixed(2)) : null,
+  });
 })();

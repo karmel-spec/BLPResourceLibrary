@@ -87,6 +87,9 @@ function fileLinks(r) {
   }
   if (files.stl) {
     parts.unshift(`<button class="preview-btn" data-stl="${files.stl}" data-title="${String(r.title).replace(/"/g, "&quot;")}" data-id="${r.id}" data-thumb="${r.thumb || ""}">◉ PREVIEW 3D</button>`);
+  } else if (hasFusion) {
+    // No hosted STL — Autodesk's share page has its own online 3D viewer.
+    parts.unshift(`<a class="preview-btn preview-link" href="${r.fusion}" target="_blank" rel="noopener">◉ PREVIEW 3D</a>`);
   }
   return parts.join("");
 }
