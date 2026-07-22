@@ -71,6 +71,12 @@ function fmtDate(iso) {
 }
 
 const FILE_ORDER = ["step", "stl", "f3d", "3mf", "dxf", "pdf", "zip"];
+function primaryHref(r) {
+  if (r.fusion && r.fusion !== "PASTE_a360_SHARE_LINK") return r.fusion;
+  const files = r.files || {};
+  for (const k of FILE_ORDER) if (files[k]) return files[k];
+  return null;
+}
 function fileLinks(r) {
   if (r.youtube) {
     return `<a class="r" href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener">▶ WATCH</a>`;
@@ -97,7 +103,11 @@ function card(r) {
   if (r.youtube) {
     thumb = `<div class="thumb"><a href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener"><img loading="lazy" src="https://img.youtube.com/vi/${r.youtube}/hqdefault.jpg" alt="${r.title}"><span class="dur">${r.dur || ""}</span></a></div>`;
   } else if (r.thumb) {
-    thumb = `<div class="thumb cad"><a href="${r.fusion}" target="_blank" rel="noopener"><img loading="lazy" src="${r.thumb}" alt="${r.title}"><span class="badge3d">3D MODEL</span></a></div>`;
+    const href = primaryHref(r);
+    const img = `<img loading="lazy" src="${r.thumb}" alt="${r.title}"><span class="badge3d">3D MODEL</span>`;
+    thumb = href
+      ? `<div class="thumb cad"><a href="${href}" target="_blank" rel="noopener">${img}</a></div>`
+      : `<div class="thumb cad">${img}</div>`;
   }
   const meta = r.youtube
     ? `<div class="maker">${topicLabel(r.sub)}</div>`
