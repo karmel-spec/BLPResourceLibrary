@@ -178,12 +178,31 @@
         files, thumb_url, youtube: youtube || null,
       });
       if (error) throw error;
+      notifyLibrarians(title);
       setStatus("upStatus", "Submitted ✓ The librarians will review it shortly.");
       ["upTitle", "upMaker", "upDesc", "upYoutube"].forEach((id) => $(id).value = "");
       fileInput.value = ""; $("upThumb").value = "";
       loadMine();
     } catch (err) { setStatus("upStatus", "Upload failed: " + err.message, true); }
   };
+
+  // Email the librarians about a new submission (fire-and-forget — a lost
+  // notification must never break the submit flow; the queue is the backstop).
+  function notifyLibrarians(title) {
+    if (!CONFIG.NOTIFY_EMAIL) return;
+    const me = window.Auth.user() || {};
+    fetch(`https://formsubmit.co/ajax/${CONFIG.NOTIFY_EMAIL}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        _subject: "Piano Technology Library — new submission to review",
+        _template: "table",
+        Title: title,
+        Contributor: me.name || me.email || "Unknown",
+        "Review it here": "https://pianotechnologylibrary.com/profile.html",
+      }),
+    }).catch(() => {});
+  }
 
   function normalizeYoutube(url) {
     if (!url) return null;

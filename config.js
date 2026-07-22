@@ -17,6 +17,9 @@ const CONFIG = {
   // queue + backend controls.
   ADMIN_EMAILS: ["brigham@brighamlarsonpianos.com", "karmel@brighamlarsonpianos.com", "brighamlarson@gmail.com", "karmel.larson@gmail.com"],
   ADMIN_EMAIL: "brigham@brighamlarsonpianos.com", // legacy alias
+
+  // Where "new submission — please review" alert emails go (via formsubmit.co).
+  NOTIFY_EMAIL: "info@brighamlarsonpianos.com",
 };
 
 // True once real Supabase credentials have been filled in above.

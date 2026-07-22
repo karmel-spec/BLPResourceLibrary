@@ -174,8 +174,10 @@ if (!location.hash) {
   window.Auth.onChange((u) => { const el = document.getElementById("authGate"); if (u && el) el.hidden = true; });
 
   // Intercept first actions while signed out (capture phase beats other handlers).
+  // 3D previews (in-site viewer and Fusion viewer links) are free — no gate.
   document.addEventListener("click", (e) => {
     if (window.Auth.user()) return;
+    if (e.target.closest(".preview-btn")) return;
     const dl = e.target.closest(".dl a");
     const fb = e.target.closest(".feedback-btn");
     if (!dl && !fb) return;

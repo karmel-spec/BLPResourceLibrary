@@ -180,6 +180,10 @@ h1 span { color: var(--red); }
   display: inline-flex; align-items: center; gap: 4px;
 }
 .pc .dl a.dl-file:hover { background: var(--ink); color: #fff; }
+/* Fusion-viewer preview links must look like the (button) preview buttons:
+   ink background, white text at all times — not only on hover. */
+.pc .dl a.preview-btn { background: var(--ink); border: 1.5px solid var(--ink); color: #fff; }
+.pc .dl a.preview-btn:hover { background: var(--red); border-color: var(--red); color: #fff; }
 .pc .dl .dl-pending { color: var(--ink-faint); font-style: italic; padding: 5px 0; }
 .pc p.spacer { margin: 0; flex: 1; }
 .empty { grid-column: 1 / -1; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-faint); padding: 40px 0; text-align: center; }
