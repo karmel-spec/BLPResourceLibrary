@@ -376,6 +376,12 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
   padding: 14px 18px 10px; border-bottom: 1.5px solid var(--ink);
 }
 .viewer-head h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 700; text-transform: uppercase; line-height: 1.05; }
+.viewer-close {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 1px;
+  background: var(--red); color: #fff; border: 1.5px solid var(--red);
+  padding: 8px 14px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+.viewer-close:hover { background: #7c1717; border-color: #7c1717; }
 .viewer-id { font-size: 10.5px; color: var(--red); letter-spacing: 1px; }
 .viewer-stage { position: relative; height: min(60vh, 560px); background: #f4f2ec; }
 .viewer-stage canvas { display: block; width: 100% !important; height: 100% !important; }
@@ -388,6 +394,20 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
   padding: 8px 18px; border-top: 1.5px solid var(--ink);
   font-size: 10px; color: var(--ink-soft); letter-spacing: .5px; text-align: center;
 }
+.viewer-load {
+  position: absolute; inset: 0; z-index: 2; background: #f4f2ec;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+}
+.vw-thumbwrap { position: relative; width: min(46%, 300px); aspect-ratio: 4/3; }
+.vw-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.vw-gray { filter: grayscale(100%) opacity(.45); }
+.vw-color { clip-path: inset(100% 0 0 0); transition: clip-path .25s ease-out; }
+.vw-bar {
+  width: min(60%, 360px); height: 10px; border: 1.5px solid var(--ink);
+  background: #fff; overflow: hidden;
+}
+.vw-fill { height: 100%; width: 0%; background: var(--red); transition: width .25s ease-out; }
+.vw-pct { font-size: 12px; letter-spacing: 1px; color: var(--ink-soft); }
 
 /* ---- Contributors directory ---- */
 .people-grid {
