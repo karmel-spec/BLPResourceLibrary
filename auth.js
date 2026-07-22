@@ -3,6 +3,14 @@
 // Exposes window.Auth: { user(), isAdmin(), signIn(), signOut(), onChange(fn),
 //                         ready (bool: true = real Supabase, false = demo) }
 // ============================================================================
+
+// Every page opens at the top. Late-rendering catalogs shift the layout and
+// the browser's scroll restoration lands visitors mid-page; only deep links
+// to a #section (e.g. index.html#library) are allowed to scroll.
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+if (!location.hash) {
+  window.addEventListener("pageshow", () => window.scrollTo(0, 0));
+}
 (function () {
   let supabase = null;
   let currentUser = null;              // { name, email, avatar }
