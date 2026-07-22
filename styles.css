@@ -2,7 +2,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --container: min(100% , 1920px);
+  --container: 100%; /* full-bleed: the catalog uses every pixel of the screen */
   --red: #9e2020;
   --ink: #1d2226;
   --ink-soft: #47525a;
