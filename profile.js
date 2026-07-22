@@ -13,12 +13,24 @@
 
   let profile = null; // my contributor row
 
+  // Neutral head-and-shoulders placeholder (no photo yet / broken photo URL)
+  const PHOTO_PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+    '<rect width="100" height="100" fill="#e2e8ea"/>' +
+    '<circle cx="50" cy="38" r="16" fill="#aab7bd"/>' +
+    '<path d="M20 88 Q50 58 80 88" fill="#aab7bd"/></svg>');
+
   function sb() { return window.__supabase; }
   function uid() { return window.Auth.user()?.id; }
 
   function slugify(name) {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
   }
+
+  // Broken/missing photo URLs fall back to the neutral placeholder.
+  $("pfPhoto").addEventListener("error", () => {
+    if (!$("pfPhoto").src.startsWith("data:")) $("pfPhoto").src = PHOTO_PLACEHOLDER;
+  });
 
   // ---- boot -----------------------------------------------------------------
   window.Auth.onChange(async (user) => {
@@ -53,7 +65,9 @@
     $("pfBio").value = profile?.bio || "";
     $("pfLinks").value = (profile?.links || [])
       .map((l) => `${l.label} ${l.url}`).join("\n");
-    $("pfPhoto").src = profile?.photo_url || user.avatar || "";
+    const photo = photoUrl || profile?.photo_url || user.avatar || "";
+    $("pfPhoto").src = photo || PHOTO_PLACEHOLDER;
+    $("pfPhotoBtnText").textContent = photo ? "CHANGE PHOTO" : "ADD PHOTO";
     if (profile) {
       $("pfView").hidden = false;
       $("pfView").href = "contributor.html?id=" + profile.slug;
@@ -72,7 +86,7 @@
       if (error) throw error;
       photoUrl = sb().storage.from("contributions").getPublicUrl(path).data.publicUrl;
       $("pfPhoto").src = photoUrl;
-      $("pfPhoto").style.visibility = "visible";
+      $("pfPhotoBtnText").textContent = "CHANGE PHOTO";
       setStatus("pfStatus", "Photo ready — click SAVE PROFILE.");
     } catch (err) { setStatus("pfStatus", "Photo upload failed: " + err.message, true); }
   });
