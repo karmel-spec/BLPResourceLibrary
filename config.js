@@ -8,8 +8,8 @@
 // ============================================================================
 
 const CONFIG = {
-  SUPABASE_URL: "https://tlkbvniiaqwxmgewhxvx.supabase.co",
-  SUPABASE_ANON_KEY: "sb_publishable_CMh8EW_QljOHFzWRhGvGcg_OV2zmNtV",
+  SUPABASE_URL: "https://fjyydcsxauwogtgswfss.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_LRy1fJSiABmkGHxYd8MqMQ__0q37nEn",
 
   // Library owners/moderators. Signing in with one of these emails unlocks
   // admin features: the private "trusted by" stat and the submission queue.
