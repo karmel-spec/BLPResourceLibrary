@@ -84,3 +84,29 @@ Visitors can now sign in with Google, and comments are shared across everyone.
 - Flipping it writes `stats_public` to `site_settings`, so once the numbers are
   worth showing you can reveal them to everyone with one click. Edit the numbers
   in `index.html` (`#trustStat`).
+
+---
+
+## Community backend (contributor profiles + uploads)
+
+Run `tools/schema-community.sql` in the SQL editor once. It creates:
+- `contributors` — one profile row per signed-in user (RLS: read all, edit own)
+- `submissions` — community uploads with `pending/approved/rejected` status
+  (RLS: everyone reads approved; owners read/edit their own while pending;
+  admins in the policy list moderate)
+- `contributions` storage bucket — public reads; signed-in users can write
+  only inside their own `{user-id}/…` folder
+
+Admins/moderators: brigham@brighamlarsonpianos.com and karmel.larson@gmail.com
+(update both `config.js` ADMIN_EMAILS and the SQL policies to change this).
+
+## ⚠️ Account map (learned the hard way)
+
+- The Supabase account that owns THIS project is GitHub-linked to the
+  **karmel-spec** GitHub account (email karmel.larson@gmail.com). Sign in to
+  the dashboard with **Continue with GitHub** as karmel-spec.
+- Signing in with GitHub as karmel@brighamlarsonpianos.com opens a DIFFERENT
+  Supabase account (Karmel Pro / Momni / Abby White orgs) that cannot see
+  this project.
+- Email+password sign-in does not exist for this account; password resets
+  bounce ("account is linked to GitHub").
