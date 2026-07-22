@@ -23,7 +23,7 @@ create policy "insert own" on comments for insert with check (auth.uid() = user_
 drop policy if exists "delete own or admin" on comments;
 create policy "delete own or admin" on comments for delete
   using (auth.uid() = user_id
-         or auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel.larson@gmail.com'));
+         or auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
 
 -- ---- Site settings (e.g. the private "trusted by" stat toggle) --------------
 create table if not exists site_settings ( key text primary key, value text );
@@ -32,8 +32,8 @@ drop policy if exists "read settings" on site_settings;
 create policy "read settings" on site_settings for select using (true);
 drop policy if exists "owner writes settings" on site_settings;
 create policy "owner writes settings" on site_settings for all
-  using (auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel.larson@gmail.com'))
-  with check (auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel.larson@gmail.com'));
+  using (auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'))
+  with check (auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
 
 -- ---- Contributor profiles ----------------------------------------------------
 create table if not exists contributors (
@@ -77,7 +77,7 @@ drop policy if exists "read approved or own or admin" on submissions;
 create policy "read approved or own or admin" on submissions for select
   using (status = 'approved'
          or contributor_id = auth.uid()
-         or auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel.larson@gmail.com'));
+         or auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
 drop policy if exists "insert own" on submissions;
 create policy "insert own" on submissions for insert
   with check (contributor_id = auth.uid());
@@ -86,11 +86,11 @@ create policy "update own pending" on submissions for update
   using (contributor_id = auth.uid() and status = 'pending');
 drop policy if exists "admin updates" on submissions;
 create policy "admin updates" on submissions for update
-  using (auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel.larson@gmail.com'));
+  using (auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
 drop policy if exists "delete own or admin" on submissions;
 create policy "delete own or admin" on submissions for delete
   using (contributor_id = auth.uid()
-         or auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel.larson@gmail.com'));
+         or auth.jwt() ->> 'email' in ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
 
 -- ---- Storage: hosted model files + community uploads --------------------------
 insert into storage.buckets (id, name, public) values ('models','models', true)

@@ -255,12 +255,29 @@ if (nlForm) {
     if (!error) {
       msg.textContent = "✓ YOU'RE ON THE LIST — SEE YOU NEXT BULLETIN";
       document.getElementById("nlEmail").value = "";
-    } else if (String(error.code) === "23505") {
-      msg.textContent = "✓ ALREADY ON THE LIST — YOU'RE ALL SET";
-    } else {
-      msg.textContent = "HMM, THAT DIDN'T TAKE — TRY AGAIN IN A MOMENT";
-      console.error("newsletter signup:", error);
+      return;
     }
+    if (String(error.code) === "23505") {
+      msg.textContent = "✓ ALREADY ON THE LIST — YOU'RE ALL SET";
+      return;
+    }
+    // DB path unavailable — fall back to emailing the signup to the librarians
+    // so no address is ever lost.
+    console.error("newsletter signup:", error);
+    try {
+      const r = await fetch(`https://formsubmit.co/ajax/${CONFIG.NOTIFY_EMAIL}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ _subject: "Piano Technology Library — newsletter signup", Email: email }),
+      });
+      const j = await r.json();
+      if (j.success === "true") {
+        msg.textContent = "✓ YOU'RE ON THE LIST — SEE YOU NEXT BULLETIN";
+        document.getElementById("nlEmail").value = "";
+        return;
+      }
+    } catch (e) { /* fall through */ }
+    msg.textContent = "HMM, THAT DIDN'T TAKE — TRY AGAIN IN A MOMENT";
   });
 }
 
