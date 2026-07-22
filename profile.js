@@ -9,9 +9,10 @@
 
   const CAT_LABEL = { parts: "PART", fixtures: "FIXTURE", player: "PLAYER",
     cabinet: "CABINET", research: "RESEARCH", video: "VIDEO" };
-  const STATUS_LABEL = { pending: "IN REVIEW", approved: "PUBLISHED", rejected: "NOT PUBLISHED" };
+  const STATUS_LABEL = { pending: "IN REVIEW", approved: "PUBLISHED", rejected: "NOT PUBLISHED", archived: "ARCHIVED" };
 
   let profile = null; // my contributor row
+  let newVersionOf = null; // submission being replaced when uploading a new version
 
   // Neutral head-and-shoulders placeholder (no photo yet / broken photo URL)
   const PHOTO_PLACEHOLDER = "data:image/svg+xml;utf8," + encodeURIComponent(
@@ -51,7 +52,7 @@
     $("dashUpload").hidden = !profile;      // profile first, then uploads
     $("dashMine").hidden = !profile;
     if (profile) loadMine();
-    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); }
+    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); }
   });
   $("dashSignIn").onclick = () => window.Auth.signIn();
 
@@ -169,19 +170,26 @@
         thumb_url = sb().storage.from("contributions").getPublicUrl(path).data.publicUrl;
       }
       setStatus("upStatus", "Submitting…");
-      const { error } = await sb().from("submissions").insert({
+      const row = {
         contributor_id: uid(),
         title,
         category: $("upCat").value,
         maker: $("upMaker").value.trim() || null,
         description: $("upDesc").value.trim() || null,
         files, thumb_url, youtube: youtube || null,
-      });
+      };
+      if (newVersionOf) {
+        row.version = (newVersionOf.version || 1) + 1;
+        row.replaces = newVersionOf.id;
+        row.replace_action = document.querySelector('input[name="verAction"]:checked').value;
+      }
+      const { error } = await sb().from("submissions").insert(row);
       if (error) throw error;
-      notifyLibrarians(title);
+      notifyLibrarians(title + (row.version ? ` (v${row.version})` : ""));
       setStatus("upStatus", "Submitted ✓ The librarians will review it shortly.");
       ["upTitle", "upMaker", "upDesc", "upYoutube"].forEach((id) => $(id).value = "");
       fileInput.value = ""; $("upThumb").value = "";
+      cancelNewVersion();
       loadMine();
     } catch (err) { setStatus("upStatus", "Upload failed: " + err.message, true); }
   };
@@ -217,7 +225,35 @@
     $("mineList").innerHTML = (data || []).length
       ? data.map((s) => subRow(s, false)).join("")
       : `<div class="cm-empty">Nothing shared yet — your first contribution goes right above. 🔧</div>`;
+    $("mineList").querySelectorAll("[data-newver]").forEach((b) =>
+      b.onclick = () => startNewVersion((data || []).find((s) => s.id === b.dataset.newver)));
   }
+
+  // ---- version control -----------------------------------------------------------
+  // Pre-fills the upload form as "version N+1 of X" and asks what to do with
+  // the old version (keep / archive / delete) once the new one is approved.
+  function startNewVersion(s) {
+    if (!s) return;
+    newVersionOf = s;
+    $("verLabel").textContent = "V" + ((s.version || 1) + 1);
+    $("verTitle").textContent = s.title;
+    $("verBanner").hidden = false;
+    $("upTitle").value = s.title;
+    $("upCat").value = s.category || "parts";
+    $("upMaker").value = s.maker || "";
+    $("upDesc").value = s.description || "";
+    document.querySelector('input[name="verAction"][value="keep"]').checked = true;
+    $("dashUpload").scrollIntoView({ behavior: "smooth" });
+    setStatus("upStatus", "");
+  }
+  function cancelNewVersion() {
+    newVersionOf = null;
+    $("verBanner").hidden = true;
+  }
+  $("verCancel").onclick = () => {
+    cancelNewVersion();
+    ["upTitle", "upMaker", "upDesc"].forEach((id) => $(id).value = "");
+  };
 
   // ---- admin queue ---------------------------------------------------------------
   async function loadQueue() {
@@ -235,7 +271,19 @@
   async function review(id, status) {
     const { error } = await sb().from("submissions")
       .update({ status, reviewed_at: new Date().toISOString() }).eq("id", id);
-    if (error) alert("Update failed: " + error.message);
+    if (error) { alert("Update failed: " + error.message); return; }
+    // Approving a new version applies the contributor's choice to the old one.
+    if (status === "approved") {
+      const { data: sub } = await sb().from("submissions")
+        .select("replaces, replace_action").eq("id", id).single();
+      if (sub && sub.replaces) {
+        if (sub.replace_action === "archive") {
+          await sb().from("submissions").update({ status: "archived" }).eq("id", sub.replaces);
+        } else if (sub.replace_action === "delete") {
+          await sb().from("submissions").delete().eq("id", sub.replaces);
+        } // "keep": both versions stay live
+      }
+    }
     loadQueue(); loadMine();
   }
 
@@ -243,15 +291,22 @@
     const links = Object.entries(s.files || {})
       .map(([k, v]) => `<a href="${esc(v)}" target="_blank" rel="noopener">${esc(k.toUpperCase())}</a>`).join(" ");
     const who = admin && s.contributors ? `<span class="sub-who">by ${esc(s.contributors.name)}</span>` : "";
+    const ver = (s.version || 1) > 1 ? `<span class="ver-chip">V${s.version}</span> ` : "";
+    const verNote = admin && s.replaces
+      ? `<span class="mono sub-vernote">⬆ new version — old copy will be ${esc(s.replace_action || "kept")}${s.replace_action === "keep" ? "t" : "d"}</span>`
+      : "";
     const actions = admin
       ? `<span class="sub-actions"><button class="au-btn primary" data-approve="${s.id}">APPROVE</button>
          <button class="au-btn" data-reject="${s.id}">REJECT</button></span>`
-      : `<span class="sub-status s-${esc(s.status)}">${STATUS_LABEL[s.status] || esc(s.status)}</span>`;
+      : `<span class="sub-actions"><span class="sub-status s-${esc(s.status)}">${STATUS_LABEL[s.status] || esc(s.status)}</span>${
+          s.status === "approved" ? `<button class="au-btn" data-newver="${s.id}">⬆ UPLOAD NEW VERSION</button>` : ""
+        }</span>`;
     return `<div class="sub-row">
       ${s.thumb_url ? `<img class="sub-thumb" src="${esc(s.thumb_url)}" alt="">` : `<span class="sub-thumb none"></span>`}
       <div class="sub-main">
-        <b>${esc(s.title)}</b>
+        <b>${ver}${esc(s.title)}</b>
         <span class="mono sub-meta">${CAT_LABEL[s.category] || "ITEM"}${s.maker ? " · " + esc(s.maker) : ""}${who ? " · " : ""}${who}</span>
+        ${verNote}
         <span class="sub-links">${links}${s.youtube ? ` <a href="https://www.youtube.com/watch?v=${esc(s.youtube)}" target="_blank" rel="noopener">VIDEO</a>` : ""}</span>
       </div>
       ${actions}
@@ -262,5 +317,88 @@
     const el = $(id);
     el.textContent = msg;
     el.classList.toggle("err", !!isErr);
+  }
+
+  // ---- Newsletter prep (admins only) ---------------------------------------------
+  // Builds a plain-text digest of everything added in the chosen period, can email
+  // a review copy to the library inbox, and opens the admin's own mail client with
+  // every member BCC'd — the admin approves and presses Send themselves.
+  let nlSubscribers = [];
+  function initNewsletter() {
+    if (!window.Auth.isAdmin()) return;
+    $("dashNews").hidden = false;
+
+    $("nlBuild").onclick = async () => {
+      setStatus("nlStatus", "Building…");
+      const days = parseInt($("nlPeriod").value, 10);
+      const cutoff = new Date(Date.now() - days * 864e5);
+      const cutoffIso = cutoff.toISOString().slice(0, 10);
+
+      // Founding-catalog items (data.js) + approved community submissions.
+      const items = RESOURCES.filter((r) => r.dateAdded && r.dateAdded >= cutoffIso)
+        .map((r) => ({ title: r.title, by: (CONTRIBUTORS[r.by] || {}).name || "the library", cat: r.cat, youtube: !!r.youtube }));
+      const { data: subs } = await sb().from("submissions")
+        .select("title, category, youtube, version, contributors(name)")
+        .eq("status", "approved").gte("created_at", cutoff.toISOString());
+      (subs || []).forEach((s) => items.push({
+        title: (s.version || 1) > 1 ? `${s.title} (v${s.version})` : s.title,
+        by: s.contributors ? s.contributors.name : "a community member",
+        cat: s.category, youtube: !!s.youtube,
+      }));
+
+      const { data: people } = await sb().from("newsletter_subscribers").select("email");
+      nlSubscribers = (people || []).map((p) => p.email);
+
+      const period = days === 7 ? "week" : "month";
+      const lines = items.map((i) => `  • ${i.title} — shared by ${i.by}${i.youtube ? " (video)" : ""}`);
+      $("nlText").value =
+`Hello from the Piano Technology Library!
+
+${items.length ? `Here's what your fellow technicians added to the library this ${period}:` : `It's been a quiet ${period} at the library — but the full catalog is always open:`}
+
+${lines.join("\n") || "  (no new items this period)"}
+
+Browse everything, download files, and preview parts in 3D — free, always:
+https://pianotechnologylibrary.com
+
+Have something of your own to share? Every contribution is credited and linked to you:
+https://pianotechnologylibrary.com/profile
+
+Keep the craft alive,
+Brigham Larson Pianos & the Piano Technology Library
+(You're receiving this because you're a member of pianotechnologylibrary.com — reply to this email to unsubscribe.)`;
+
+      $("nlEditWrap").hidden = false;
+      $("nlAlert").hidden = false;
+      $("nlSend").hidden = false;
+      $("nlMeta").hidden = false;
+      $("nlMeta").textContent = `${items.length} NEW ITEM${items.length === 1 ? "" : "S"} · ${nlSubscribers.length} MEMBER${nlSubscribers.length === 1 ? "" : "S"} ON THE LIST`;
+      setStatus("nlStatus", "Draft ready — edit below, then send.");
+    };
+
+    $("nlAlert").onclick = async () => {
+      setStatus("nlStatus", "Emailing the draft…");
+      try {
+        const r = await fetch(`https://formsubmit.co/ajax/${CONFIG.NOTIFY_EMAIL}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({
+            _subject: "Piano Technology Library — newsletter draft ready to send",
+            Draft: $("nlText").value,
+            Members: String(nlSubscribers.length),
+          }),
+        });
+        const j = await r.json();
+        setStatus("nlStatus", j.success === "true" ? `Draft emailed to ${CONFIG.NOTIFY_EMAIL} ✓` : "Email failed — is the form activated?", j.success !== "true");
+      } catch (e) { setStatus("nlStatus", "Email failed: " + e.message, true); }
+    };
+
+    $("nlSend").onclick = (e) => {
+      if (!nlSubscribers.length) { e.preventDefault(); return setStatus("nlStatus", "No members on the list yet.", true); }
+      const subject = "New at the Piano Technology Library";
+      $("nlSend").href = `mailto:${CONFIG.NOTIFY_EMAIL}?bcc=${encodeURIComponent(nlSubscribers.join(","))}` +
+        `&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent($("nlText").value)}`;
+      setStatus("nlStatus", "Opening your mail app — members are BCC'd; review and press Send.");
+    };
   }
 })();

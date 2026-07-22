@@ -6,7 +6,7 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260722142107">
+<link rel="stylesheet" href="styles.css?v=20260722151510">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='4' y='4' width='92' height='92' rx='14' fill='%2314181b' stroke='%239e2020' stroke-width='6'/><rect x='16' y='22' width='68' height='58' rx='2' fill='%23f4f2ec'/><line x1='29.6' y1='22' x2='29.6' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='43.2' y1='22' x2='43.2' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='56.8' y1='22' x2='56.8' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='70.4' y1='22' x2='70.4' y2='80' stroke='%2314181b' stroke-width='2'/><rect x='25' y='22' width='9' height='34' fill='%2314181b'/><rect x='38.7' y='22' width='9' height='34' fill='%2314181b'/><rect x='65.9' y='22' width='9' height='34' fill='%2314181b'/></svg>">
 </head>
 <body>
@@ -106,6 +106,15 @@
     <p class="dash-note">CAD models, jigs, drawings, research, or a training video.
     Submissions are reviewed by the library before they appear publicly — you'll
     see the status below.</p>
+    <!-- Version-update banner: shown when replacing one of your published items -->
+    <div class="newver-banner" id="verBanner" hidden>
+      <div class="nv-head">⬆ NEW VERSION — this upload will be <b id="verLabel">V2</b> of “<span id="verTitle"></span>”</div>
+      <div class="nv-q">What should happen to the old version once this one is approved?</div>
+      <label><input type="radio" name="verAction" value="keep" checked> <b>Keep it</b> — both versions stay available for download</label>
+      <label><input type="radio" name="verAction" value="archive"> <b>Archive it</b> — removed from the catalog, kept on file</label>
+      <label><input type="radio" name="verAction" value="delete"> <b>Delete it</b> — the old version is removed permanently</label>
+      <button type="button" class="nv-cancel" id="verCancel">✕ Cancel — this is a brand-new item, not an update</button>
+    </div>
     <div class="dash-fields">
       <label>Title<input id="upTitle" type="text" placeholder="e.g. Baldwin SD-10 Damper Guide Rail Jig"></label>
       <div class="dash-row">
@@ -143,6 +152,30 @@
     to the catalog immediately.</p>
     <div id="adminList" class="sub-list"></div>
   </div>
+
+  <!-- Newsletter prep (admins only) -->
+  <div id="dashNews" class="dash-block admin" hidden>
+    <h2>Newsletter prep <span class="mono admin-tag">LIBRARIAN</span></h2>
+    <p class="dash-note">Build a digest of everything added to the library recently,
+    email a review copy to the library inbox, then send it to every member from
+    your own email — you stay the sender, nothing goes out without you.</p>
+    <div class="dash-actions nl-actions">
+      <label class="nl-period">Covering
+        <select id="nlPeriod">
+          <option value="7">the last week</option>
+          <option value="30" selected>the last month</option>
+        </select>
+      </label>
+      <button class="au-btn" id="nlBuild">BUILD DIGEST</button>
+      <button class="au-btn" id="nlAlert" hidden>EMAIL ME THE DRAFT</button>
+      <a class="au-btn primary" id="nlSend" hidden>OPEN IN MAIL — SEND TO MEMBERS</a>
+      <span id="nlStatus" class="dash-status"></span>
+    </div>
+    <div class="nl-meta mono" id="nlMeta" hidden></div>
+    <label id="nlEditWrap" hidden>Digest (edit freely before sending)
+      <textarea id="nlText" rows="16"></textarea>
+    </label>
+  </div>
 </div>
 
 <footer>
@@ -156,11 +189,11 @@
   A FREE COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260722142107"></script>
-<script src="data.js?v=20260722142107"></script>
-<script src="auth.js?v=20260722142107"></script>
-<script src="backend.js?v=20260722142107"></script>
-<script src="profile.js?v=20260722142107"></script>
+<script src="config.js?v=20260722151510"></script>
+<script src="data.js?v=20260722151510"></script>
+<script src="auth.js?v=20260722151510"></script>
+<script src="backend.js?v=20260722151510"></script>
+<script src="profile.js?v=20260722151510"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");

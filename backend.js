@@ -46,7 +46,7 @@
     const r = {
       id: "PTL-C" + row.id,
       cat,
-      title: row.title,
+      title: (row.version || 1) > 1 ? `${row.title} (v${row.version})` : row.title,
       maker: row.maker || "Community Contribution",
       desc: row.description || "",
       formats: Object.keys(files).map((k) => k.toUpperCase()),

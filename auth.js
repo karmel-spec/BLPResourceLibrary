@@ -49,10 +49,22 @@ if (!location.hash) {
         email: u.email,
         avatar: u.user_metadata.avatar_url || u.user_metadata.picture || "",
       };
+      enrollNewsletter();
     } else {
       currentUser = null;
     }
     notify();
+  }
+
+  // Every signed-in member is a newsletter subscriber (admin-readable only;
+  // fire-and-forget — enrollment must never affect sign-in).
+  let enrolled = false;
+  function enrollNewsletter() {
+    if (enrolled || !supabase || !currentUser) return;
+    enrolled = true;
+    supabase.from("newsletter_subscribers")
+      .upsert({ user_id: currentUser.id, email: currentUser.email, name: currentUser.name })
+      .then(() => {}, () => {});
   }
 
   // ---- Demo mode (no backend) ----------------------------------------------

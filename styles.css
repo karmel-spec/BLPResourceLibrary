@@ -476,6 +476,38 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 .dash-actions .au-btn { color: var(--ink); border-color: var(--ink); }
 .dash-actions .au-btn.primary, .dash-block .au-btn.primary { color: #fff; border-color: var(--red); }
 .dash-status { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #1c7c33; }
+
+/* ---- Version control ---- */
+.newver-banner {
+  border: 1.5px dashed var(--red); background: #fdf6f4; padding: 16px 18px; margin-bottom: 18px;
+  font-size: 13.5px;
+}
+.newver-banner .nv-head { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .5px; color: var(--red); }
+.newver-banner .nv-q { margin: 10px 0 6px; font-weight: 600; }
+.newver-banner label { display: block; padding: 3px 0; cursor: pointer; }
+.newver-banner input[type=radio] { margin-right: 6px; }
+.nv-cancel {
+  margin-top: 10px; background: none; border: none; cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); text-decoration: underline;
+}
+.nv-cancel:hover { color: var(--ink); }
+.ver-chip {
+  display: inline-block; background: var(--red); color: #fff; font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; letter-spacing: .5px; padding: 1px 6px; vertical-align: 1px;
+}
+.sub-vernote { display: block; font-size: 10.5px; color: var(--red); letter-spacing: .3px; margin-top: 2px; }
+.sub-status.s-archived { color: var(--ink-faint); }
+
+/* ---- Newsletter prep ---- */
+.nl-actions { flex-wrap: wrap; }
+.nl-period { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; display: flex; align-items: center; gap: 8px; }
+.nl-period select { font-family: inherit; font-size: 12px; padding: 6px 8px; border: 1.5px solid var(--ink); background: #fff; }
+.nl-meta { margin: 12px 0 4px; font-size: 11px; letter-spacing: .5px; color: var(--ink-soft); }
+#nlEditWrap { display: block; margin-top: 10px; font-size: 13px; }
+#nlText {
+  width: 100%; margin-top: 6px; border: 1.5px solid var(--ink); background: #fff;
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.55; padding: 12px;
+}
 .dash-status.err { color: var(--red); }
 .dash-block.admin { border-color: var(--red); box-shadow: 4px 4px 0 rgba(158,32,32,.15); }
 .admin-tag { font-size: 9px; letter-spacing: 2px; background: var(--red); color: #fff; padding: 3px 8px; vertical-align: middle; }
