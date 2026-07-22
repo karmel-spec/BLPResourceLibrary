@@ -169,6 +169,19 @@ function renderGrid() {
   grid.innerHTML = list.length
     ? list.map(card).join("")
     : `<div class="empty">NO MATCHES IN THE CATALOG — TRY A DIFFERENT SEARCH TERM</div>`;
+  // While searching, New Acquisitions (unfiltered) would sit above the results
+  // and make the search look dead — hide it and headline the result count.
+  const searching = !!query;
+  const acqHead = document.getElementById("acqHead");
+  const acq = document.getElementById("acquisitions");
+  if (acqHead) acqHead.style.display = searching ? "none" : "";
+  if (acq) acq.style.display = searching ? "none" : "";
+  const catHead = document.getElementById("catHead");
+  if (catHead) {
+    catHead.textContent = searching
+      ? `${list.length} Result${list.length === 1 ? "" : "s"} for “${query}”`
+      : "The Full Catalog";
+  }
   if (window.Comments) window.Comments.refreshBadges();
 }
 
@@ -189,8 +202,14 @@ subtabs.addEventListener("click", e => {
 });
 
 const q = document.getElementById("q");
+function runSearch() {
+  query = q.value.trim();
+  renderGrid();
+  if (query) document.getElementById("library").scrollIntoView({ behavior: "smooth" });
+}
 q.addEventListener("input", () => { query = q.value.trim(); renderGrid(); });
-document.getElementById("qbtn").addEventListener("click", () => { query = q.value.trim(); renderGrid(); });
+q.addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });
+document.getElementById("qbtn").addEventListener("click", runSearch);
 
 document.querySelectorAll("header nav a[data-cat]").forEach(a =>
   a.addEventListener("click", () => { activeCat = a.dataset.cat; activeTopic = "all"; render(); })
