@@ -2,6 +2,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
+  --container: min(100% , 1920px);
   --red: #9e2020;
   --ink: #1d2226;
   --ink-soft: #47525a;
@@ -33,7 +34,7 @@ header {
   position: sticky; top: 0; z-index: 50;
 }
 .header-inner {
-  max-width: 1240px; margin: 0 auto; padding: 14px 24px;
+  max-width: var(--container); margin: 0 auto; padding: 14px 24px;
   display: flex; align-items: center; gap: 30px; flex-wrap: wrap;
 }
 .mark { display: flex; align-items: center; gap: 14px; text-decoration: none; }
@@ -58,7 +59,7 @@ header nav a.cta {
 header nav a.cta:hover { background: #7c1717; border-bottom: none; padding-bottom: 9px; }
 
 /* ---- Hero title block ---- */
-.hero { max-width: 1240px; margin: 34px auto 0; padding: 0 24px; display: flex; gap: 36px; align-items: stretch; }
+.hero { max-width: var(--container); margin: 34px auto 0; padding: 0 24px; display: flex; gap: 36px; align-items: stretch; }
 .tb-l { flex: 1.3; border: 1.5px solid var(--ink); background: rgba(255,255,255,.88); padding: 30px 34px; position: relative; }
 .corner { position: absolute; width: 10px; height: 10px; border: 1.5px solid var(--red); }
 .c1 { top: -5px; left: -5px; border-right: none; border-bottom: none; }
@@ -111,7 +112,7 @@ h1 span { color: var(--red); }
 
 /* ---- Shelf headings (New Acquisitions / Full Catalog) ---- */
 .shelf-head {
-  max-width: 1240px; margin: 34px auto 0; padding: 0 24px;
+  max-width: var(--container); margin: 34px auto 0; padding: 0 24px;
   display: flex; justify-content: space-between; align-items: baseline;
 }
 .shelf-head h2 {
@@ -123,7 +124,7 @@ h1 span { color: var(--red); }
 .shelf-head.full { margin-top: 40px; margin-bottom: 4px; }
 
 /* ---- Category tabs ---- */
-.filetabs { max-width: 1240px; margin: 26px auto 0; padding: 0 24px; display: flex; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.filetabs { max-width: var(--container); margin: 26px auto 0; padding: 0 24px; display: flex; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
 .ft {
   border: 1.5px solid var(--ink); border-right: none; padding: 10px 20px;
   background: #fff; color: var(--ink-soft); cursor: pointer; user-select: none;
@@ -134,14 +135,14 @@ h1 span { color: var(--red); }
 .ft.on .n { color: #ff9d9d; }
 
 /* ---- Video topic sub-tabs ---- */
-.subtabs { max-width: 1240px; margin: 12px auto 0; padding: 0 24px; display: none; flex-wrap: wrap; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; }
+.subtabs { max-width: var(--container); margin: 12px auto 0; padding: 0 24px; display: none; flex-wrap: wrap; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; }
 .st { border: 1px solid var(--ink-faint); padding: 6px 12px; background: rgba(255,255,255,.8); color: var(--ink-soft); cursor: pointer; user-select: none; }
 .st b { color: var(--red); margin-left: 4px; }
 .st.on { background: var(--red); border-color: var(--red); color: #fff; }
 .st.on b { color: #ffd3d3; }
 
 /* ---- Resource grid ---- */
-.grid { max-width: 1240px; margin: 22px auto 10px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 22px; }
+.grid { max-width: var(--container); margin: 22px auto 10px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 22px; }
 .pc { border: 1.5px solid var(--ink); background: #fff; display: flex; flex-direction: column; }
 .pc .head {
   display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace;
@@ -193,7 +194,7 @@ h1 span { color: var(--red); }
 .byline:hover b { color: var(--red); }
 
 /* ---- Contributor profile page ---- */
-.prof-wrap { max-width: 1240px; margin: 34px auto 0; padding: 0 24px; }
+.prof-wrap { max-width: var(--container); margin: 34px auto 0; padding: 0 24px; }
 .prof-block { border: 1.5px solid var(--ink); background: rgba(255,255,255,.9); padding: 30px 34px; position: relative; }
 .prof-grid { display: grid; grid-template-columns: 190px 1fr 150px; gap: 30px; align-items: start; }
 .prof-photo { position: relative; }
@@ -216,7 +217,7 @@ h1 span { color: var(--red); }
 @media (max-width: 900px) { .prof-grid { grid-template-columns: 1fr; } }
 
 /* ---- Mission ---- */
-.mission { max-width: 1240px; margin: 40px auto; padding: 0 24px; display: flex; gap: 36px; }
+.mission { max-width: var(--container); margin: 40px auto; padding: 0 24px; display: flex; gap: 36px; }
 .mission .block { flex: 1; border: 1.5px solid var(--ink); background: rgba(255,255,255,.88); padding: 26px 30px; }
 .mission h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 .mission h2 span { color: var(--red); }
@@ -236,7 +237,7 @@ h1 span { color: var(--red); }
 /* ---- Footer ---- */
 footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px; }
 .footer-inner {
-  max-width: 1240px; margin: 0 auto; padding: 22px 24px;
+  max-width: var(--container); margin: 0 auto; padding: 22px 24px;
   display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
   font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8fa1ad;
 }
