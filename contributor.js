@@ -1,8 +1,8 @@
 // Contributor profile page — renders a technician's title block + their shared resources.
+// Founding contributors come from data.js; community contributors from Supabase.
 const params = new URLSearchParams(location.search);
 const cid = params.get("id") || "brigham-larson";
-const c = CONTRIBUTORS[cid];
-const mine = RESOURCES.filter(r => r.by === cid);
+let mine = [];
 
 const profile = document.getElementById("profile");
 
@@ -14,27 +14,38 @@ function catLabel(key) {
   return map[key] || "ITEM";
 }
 
-if (!c) {
-  profile.innerHTML = `<div class="prof-wrap"><div class="prof-block"><p class="mono">UNKNOWN CONTRIBUTOR ID: ${cid}</p></div></div>`;
-} else {
+async function renderProfilePage() {
+  if (window.Community) {
+    await window.Community.load();
+    if (window.Community.resources.length) RESOURCES.push(...window.Community.resources);
+  }
+  const c = CONTRIBUTORS[cid];
+  mine = RESOURCES.filter(r => r.by === cid);
+
+  if (!c) {
+    profile.innerHTML = `<div class="prof-wrap"><div class="prof-block"><p class="mono">UNKNOWN CONTRIBUTOR ID: ${cid}</p></div></div>`;
+    return;
+  }
   document.title = `${c.name} — Piano Technology Library`;
   const files = mine.filter(r => !r.youtube).length;
   const vids = mine.filter(r => r.youtube).length;
+  const credLine = [c.credential, c.location].filter(Boolean).join(" · ");
+  const dwgLine = ["CONTRIBUTOR FILE", cid.toUpperCase(), (c.location || "").toUpperCase()].filter(Boolean).join(" · ");
   profile.innerHTML = `
   <div class="prof-wrap">
     <div class="prof-block">
       <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
       <div class="prof-grid">
         <div class="prof-photo">
-          <img src="${c.photo}" alt="${c.name}">
+          <img src="${c.photo}" alt="${c.name}" onerror="this.style.visibility='hidden'">
         </div>
         <div class="prof-info">
-          <div class="dwg">CONTRIBUTOR FILE · ${cid.toUpperCase()} · ${c.location.toUpperCase()}</div>
+          <div class="dwg">${dwgLine}</div>
           <h1>${c.name}</h1>
-          <div class="prof-cred">${c.credential} · ${c.location}</div>
-          <p class="prof-bio">${c.bio}</p>
+          ${credLine ? `<div class="prof-cred">${credLine}</div>` : ""}
+          ${c.bio ? `<p class="prof-bio">${c.bio}</p>` : ""}
           <div class="prof-links">
-            ${c.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join("")}
+            ${(c.links || []).map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join("")}
           </div>
         </div>
         <div class="prof-stats">
@@ -49,6 +60,7 @@ if (!c) {
       <a href="index.html#library">← Back to the full catalog</a>
     </div>
   </div>`;
+  document.getElementById("grid").innerHTML = mine.map(card).join("");
 }
 
 function fmtDate(iso) {
@@ -58,7 +70,7 @@ function fmtDate(iso) {
   return `${mon} ${d}, ${y}`;
 }
 
-const FILE_ORDER = ["step", "stl", "f3d", "3mf"];
+const FILE_ORDER = ["step", "stl", "f3d", "3mf", "dxf", "pdf", "zip"];
 function fileLinks(r) {
   if (r.youtube) {
     return `<a class="r" href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener">▶ WATCH</a>`;
@@ -107,5 +119,6 @@ function card(r) {
   </div>`;
 }
 
-document.getElementById("grid").innerHTML = mine.map(card).join("");
-if (window.Comments) window.Comments.refreshBadges();
+renderProfilePage().then(() => {
+  if (window.Comments) window.Comments.refreshBadges();
+});

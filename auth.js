@@ -12,8 +12,10 @@
   const notify = () => listeners.forEach((fn) => fn(currentUser));
 
   function isAdmin() {
-    return !!currentUser && currentUser.email &&
-           currentUser.email.toLowerCase() === CONFIG.ADMIN_EMAIL.toLowerCase();
+    if (!currentUser || !currentUser.email) return false;
+    const mail = currentUser.email.toLowerCase();
+    const admins = CONFIG.ADMIN_EMAILS || [CONFIG.ADMIN_EMAIL];
+    return admins.some((a) => a.toLowerCase() === mail);
   }
 
   // ---- Real Supabase mode ---------------------------------------------------
@@ -106,8 +108,9 @@
     if (!slot) return;
     if (user) {
       slot.innerHTML =
-        `<span class="au-user"><img src="${user.avatar || ""}" alt="" onerror="this.style.display='none'">` +
-        `<span class="au-name">${user.name}</span></span>` +
+        `<a class="au-user" href="profile.html" title="My contributor dashboard">` +
+        `<img src="${user.avatar || ""}" alt="" onerror="this.style.display='none'">` +
+        `<span class="au-name">${user.name}</span></a>` +
         `<button class="au-btn" id="authSignOut">SIGN OUT</button>`;
       document.getElementById("authSignOut").onclick = () => window.Auth.signOut();
     } else {

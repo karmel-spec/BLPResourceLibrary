@@ -11,9 +11,10 @@ const CONFIG = {
   SUPABASE_URL: "https://tlkbvniiaqwxmgewhxvx.supabase.co",
   SUPABASE_ANON_KEY: "sb_publishable_CMh8EW_QljOHFzWRhGvGcg_OV2zmNtV",
 
-  // The library owner. When signed in with this email you see admin-only
-  // features (e.g. the private "trusted by" stat and its make-public toggle).
-  ADMIN_EMAIL: "brigham@brighamlarsonpianos.com",
+  // Library owners/moderators. Signing in with one of these emails unlocks
+  // admin features: the private "trusted by" stat and the submission queue.
+  ADMIN_EMAILS: ["brigham@brighamlarsonpianos.com", "karmel.larson@gmail.com"],
+  ADMIN_EMAIL: "brigham@brighamlarsonpianos.com", // legacy alias
 };
 
 // True once real Supabase credentials have been filled in above.

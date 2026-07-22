@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Contributor Dashboard — Piano Technology Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='6' y='6' width='88' height='88' fill='%2314181b' stroke='%239e2020' stroke-width='8'/><text x='50' y='68' font-family='monospace' font-size='48' fill='white' text-anchor='middle'>BL</text></svg>">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="mark" href="index.html">
+      <div>
+        <div class="t1">PIANO TECHNOLOGY LIBRARY</div>
+        <div class="t2">FREE &amp; OPEN FOR PIANO TECHNICIANS EVERYWHERE</div>
+      </div>
+    </a>
+    <span id="authSlot" class="auth-slot"></span>
+    <button class="navtoggle" id="navToggle" aria-label="Menu" aria-expanded="false">☰</button>
+    <nav id="nav">
+      <a href="index.html">INDEX</a>
+      <a href="index.html#library">CATALOG</a>
+      <a href="about.html">ABOUT</a>
+      <a class="cta" href="contribute.html">CONTRIBUTE</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page dash">
+  <div class="page-head">
+    <div class="dwg">CONTRIBUTOR FILE · YOUR WORKBENCH AT THE LIBRARY</div>
+    <h1>My Contributor <span>Dashboard</span></h1>
+  </div>
+
+  <!-- Signed-out prompt -->
+  <div id="dashSignedOut" class="dash-block" hidden>
+    <h2>Sign in to set up your dashboard</h2>
+    <p>Your contributor profile and everything you share are stored with your
+    Google account — sign in once and your work is saved online, permanently.</p>
+    <button class="au-btn primary" id="dashSignIn">SIGN IN WITH GOOGLE</button>
+  </div>
+
+  <!-- Profile editor -->
+  <div id="dashProfile" class="dash-block" hidden>
+    <h2 id="profHeading">Your public profile</h2>
+    <p class="dash-note">This is how you'll appear on everything you share —
+    every card credits its contributor and links to your profile page.</p>
+    <div class="dash-grid">
+      <div class="dash-photo">
+        <img id="pfPhoto" src="" alt="" onerror="this.style.visibility='hidden'">
+        <label class="au-btn file-btn">CHANGE PHOTO<input type="file" id="pfPhotoFile" accept="image/*" hidden></label>
+      </div>
+      <div class="dash-fields">
+        <label>Name<input id="pfName" type="text" placeholder="Your name"></label>
+        <label>Credential <span class="opt">(optional)</span><input id="pfCred" type="text" placeholder="e.g. RPT — Registered Piano Technician"></label>
+        <label>Location <span class="opt">(optional)</span><input id="pfLoc" type="text" placeholder="City, Country"></label>
+        <label>Website <span class="opt">(optional)</span><input id="pfSite" type="url" placeholder="https://…"></label>
+        <label>Bio <span class="opt">(optional)</span><textarea id="pfBio" rows="4" placeholder="Tell other technicians who you are, what you work on, and what you love about the craft."></textarea></label>
+        <label>Links <span class="opt">(optional — one per line, e.g. YOUTUBE https://…)</span><textarea id="pfLinks" rows="3" placeholder="YOUTUBE https://youtube.com/@you&#10;INSTAGRAM https://instagram.com/you"></textarea></label>
+        <div class="dash-actions">
+          <button class="au-btn primary" id="pfSave">SAVE PROFILE</button>
+          <a id="pfView" class="au-btn" hidden>VIEW PUBLIC PROFILE</a>
+          <span id="pfStatus" class="dash-status"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload a contribution -->
+  <div id="dashUpload" class="dash-block" hidden>
+    <h2>Share something with the community</h2>
+    <p class="dash-note">CAD models, jigs, drawings, research, or a training video.
+    Submissions are reviewed by the library before they appear publicly — you'll
+    see the status below.</p>
+    <div class="dash-fields">
+      <label>Title<input id="upTitle" type="text" placeholder="e.g. Baldwin SD-10 Damper Guide Rail Jig"></label>
+      <div class="dash-row">
+        <label>Category<select id="upCat">
+          <option value="parts">Replacement Part</option>
+          <option value="fixtures">Jig / Fixture</option>
+          <option value="player">Player Piano</option>
+          <option value="cabinet">Cabinet</option>
+          <option value="research">Research</option>
+          <option value="video">Training Video</option>
+        </select></label>
+        <label>Maker / Brand <span class="opt">(optional)</span><input id="upMaker" type="text" placeholder="e.g. Baldwin"></label>
+      </div>
+      <label>Description<textarea id="upDesc" rows="3" placeholder="What is it, what problem does it solve, anything the next technician should know."></textarea></label>
+      <label>Files <span class="opt">(F3D, STEP, STL, 3MF, PDF, ZIP — up to 50MB each)</span><input id="upFiles" type="file" multiple accept=".f3d,.step,.stp,.stl,.3mf,.pdf,.zip,.dxf"></label>
+      <label>Preview image <span class="opt">(optional — a render or photo for the card)</span><input id="upThumb" type="file" accept="image/*"></label>
+      <label>YouTube link <span class="opt">(optional — for training videos)</span><input id="upYoutube" type="url" placeholder="https://youtube.com/watch?v=…"></label>
+      <div class="dash-actions">
+        <button class="au-btn primary" id="upSubmit">SUBMIT TO THE LIBRARY</button>
+        <span id="upStatus" class="dash-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- My submissions -->
+  <div id="dashMine" class="dash-block" hidden>
+    <h2>Your submissions</h2>
+    <div id="mineList" class="sub-list"></div>
+  </div>
+
+  <!-- Admin queue -->
+  <div id="dashAdmin" class="dash-block admin" hidden>
+    <h2>Review queue <span class="mono admin-tag">LIBRARIAN</span></h2>
+    <p class="dash-note">Pending community submissions. Approving publishes them
+    to the catalog immediately.</p>
+    <div id="adminList" class="sub-list"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span>A permanent, community-owned record of the craft.</span>
+    <span><a href="about.html">About this library</a> · <a href="contribute.html">Contribute</a></span>
+  </div>
+</footer>
+
+<div class="redbar">
+  A FREE COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
+</div>
+
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script src="auth.js"></script>
+<script src="backend.js"></script>
+<script src="profile.js"></script>
+<script>
+  document.getElementById("navToggle").onclick = function () {
+    const nav = document.getElementById("nav");
+    nav.classList.toggle("open");
+    this.setAttribute("aria-expanded", nav.classList.contains("open"));
+  };
+</script>
+</body>
+</html>

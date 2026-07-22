@@ -57,7 +57,7 @@ function byline(r) {
 // Download / open links for a resource card.
 // Hosted files (r.files = {f3d,step,stl,3mf}) become real download buttons;
 // "Open in Fusion" stays when there's a share link; otherwise fall back to it.
-const FILE_ORDER = ["step", "stl", "f3d", "3mf"];
+const FILE_ORDER = ["step", "stl", "f3d", "3mf", "dxf", "pdf", "zip"];
 function fileLinks(r) {
   if (r.youtube) {
     return `<a class="r" href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener">▶ WATCH</a>`;
@@ -189,6 +189,18 @@ document.getElementById("stat-videos").textContent =
 renderCardCatalog();
 renderAcquisitions();
 render();
+
+// Merge community contributions (from the shared backend) into the catalog.
+if (window.Community) {
+  window.Community.load().then(() => {
+    if (window.Community.resources.length) {
+      RESOURCES.push(...window.Community.resources);
+      renderCardCatalog();
+      renderAcquisitions();
+      render();
+    }
+  });
+}
 
 // ---- Mobile nav toggle ------------------------------------------------------
 const navToggle = document.getElementById("navToggle");
