@@ -63,7 +63,8 @@ if (!location.hash) {
     if (enrolled || !supabase || !currentUser) return;
     enrolled = true;
     supabase.from("newsletter_subscribers")
-      .upsert({ user_id: currentUser.id, email: currentUser.email, name: currentUser.name })
+      .upsert({ user_id: currentUser.id, email: currentUser.email, name: currentUser.name },
+              { onConflict: "email", ignoreDuplicates: true })
       .then(() => {}, () => {});
   }
 

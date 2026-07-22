@@ -25,9 +25,20 @@ const dataJs = fs.readFileSync(path.join(ROOT, "data.js"), "utf8");
 const urls = [...new Set([...dataJs.matchAll(new RegExp(OLD.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "/storage/v1/object/public/([^\"\\s]+)", "g"))].map((m) => m[1]))];
 console.log(`Found ${urls.length} hosted files to copy.`);
 
-let ok = 0, failed = 0;
+let ok = 0, failed = 0, skipped = 0;
 for (const objectPath of urls) {
   try {
+    // Already copied on a previous run? (compare sizes via HEAD on both sides)
+    const [have, want] = await Promise.all([
+      fetch(`${NEW}/storage/v1/object/public/${objectPath}`, { method: "HEAD" }),
+      fetch(`${OLD}/storage/v1/object/public/${objectPath}`, { method: "HEAD" }),
+    ]);
+    if (have.ok && want.ok &&
+        have.headers.get("content-length") === want.headers.get("content-length")) {
+      ok++; skipped++;
+      if (ok % 25 === 0) console.log(`  …${ok}/${urls.length}`);
+      continue;
+    }
     const src = await fetch(`${OLD}/storage/v1/object/public/${objectPath}`);
     if (!src.ok) throw new Error(`download ${src.status}`);
     const buf = Buffer.from(await src.arrayBuffer());
@@ -44,7 +55,7 @@ for (const objectPath of urls) {
     console.log(`  ✗ ${objectPath} — ${e.message}`);
   }
 }
-console.log(`\nCopied ${ok}/${urls.length} (${failed} failed).`);
+console.log(`\nCopied ${ok}/${urls.length} (${skipped} already there, ${failed} failed).`);
 
 if (failed === 0 && ok > 0) {
   const updated = dataJs.split(OLD).join(NEW);

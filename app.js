@@ -239,6 +239,31 @@ if (window.Community) {
   });
 }
 
+// ---- Monthly-update signup ---------------------------------------------------
+// Anyone can leave an email — no account needed. Rows land in the same
+// newsletter_subscribers list the admin digest mails to.
+const nlForm = document.getElementById("nlSignup");
+if (nlForm) {
+  nlForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById("nlMsg");
+    const email = document.getElementById("nlEmail").value.trim().toLowerCase();
+    if (!email) return;
+    if (!window.__supabase) { msg.textContent = "One moment — still connecting…"; return; }
+    msg.textContent = "ADDING…";
+    const { error } = await window.__supabase.from("newsletter_subscribers").insert({ email });
+    if (!error) {
+      msg.textContent = "✓ YOU'RE ON THE LIST — SEE YOU NEXT BULLETIN";
+      document.getElementById("nlEmail").value = "";
+    } else if (String(error.code) === "23505") {
+      msg.textContent = "✓ ALREADY ON THE LIST — YOU'RE ALL SET";
+    } else {
+      msg.textContent = "HMM, THAT DIDN'T TAKE — TRY AGAIN IN A MOMENT";
+      console.error("newsletter signup:", error);
+    }
+  });
+}
+
 // ---- Mobile nav toggle ------------------------------------------------------
 const navToggle = document.getElementById("navToggle");
 const nav = document.getElementById("nav");

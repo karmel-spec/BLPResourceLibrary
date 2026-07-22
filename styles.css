@@ -498,6 +498,33 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 .sub-vernote { display: block; font-size: 10.5px; color: var(--red); letter-spacing: .3px; margin-top: 2px; }
 .sub-status.s-archived { color: var(--ink-faint); }
 
+/* ---- Monthly-update signup band ---- */
+.nl-band { background: #14181b; border-top: 3px solid var(--red); margin-top: 40px; }
+.nl-inner {
+  max-width: var(--container); margin: 0 auto; padding: 34px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap;
+}
+.nl-copy { max-width: 560px; }
+.nl-copy .dwg { color: #8fa1ad; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 1px; }
+.nl-copy h2 {
+  color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;
+}
+.nl-copy p { color: #9db0bc; font-size: 14px; line-height: 1.6; margin-top: 6px; }
+.nl-form { display: flex; gap: 0; flex-wrap: wrap; align-items: center; }
+.nl-form input {
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px; padding: 13px 16px;
+  border: 1.5px solid #3a444d; background: #1d2226; color: #fff; min-width: 260px;
+}
+.nl-form input:focus { outline: none; border-color: var(--red); }
+.nl-form button {
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 1px; font-weight: 600;
+  background: var(--red); color: #fff; border: 1.5px solid var(--red); padding: 13px 20px; cursor: pointer;
+}
+.nl-form button:hover { background: #7c1717; }
+.nl-msg { flex-basis: 100%; margin-top: 10px; font-size: 11px; letter-spacing: .5px; color: #7fd39a; min-height: 14px; }
+@media (max-width: 900px) { .nl-inner { flex-direction: column; align-items: flex-start; } }
+
 /* ---- Newsletter prep ---- */
 .nl-actions { flex-wrap: wrap; }
 .nl-period { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; display: flex; align-items: center; gap: 8px; }
