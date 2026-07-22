@@ -7,7 +7,7 @@
 
 -- Version control for submissions
 alter table submissions add column if not exists version int not null default 1;
-alter table submissions add column if not exists replaces uuid references submissions(id) on delete set null;
+alter table submissions add column if not exists replaces bigint references submissions(id) on delete set null;
 alter table submissions add column if not exists replace_action text check (replace_action in ('keep','archive','delete'));
 
 -- Newsletter subscribers: signed-in members auto-enroll; anyone may subscribe

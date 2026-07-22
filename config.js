@@ -8,7 +8,10 @@
 // ============================================================================
 
 const CONFIG = {
-  SUPABASE_URL: "https://fjyydcsxauwogtgswfss.supabase.co",
+  // Custom domain (active July 22, 2026) — the Google consent screen shows this
+  // instead of the raw supabase.co project address. The default
+  // fjyydcsxauwogtgswfss.supabase.co domain also keeps working.
+  SUPABASE_URL: "https://api.pianotechnologylibrary.com",
   SUPABASE_ANON_KEY: "sb_publishable_LRy1fJSiABmkGHxYd8MqMQ__0q37nEn",
 
   // Library owners/moderators. Signing in with one of these emails unlocks
