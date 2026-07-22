@@ -13,7 +13,9 @@ const CONFIG = {
 
   // Library owners/moderators. Signing in with one of these emails unlocks
   // admin features: the private "trusted by" stat and the submission queue.
-  ADMIN_EMAILS: ["brigham@brighamlarsonpianos.com", "karmel.larson@gmail.com"],
+  // NOT a login gate — anyone can sign in. These two only get the moderation
+  // queue + backend controls.
+  ADMIN_EMAILS: ["brigham@brighamlarsonpianos.com", "karmel@brighamlarsonpianos.com", "brighamlarson@gmail.com", "karmel.larson@gmail.com"],
   ADMIN_EMAIL: "brigham@brighamlarsonpianos.com", // legacy alias
 };
 

@@ -49,6 +49,7 @@ header {
   font-weight: 600; letter-spacing: 2.5px; color: #fff;
 }
 .mark .t2 { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #8fa1ad; letter-spacing: 1px; }
+.t2-short { display: none; }  /* desktop shows the full "TECHNICIANS" wording */
 header nav { flex-basis: 100%; justify-content: flex-end; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; display: flex; align-items: center; }
 header nav a { color: #9db0bc; text-decoration: none; margin-left: 28px; }
 header nav a:hover, header nav a.on { color: #fff; border-bottom: 2px solid var(--red); padding-bottom: 6px; }
@@ -410,6 +411,31 @@ body { padding-bottom: 40px; }
   .sub-row { flex-wrap: wrap; }
 }
 
+/* ---- Contributor-page invite bar ---- */
+.invite-bar { background: #14181b; border-bottom: 1px solid #2a323a; }
+.invite-inner {
+  max-width: var(--container); margin: 0 auto; padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+}
+.invite-text { color: #dfe4e8; font-size: 14px; }
+.invite-text b { font-family: 'Barlow Condensed', sans-serif; font-size: 19px; letter-spacing: .5px; text-transform: uppercase; margin-right: 12px; }
+.invite-text span { color: #9db0bc; }
+.invite-btn {
+  background: var(--red); color: #fff; text-decoration: none; white-space: nowrap;
+  font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 1px;
+  padding: 11px 20px; font-weight: 600;
+}
+.invite-btn:hover { background: #7c1717; }
+
+/* ---- Dashboard get-started block ---- */
+.dash-block.getstarted { text-align: center; padding: 40px 34px; }
+.dash-block.getstarted h2 { font-size: 30px; }
+.dash-block.getstarted p { max-width: 560px; margin: 10px auto 20px; font-size: 14.5px; color: var(--ink-soft); }
+.au-btn.big { display: inline-block; font-size: 15px; padding: 14px 28px; }
+.ghost-link { display: block; margin-top: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink-faint); text-decoration: underline; }
+.ghost-link:hover { color: var(--ink); }
+.contribute-intro { margin-top: 26px; }
+
 /* ---- Auth gate (sign-in on first action) ---- */
 .authgate .ag-modal { max-width: 420px; text-align: center; padding: 30px 34px 26px; }
 .ag-head {
@@ -483,16 +509,19 @@ body { padding-bottom: 40px; }
   .ideas { grid-template-columns: 1fr 1fr; }
   .prof-grid { grid-template-columns: 1fr; }
   .header-inner { flex-wrap: wrap; gap: 12px 20px; }
-  .navtoggle { display: block; margin-left: 0; }
+  .t2-full { display: none; }
+  .t2-short { display: inline; }  /* mobile shows the shorter "TECHS" wording */
+  .navtoggle { display: block; margin-left: auto; order: 1; }  /* hamburger pinned top-right of row 1 */
+  .auth-slot { order: 2; flex-basis: 100%; margin-left: 0; justify-content: flex-end; }
   .au-name { display: none; }
   header nav {
     display: none; flex-direction: column; align-items: flex-start; gap: 4px;
     width: 100%; margin-left: 0; padding-top: 8px; border-top: 1px solid #2a323a;
+    order: 3;
   }
   header nav.open { display: flex; }
   header nav a { margin-left: 0; padding: 8px 0; width: 100%; }
   header nav a.cta { padding: 10px 16px; margin-top: 4px; }
-  .auth-slot { margin-left: auto; }
 }
 @media (max-width: 640px) {
   .page-head h1 { font-size: 34px; }

@@ -6,7 +6,7 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=202607221122">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='4' y='4' width='92' height='92' rx='14' fill='%2314181b' stroke='%239e2020' stroke-width='6'/><rect x='16' y='22' width='68' height='58' rx='2' fill='%23f4f2ec'/><line x1='29.6' y1='22' x2='29.6' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='43.2' y1='22' x2='43.2' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='56.8' y1='22' x2='56.8' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='70.4' y1='22' x2='70.4' y2='80' stroke='%2314181b' stroke-width='2'/><rect x='25' y='22' width='9' height='34' fill='%2314181b'/><rect x='38.7' y='22' width='9' height='34' fill='%2314181b'/><rect x='65.9' y='22' width='9' height='34' fill='%2314181b'/></svg>">
 </head>
 <body>
@@ -16,7 +16,7 @@
     <a class="mark" href="index.html">
       <div>
         <div class="t1">PIANO TECHNOLOGY LIBRARY</div>
-        <div class="t2">FREE &amp; OPEN FOR PIANO TECHNICIANS EVERYWHERE</div>
+        <div class="t2"><span class="t2-full">FREE &amp; OPEN FOR PIANO TECHNICIANS EVERYWHERE</span><span class="t2-short">FREE &amp; OPEN FOR PIANO TECHS EVERYWHERE</span></div>
       </div>
     </a>
     <span id="authSlot" class="auth-slot"></span>
@@ -25,7 +25,7 @@
       <a href="index.html">INDEX</a>
       <a href="index.html#library">CATALOG</a>
       <a href="about.html">ABOUT</a>
-      <a class="cta" href="contribute.html">CONTRIBUTE</a>
+      <a class="cta" href="profile.html">CONTRIBUTE</a>
     </nav>
   </div>
 </header>
@@ -36,12 +36,41 @@
     <h1>My Contributor <span>Dashboard</span></h1>
   </div>
 
-  <!-- Signed-out prompt -->
-  <div id="dashSignedOut" class="dash-block" hidden>
-    <h2>Sign in to set up your dashboard</h2>
-    <p>Your contributor profile and everything you share are stored with your
-    Google account — sign in once and your work is saved online, permanently.</p>
-    <button class="au-btn primary" id="dashSignIn">SIGN IN WITH GOOGLE</button>
+  <!-- Signed-out prompt: get-started CTA first, the why/what below it -->
+  <div id="dashSignedOut" hidden>
+    <div class="dash-block getstarted">
+      <h2>Set up your contributor dashboard</h2>
+      <p>Sign in with Google to create your profile and share your work. Everything
+      you contribute is stored online with your account — saved permanently, not on
+      any one computer.</p>
+      <button class="au-btn primary big" id="dashSignIn">SIGN IN WITH GOOGLE</button>
+      <a class="ghost-link" href="index.html#library">or browse the library first →</a>
+    </div>
+
+    <div class="prose contribute-intro">
+      <h2>Why contribute</h2>
+      <ul class="reasons">
+        <li><b>Save the next technician days of work.</b> The problem you already solved is a problem someone else is about to start from scratch.</li>
+        <li><b>Preserve your work.</b> Files on a shop computer disappear. Files in the library outlast any one hard drive, shop, or career.</li>
+        <li><b>Get credit.</b> Every resource carries your name and links to your contributor profile — your website, your channel, your reputation in the trade.</li>
+        <li><b>Strengthen the craft.</b> A profession that shares openly is a profession that keeps getting better. That helps everyone, including you.</li>
+      </ul>
+
+      <h2>What to contribute</h2>
+      <p>Anything that would have saved you time if someone had shared it first. A few ideas to get you thinking:</p>
+      <div class="ideas">
+        <div class="idea"><div class="ic">⚙️</div><h3>Replacement Parts</h3><p>Flanges, hammer butts, damper components, player parts, cabinet hardware — especially obsolete parts no supplier carries.</p></div>
+        <div class="idea"><div class="ic">🛠️</div><h3>Jigs &amp; Fixtures</h3><p>Boring jigs, drilling fixtures, routing systems, alignment and regulation aids you built for your own bench.</p></div>
+        <div class="idea"><div class="ic">📐</div><h3>Research &amp; Drawings</h3><p>Action geometry studies, historical reconstructions, patent drawings, measured drawings of rare mechanisms.</p></div>
+        <div class="idea"><div class="ic">🎥</div><h3>Technique &amp; Video</h3><p>How you actually do the job — regulation, voicing, restringing, bridge work — filmed at your own bench.</p></div>
+        <div class="idea"><div class="ic">📝</div><h3>Manufacturing Notes</h3><p>CAM setups, tool libraries, print settings, material recommendations, and the lessons learned getting a part to fit.</p></div>
+        <div class="idea"><div class="ic">📷</div><h3>Documentation</h3><p>Photos, failure points, before-and-afters — the context that makes a file usable, not just a mystery shape.</p></div>
+      </div>
+
+      <h2>What makes a great contribution</h2>
+      <p>Don't worry about polish — worry about usefulness. The best entries include the reasoning, not just the geometry: what the part is, what it fits, how you made it, and anything that would trip up the next person. A clear photo and a sentence of context turn a file into a resource.</p>
+      <p class="fine">Prefer email? Reach us at <a href="mailto:karmel@brighamlarsonpianos.com">karmel@brighamlarsonpianos.com</a> and we'll help you get your contribution in.</p>
+    </div>
   </div>
 
   <!-- Profile editor -->
@@ -118,7 +147,7 @@
 <footer>
   <div class="footer-inner">
     <span>A permanent, community-owned record of the craft.</span>
-    <span><a href="about.html">About this library</a> · <a href="contribute.html">Contribute</a></span>
+    <span><a href="about.html">About this library</a> · <a href="profile.html">Contribute</a></span>
   </div>
 </footer>
 
@@ -126,11 +155,11 @@
   A FREE COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js"></script>
-<script src="data.js"></script>
-<script src="auth.js"></script>
-<script src="backend.js"></script>
-<script src="profile.js"></script>
+<script src="config.js?v=202607221122"></script>
+<script src="data.js?v=202607221122"></script>
+<script src="auth.js?v=202607221122"></script>
+<script src="backend.js?v=202607221122"></script>
+<script src="profile.js?v=202607221122"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");
