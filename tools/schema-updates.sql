@@ -60,3 +60,33 @@ create policy "admins read log" on activity_log
 
 create index if not exists activity_log_created_idx on activity_log (created_at desc);
 create index if not exists activity_log_type_idx on activity_log (type);
+
+-- Beta feedback (admins only): bug reports, ideas, suggestions from the Beta
+-- Feedback button. Anyone can WRITE; only admins READ and UPDATE (mark done).
+create table if not exists beta_feedback (
+  id bigint generated always as identity primary key,
+  category text not null,
+  message text not null,
+  actor_email text,
+  actor_name text,
+  page text,
+  status text not null default 'open' check (status in ('open','done')),
+  created_at timestamptz default now()
+);
+alter table beta_feedback enable row level security;
+
+drop policy if exists "anyone can send feedback" on beta_feedback;
+create policy "anyone can send feedback" on beta_feedback
+  for insert to anon, authenticated with check (true);
+
+drop policy if exists "admins read feedback" on beta_feedback;
+create policy "admins read feedback" on beta_feedback
+  for select using (auth.jwt() ->> 'email' in
+    ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+
+drop policy if exists "admins update feedback" on beta_feedback;
+create policy "admins update feedback" on beta_feedback
+  for update using (auth.jwt() ->> 'email' in
+    ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+
+create index if not exists beta_feedback_status_idx on beta_feedback (status, created_at desc);

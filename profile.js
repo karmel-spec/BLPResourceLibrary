@@ -52,7 +52,7 @@
     $("dashUpload").hidden = !profile;      // profile first, then uploads
     $("dashMine").hidden = !profile;
     if (profile) loadMine();
-    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); initActivityLog(); }
+    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); initActivityLog(); initBetaFeedback(); }
   });
   $("dashSignIn").onclick = () => window.Auth.signIn();
 
@@ -482,5 +482,66 @@ Brigham Larson Pianos & the Piano Technology Library
     if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
     const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()];
     return `${mon} ${d.getDate()}, ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
+  }
+
+  // ---- Beta feedback punch-list (admins only) ------------------------------------
+  const FB_META = {
+    bug:        { icon: "🐛", label: "Bug" },
+    suggestion: { icon: "💡", label: "Suggestion" },
+    feature:    { icon: "✨", label: "Feature idea" },
+    design:     { icon: "🎨", label: "Design" },
+    question:   { icon: "❓", label: "Question" },
+    other:      { icon: "💬", label: "Other" },
+  };
+  let betaFilter = "open";
+
+  function initBetaFeedback() {
+    $("dashBeta").hidden = false;
+    const filters = ["open", "done", "all"];
+    $("betaFilters").innerHTML = filters.map((f) =>
+      `<button class="log-filter${f === betaFilter ? " on" : ""}" data-bf="${f}">${f.toUpperCase()}</button>`).join("");
+    $("betaFilters").querySelectorAll("[data-bf]").forEach((b) =>
+      b.onclick = () => { betaFilter = b.dataset.bf; loadBeta(); });
+    $("betaRefresh").onclick = loadBeta;
+    loadBeta();
+  }
+
+  async function loadBeta() {
+    $("betaFilters").querySelectorAll("[data-bf]").forEach((b) =>
+      b.classList.toggle("on", b.dataset.bf === betaFilter));
+    $("betaList").innerHTML = `<div class="cm-empty">Loading…</div>`;
+    let q = sb().from("beta_feedback").select("*").order("created_at", { ascending: false }).limit(200);
+    if (betaFilter !== "all") q = q.eq("status", betaFilter);
+    const { data, error } = await q;
+    if (error) { $("betaList").innerHTML = `<div class="cm-empty">Could not load feedback: ${esc(error.message)}</div>`; return; }
+    const rows = data || [];
+    $("betaList").innerHTML = rows.length
+      ? rows.map(betaRow).join("")
+      : `<div class="cm-empty">No ${betaFilter === "all" ? "" : betaFilter + " "}feedback${betaFilter === "open" ? " — you're all caught up! 🎉" : "."}</div>`;
+    $("betaList").querySelectorAll("[data-done]").forEach((b) =>
+      b.onclick = () => setBetaStatus(b.dataset.done, "done"));
+    $("betaList").querySelectorAll("[data-reopen]").forEach((b) =>
+      b.onclick = () => setBetaStatus(b.dataset.reopen, "open"));
+  }
+
+  function betaRow(r) {
+    const m = FB_META[r.category] || { icon: "•", label: r.category };
+    const who = r.actor_name || r.actor_email || "Anonymous";
+    const done = r.status === "done";
+    return `<div class="beta-row${done ? " done" : ""}">
+      <span class="beta-ic">${m.icon}</span>
+      <div class="beta-main">
+        <span class="beta-cat mono">${esc(m.label.toUpperCase())}</span>
+        <span class="beta-msg">${esc(r.message)}</span>
+        <span class="mono beta-meta">${esc(who)}${r.actor_email && r.actor_name ? " · " + esc(r.actor_email) : ""} · ${esc(r.page || "")} · ${fmtWhen(r.created_at)}</span>
+      </div>
+      <button class="au-btn beta-toggle" ${done ? `data-reopen="${r.id}"` : `data-done="${r.id}"`}>${done ? "REOPEN" : "✓ DONE"}</button>
+    </div>`;
+  }
+
+  async function setBetaStatus(id, status) {
+    const { error } = await sb().from("beta_feedback").update({ status }).eq("id", id);
+    if (error) { alert("Update failed: " + error.message); return; }
+    loadBeta();
   }
 })();
