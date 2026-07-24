@@ -604,7 +604,7 @@ Brigham Larson Pianos & the Piano Technology Library
   }
   function prqRow(r) {
     const done = r.status === "done";
-    const to = r.fulfiller === "maker" ? `Maker (${esc(r.contributor_slug || "")})` : "Brigham Larson Pianos";
+    const to = r.fulfiller === "maker" ? `Maker (${esc(r.contributor_slug || "")})` : "Print Partner network";
     return `<div class="beta-row${done ? " done" : ""}">
       <span class="beta-ic">🖨</span>
       <div class="beta-main">

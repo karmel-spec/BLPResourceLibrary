@@ -63,14 +63,16 @@
   function fulfillmentFor(by) {
     const c = (typeof CONTRIBUTORS !== "undefined" && CONTRIBUTORS[by]) || {};
     if (c.offers_print) {
-      return { who: "maker", name: c.name || "The maker",
-        sub: `${c.name || "The maker"} offers to print &amp; ship this item. Send a request and they'll email you a quote including materials and shipping.`,
-        fine: "This is a request, not a charge. The maker will email you a final price before anything is made. Any download fee for the file itself is paid separately to the maker." };
+      const name = c.name || "The maker";
+      const from = c.print_from ? ` — from <b>$${c.print_from} + shipping</b> (overnight ships faster for more)` : "";
+      return { who: "maker", name,
+        sub: `${name} prints &amp; ships this item to order${from}. Send a request and they'll email you a final quote including materials and shipping.`,
+        fine: `This is a request, not a charge. ${name} will email you a final quote (print + shipping) before anything is made or charged. Any download fee for the file itself is paid separately to the maker.` };
     }
-    const from = (window.CONFIG && CONFIG.PRINT_BASE_FROM) || 75;
-    return { who: "blp", name: "Brigham Larson Pianos",
-      sub: `Brigham Larson Pianos prints these to order — from <b>$${from} + shipping</b> (overnight ships faster for more). Send a request and we'll email you a final quote.`,
-      fine: `This is a request, not a charge. Brigham Larson Pianos will email you a final quote (print + shipping) before anything is made or charged.` };
+    // Original maker doesn't print & ship — no name shown; the Print Partner network handles it.
+    return { who: "network", name: "",
+      sub: `The maker of this item doesn't print &amp; ship it themselves — a contributor from the <b>Print Partner network</b> will email you a final quote (print + shipping) before anything is made or charged.`,
+      fine: `This is a request, not a charge. A contributor from the Print Partner network will email you a final quote (print + shipping) before anything is made or charged.` };
   }
 
   function open(btn) {
@@ -128,7 +130,7 @@
           _subject: `PTL Print & Ship request — ${ctx.title}`,
           _template: "table",
           Item: `${ctx.title} (${ctx.id})`,
-          Fulfiller: ctx.fulfiller === "maker" ? `Maker: ${ctx.fulfillerName}` : "Brigham Larson Pianos",
+          Fulfiller: ctx.fulfiller === "maker" ? `Maker: ${ctx.fulfillerName}` : "Print Partner network (needs a fulfiller assigned)",
           Requester: `${name} <${email}>`,
           "Ship to": addr,
           Material: mat, Quantity: qty, "Shipping speed": speed,
@@ -143,8 +145,9 @@
 
     el.querySelector("#prSend").disabled = false;
     if (dbOk || emailed) {
+      const who = ctx.fulfiller === "maker" ? ctx.fulfillerName : "A contributor from the Print Partner network";
       el.querySelector("#prDoneMsg").textContent =
-        `${ctx.fulfillerName} will email you a quote (print + shipping) at ${email} soon. Nothing is charged until you approve it.`;
+        `${who} will email you a quote (print + shipping) at ${email} soon. Nothing is charged until you approve it.`;
       el.querySelector("#prBody").hidden = true;
       el.querySelector("#prDone").hidden = false;
     } else {

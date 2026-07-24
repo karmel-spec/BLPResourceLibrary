@@ -970,5 +970,9 @@ const CONTRIBUTORS = {
       { label: "TIKTOK",    url: "https://www.tiktok.com/@brighamlarsonpianos" },
       { label: "X",         url: "https://x.com/BrighamsPianos" },
     ],
+    // Brigham Larson Pianos prints & ships its own catalog to order.
+    offers_print: true,
+    print_from: 75,
+    print_notes: "CNC machining and 3D printing (filament & resin); many materials on request.",
   },
 };
