@@ -26,9 +26,8 @@
     btn.type = "button";
     btn.innerHTML = `<span class="beta-tag">BETA</span><span class="beta-label">Feedback</span>`;
     btn.addEventListener("click", open);
-    const header = document.querySelector(".header-inner");
-    const slot = document.getElementById("authSlot");
-    if (header) header.insertBefore(btn, slot || null);
+    // Fixed tab in the bottom-right corner — out of the header, always reachable.
+    document.body.appendChild(btn);
 
     // Modal
     el = document.createElement("div");

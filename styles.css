@@ -657,19 +657,19 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 
 /* ---- Beta feedback button + popup ---- */
 .beta-btn {
-  display: inline-flex; align-items: center; gap: 6px; margin-left: auto;
+  position: fixed; right: 18px; bottom: 56px; z-index: 300;
+  display: inline-flex; align-items: center; gap: 6px;
   font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .5px;
-  background: transparent; color: #f4f2ec; border: 1.5px solid #3a444d;
-  padding: 6px 11px; cursor: pointer; border-radius: 2px;
+  background: #14181b; color: #f4f2ec; border: 1.5px solid #3a444d;
+  padding: 8px 13px; cursor: pointer; border-radius: 3px;
+  box-shadow: 0 4px 14px rgba(20,24,27,.35);
 }
 .beta-btn:hover { border-color: var(--red); color: #fff; }
 .beta-tag {
   background: var(--red); color: #fff; font-size: 9px; font-weight: 600;
   letter-spacing: 1px; padding: 1px 5px; border-radius: 2px;
 }
-@media (max-width: 900px) {
-  .beta-btn { margin-left: 0; order: 3; }
-}
+@media (max-width: 640px) { .beta-btn { right: 12px; bottom: 50px; padding: 7px 10px; } }
 
 .fb-backdrop {
   position: fixed; inset: 0; z-index: 500; background: rgba(20,24,27,.82);
