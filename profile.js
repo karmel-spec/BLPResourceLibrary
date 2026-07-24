@@ -52,7 +52,7 @@
     $("dashUpload").hidden = !profile;      // profile first, then uploads
     $("dashMine").hidden = !profile;
     if (profile) loadMine();
-    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); }
+    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); initActivityLog(); }
   });
   $("dashSignIn").onclick = () => window.Auth.signIn();
 
@@ -112,6 +112,7 @@
     };
     if (photoUrl) row.photo_url = photoUrl;
     else if (!profile) row.photo_url = window.Auth.user().avatar || null;
+    const wasNew = !profile;
     try {
       if (!profile) {
         // find a free slug: name, name-2, name-3…
@@ -133,6 +134,7 @@
         profile = data;
       }
       setStatus("pfStatus", "Saved ✓ Your profile is live.");
+      if (window.Activity) window.Activity.log(wasNew ? "profile_created" : "profile_updated", (profile.name || name) + " (@" + profile.slug + ")");
       fillProfileForm(window.Auth.user());
       $("dashUpload").hidden = false;
       $("dashMine").hidden = false;
@@ -185,6 +187,7 @@
       }
       const { error } = await sb().from("submissions").insert(row);
       if (error) throw error;
+      if (window.Activity) window.Activity.log("submission", title + (row.version ? ` (v${row.version})` : ""));
       notifyLibrarians(title + (row.version ? ` (v${row.version})` : ""));
       setStatus("upStatus", "Submitted ✓ The librarians will review it shortly.");
       ["upTitle", "upMaker", "upDesc", "upYoutube"].forEach((id) => $(id).value = "");
@@ -269,9 +272,10 @@
   }
 
   async function review(id, status) {
-    const { error } = await sb().from("submissions")
-      .update({ status, reviewed_at: new Date().toISOString() }).eq("id", id);
+    const { data: updated, error } = await sb().from("submissions")
+      .update({ status, reviewed_at: new Date().toISOString() }).eq("id", id).select("title").maybeSingle();
     if (error) { alert("Update failed: " + error.message); return; }
+    if (window.Activity) window.Activity.log(status === "approved" ? "approved" : "rejected", updated ? updated.title : ("#" + id));
     // Approving a new version applies the contributor's choice to the old one.
     if (status === "approved") {
       const { data: sub } = await sb().from("submissions")
@@ -400,5 +404,83 @@ Brigham Larson Pianos & the Piano Technology Library
         `&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent($("nlText").value)}`;
       setStatus("nlStatus", "Opening your mail app — members are BCC'd; review and press Send.");
     };
+  }
+
+  // ---- Activity log (admins only) ------------------------------------------------
+  const LOG_META = {
+    login:           { icon: "🔑", label: "Signed in" },
+    email_signup:    { icon: "✉️", label: "Newsletter signup" },
+    profile_created: { icon: "🧑‍🔧", label: "New contributor profile" },
+    profile_updated: { icon: "✏️", label: "Profile updated" },
+    submission:      { icon: "📤", label: "Item submitted" },
+    approved:        { icon: "✅", label: "Item approved" },
+    rejected:        { icon: "🚫", label: "Item rejected" },
+    download:        { icon: "⬇️", label: "Download" },
+    watch:           { icon: "▶️", label: "Watched video" },
+  };
+  let logFilter = "all";
+
+  function initActivityLog() {
+    $("dashLog").hidden = false;
+    const filters = ["all", "login", "email_signup", "profile_created", "submission", "approved", "download"];
+    $("logFilters").innerHTML = filters.map((f) =>
+      `<button class="log-filter${f === logFilter ? " on" : ""}" data-f="${f}">${
+        f === "all" ? "ALL" : (LOG_META[f] ? LOG_META[f].label.toUpperCase() : f.toUpperCase())
+      }</button>`).join("");
+    $("logFilters").querySelectorAll("[data-f]").forEach((b) =>
+      b.onclick = () => { logFilter = b.dataset.f; loadLog(); });
+    $("logRefresh").onclick = loadLog;
+    loadLog();
+  }
+
+  async function loadLog() {
+    $("logFilters").querySelectorAll("[data-f]").forEach((b) =>
+      b.classList.toggle("on", b.dataset.f === logFilter));
+    $("logList").innerHTML = `<div class="cm-empty">Loading…</div>`;
+    let q = sb().from("activity_log").select("*").order("created_at", { ascending: false }).limit(200);
+    if (logFilter !== "all") q = q.eq("type", logFilter);
+    const { data, error } = await q;
+    if (error) { $("logList").innerHTML = `<div class="cm-empty">Could not load the log: ${esc(error.message)}</div>`; return; }
+    const rows = data || [];
+
+    // Today's tally across everything (independent of the active filter).
+    const { data: recent } = await sb().from("activity_log")
+      .select("type, created_at").order("created_at", { ascending: false }).limit(500);
+    const today = new Date().toISOString().slice(0, 10);
+    const todays = (recent || []).filter((r) => (r.created_at || "").slice(0, 10) === today);
+    const tally = {};
+    todays.forEach((r) => { tally[r.type] = (tally[r.type] || 0) + 1; });
+    $("logStats").textContent = todays.length
+      ? "TODAY: " + Object.entries(tally).map(([t, n]) => `${n} ${(LOG_META[t] || {}).label || t}`).join(" · ")
+      : "No activity yet today.";
+
+    $("logList").innerHTML = rows.length
+      ? rows.map(logRow).join("")
+      : `<div class="cm-empty">No activity recorded${logFilter !== "all" ? " for this filter" : " yet"}.</div>`;
+  }
+
+  function logRow(r) {
+    const m = LOG_META[r.type] || { icon: "•", label: r.type };
+    const who = r.actor_name || r.actor_email || "A visitor";
+    return `<div class="log-row">
+      <span class="log-ic">${m.icon}</span>
+      <div class="log-main">
+        <span class="log-what"><b>${esc(m.label)}</b>${r.detail ? " — " + esc(r.detail) : ""}</span>
+        <span class="mono log-who">${esc(who)}${r.actor_email && r.actor_name ? " · " + esc(r.actor_email) : ""}</span>
+      </div>
+      <span class="mono log-when">${fmtWhen(r.created_at)}</span>
+    </div>`;
+  }
+
+  function fmtWhen(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    const now = new Date();
+    const diff = Math.floor((now - d) / 1000);
+    if (diff < 60) return "just now";
+    if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+    if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+    const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()];
+    return `${mon} ${d.getDate()}, ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
   }
 })();

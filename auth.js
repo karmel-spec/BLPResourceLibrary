@@ -50,10 +50,21 @@ if (!location.hash) {
         avatar: u.user_metadata.avatar_url || u.user_metadata.picture || "",
       };
       enrollNewsletter();
+      logLoginOnce();
     } else {
       currentUser = null;
     }
     notify();
+  }
+
+  // Log a login at most once per browser session (session restore on every
+  // page nav must not spam the activity log).
+  function logLoginOnce() {
+    try {
+      if (sessionStorage.getItem("ptl_logged_login")) return;
+      sessionStorage.setItem("ptl_logged_login", "1");
+    } catch (e) { /* private mode — just skip the guard */ }
+    if (window.Activity) window.Activity.log("login", currentUser.email);
   }
 
   // Every signed-in member is a newsletter subscriber (admin-readable only;

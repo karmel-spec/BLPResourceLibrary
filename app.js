@@ -255,6 +255,7 @@ if (nlForm) {
     if (!error) {
       msg.textContent = "✓ YOU'RE ON THE LIST — SEE YOU NEXT BULLETIN";
       document.getElementById("nlEmail").value = "";
+      if (window.Activity) window.Activity.log("email_signup", email);
       return;
     }
     if (String(error.code) === "23505") {

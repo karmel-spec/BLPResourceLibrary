@@ -6,7 +6,7 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260722165554">
+<link rel="stylesheet" href="styles.css?v=20260724070648">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='4' y='4' width='92' height='92' rx='14' fill='%2314181b' stroke='%239e2020' stroke-width='6'/><rect x='16' y='22' width='68' height='58' rx='2' fill='%23f4f2ec'/><line x1='29.6' y1='22' x2='29.6' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='43.2' y1='22' x2='43.2' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='56.8' y1='22' x2='56.8' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='70.4' y1='22' x2='70.4' y2='80' stroke='%2314181b' stroke-width='2'/><rect x='25' y='22' width='9' height='34' fill='%2314181b'/><rect x='38.7' y='22' width='9' height='34' fill='%2314181b'/><rect x='65.9' y='22' width='9' height='34' fill='%2314181b'/></svg>">
 </head>
 <body>
@@ -176,6 +176,19 @@
       <textarea id="nlText" rows="16"></textarea>
     </label>
   </div>
+
+  <!-- Activity log (admins only) -->
+  <div id="dashLog" class="dash-block admin" hidden>
+    <h2>Activity log <span class="mono admin-tag">LIBRARIAN</span></h2>
+    <p class="dash-note">Everything happening across the library — logins, downloads,
+    email signups, new profiles, and shared items. Only you and Karmel can see this.</p>
+    <div class="log-controls">
+      <div class="log-filters" id="logFilters"></div>
+      <button class="au-btn" id="logRefresh">↻ REFRESH</button>
+    </div>
+    <div class="log-stats mono" id="logStats"></div>
+    <div class="log-list" id="logList"></div>
+  </div>
 </div>
 
 <footer>
@@ -189,11 +202,12 @@
   A FREE COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260722165554"></script>
-<script src="data.js?v=20260722165554"></script>
-<script src="auth.js?v=20260722165554"></script>
-<script src="backend.js?v=20260722165554"></script>
-<script src="profile.js?v=20260722165554"></script>
+<script src="config.js?v=20260724070648"></script>
+<script src="data.js?v=20260724070648"></script>
+<script src="auth.js?v=20260724070648"></script>
+<script src="backend.js?v=20260724070648"></script>
+<script src="activity.js?v=20260724070648"></script>
+<script src="profile.js?v=20260724070648"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");

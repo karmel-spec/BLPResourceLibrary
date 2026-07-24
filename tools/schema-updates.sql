@@ -34,3 +34,29 @@ drop policy if exists "admins read" on newsletter_subscribers;
 create policy "admins read" on newsletter_subscribers
   for select using (auth.jwt() ->> 'email' in
     ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+
+-- Activity log (admins only): logins, downloads, signups, profiles, submissions.
+-- Anyone can WRITE (signed-out downloads/signups must be captured); only admins
+-- can READ. No update/delete for non-admins — append-only audit trail.
+create table if not exists activity_log (
+  id bigint generated always as identity primary key,
+  type text not null,
+  detail text,
+  actor_email text,
+  actor_name text,
+  page text,
+  created_at timestamptz default now()
+);
+alter table activity_log enable row level security;
+
+drop policy if exists "anyone can log" on activity_log;
+create policy "anyone can log" on activity_log
+  for insert to anon, authenticated with check (true);
+
+drop policy if exists "admins read log" on activity_log;
+create policy "admins read log" on activity_log
+  for select using (auth.jwt() ->> 'email' in
+    ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+
+create index if not exists activity_log_created_idx on activity_log (created_at desc);
+create index if not exists activity_log_type_idx on activity_log (type);

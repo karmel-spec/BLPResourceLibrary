@@ -525,6 +525,24 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 .nl-msg { flex-basis: 100%; margin-top: 10px; font-size: 11px; letter-spacing: .5px; color: #7fd39a; min-height: 14px; }
 @media (max-width: 900px) { .nl-inner { flex-direction: column; align-items: flex-start; } }
 
+/* ---- Activity log ---- */
+.log-controls { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.log-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.log-filter {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .5px;
+  border: 1.5px solid var(--line); background: #fff; color: var(--ink-soft); padding: 5px 9px; cursor: pointer;
+}
+.log-filter:hover { border-color: var(--ink); color: var(--ink); }
+.log-filter.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.log-stats { font-size: 11px; color: var(--ink-soft); letter-spacing: .3px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.log-list { display: flex; flex-direction: column; }
+.log-row { display: flex; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.log-ic { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+.log-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.log-what { font-size: 13.5px; }
+.log-who { font-size: 10.5px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-when { font-size: 10.5px; color: var(--ink-faint, #8a8577); flex-shrink: 0; white-space: nowrap; }
+
 /* ---- Newsletter prep ---- */
 .nl-actions { flex-wrap: wrap; }
 .nl-period { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; display: flex; align-items: center; gap: 8px; }
