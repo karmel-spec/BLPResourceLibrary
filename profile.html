@@ -6,7 +6,7 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260724103828">
+<link rel="stylesheet" href="styles.css?v=20260724111812">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='4' y='4' width='92' height='92' rx='14' fill='%2314181b' stroke='%239e2020' stroke-width='6'/><rect x='16' y='22' width='68' height='58' rx='2' fill='%23f4f2ec'/><line x1='29.6' y1='22' x2='29.6' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='43.2' y1='22' x2='43.2' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='56.8' y1='22' x2='56.8' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='70.4' y1='22' x2='70.4' y2='80' stroke='%2314181b' stroke-width='2'/><rect x='25' y='22' width='9' height='34' fill='%2314181b'/><rect x='38.7' y='22' width='9' height='34' fill='%2314181b'/><rect x='65.9' y='22' width='9' height='34' fill='%2314181b'/></svg>">
 </head>
 <body>
@@ -132,6 +132,9 @@
       <label>Files <span class="opt">(F3D, STEP, STL, 3MF, PDF, ZIP — up to 50MB each)</span><input id="upFiles" type="file" multiple accept=".f3d,.step,.stp,.stl,.3mf,.pdf,.zip,.dxf"></label>
       <label>Preview image <span class="opt">(optional — a render or photo for the card)</span><input id="upThumb" type="file" accept="image/*"></label>
       <label>YouTube link <span class="opt">(optional — for training videos)</span><input id="upYoutube" type="url" placeholder="https://youtube.com/watch?v=…"></label>
+      <p class="fine upload-agree">By submitting, you confirm this is your own work or that you
+      have the right to share it, and that it doesn't include anyone else's proprietary designs.
+      See our <a href="terms.html" target="_blank" rel="noopener">Terms &amp; disclaimers</a>.</p>
       <div class="dash-actions">
         <button class="au-btn primary" id="upSubmit">SUBMIT TO THE LIBRARY</button>
         <span id="upStatus" class="dash-status"></span>
@@ -207,7 +210,7 @@
 <footer>
   <div class="footer-inner">
     <span>A permanent, community-owned record of the craft.</span>
-    <span><a href="about.html">About this library</a> · <a href="profile.html">Contribute</a> · <a href="index.html#newsletter">Monthly updates</a></span>
+    <span><a href="about.html">About this library</a> · <a href="profile.html">Contribute</a> · <a href="index.html#newsletter">Monthly updates</a> · <a href="terms.html">Terms &amp; disclaimers</a></span>
   </div>
 </footer>
 
@@ -215,13 +218,13 @@
   A FREE COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260724103828"></script>
-<script src="data.js?v=20260724103828"></script>
-<script src="auth.js?v=20260724103828"></script>
-<script src="backend.js?v=20260724103828"></script>
-<script src="activity.js?v=20260724103828"></script>
-<script src="feedback.js?v=20260724103828"></script>
-<script src="profile.js?v=20260724103828"></script>
+<script src="config.js?v=20260724111812"></script>
+<script src="data.js?v=20260724111812"></script>
+<script src="auth.js?v=20260724111812"></script>
+<script src="backend.js?v=20260724111812"></script>
+<script src="activity.js?v=20260724111812"></script>
+<script src="feedback.js?v=20260724111812"></script>
+<script src="profile.js?v=20260724111812"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");
