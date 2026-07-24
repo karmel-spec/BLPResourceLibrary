@@ -40,6 +40,12 @@
       offers_print: !!row.offers_print,
       allow_community_print: !!row.allow_community_print,
       print_notes: row.print_notes || "",
+      print_partner: !!row.print_partner,
+      print_equipment: Array.isArray(row.print_equipment) ? row.print_equipment : [],
+      print_region: row.print_region || "",
+      print_from: row.print_from != null ? Number(row.print_from) : null,
+      allow_community_print: !!row.allow_community_print,
+      print_notes: row.print_notes || "",
       community: true,
     };
   }
@@ -59,6 +65,7 @@
       pricing: ["free", "tip", "pwyw", "paid"].includes(row.pricing) ? row.pricing : "free",
       price: row.price != null ? Number(row.price) : null,
       license: row.license || null,
+      print_price: row.print_price != null ? Number(row.print_price) : null,
       community: true,
     };
     if (Object.keys(files).length) r.files = files;

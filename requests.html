@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part Requests — Piano Technology Library</title>
+<meta name="description" content="Request a piano part, tool, or jig that doesn't exist yet — and pledge what you'd pay. Enough demand motivates a maker to build it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20260724141742">
+<link rel="icon" href="icon.svg?v=20260724135928" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260724135928">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="mark" href="index.html">
+      <div>
+        <div class="t1">PIANO TECHNOLOGY LIBRARY</div>
+        <div class="t2"><span class="t2-full">FREE &amp; OPEN FOR PIANO TECHNICIANS EVERYWHERE</span><span class="t2-short">FREE &amp; OPEN FOR PIANO TECHS EVERYWHERE</span></div>
+      </div>
+    </a>
+    <span id="authSlot" class="auth-slot"></span>
+    <button class="navtoggle" id="navToggle" aria-label="Menu" aria-expanded="false">☰</button>
+    <nav id="nav">
+      <a href="index.html">INDEX</a>
+      <a href="index.html#library">CATALOG</a>
+      <a href="contributors.html">CONTRIBUTORS</a>
+      <a class="on" href="requests.html">REQUESTS</a>
+      <a href="about.html">ABOUT</a>
+      <a class="cta" href="profile.html">CONTRIBUTE</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <div class="page-head">
+    <div class="dwg">WANTED · PARTS THAT DON'T EXIST YET · PLEDGE BOARD</div>
+    <h1>Part <span>Requests</span></h1>
+    <p class="lede">Need a part, tool, or jig nobody has modeled yet? Post it here and say what
+    you'd pay for it. Other technicians can add their own pledges — and when the demand is
+    worth a maker's bench time, someone builds it and everyone wins. Pledges are honor-system
+    promises between technicians, not charges.</p>
+  </div>
+
+  <!-- Post a request -->
+  <div class="dash-block req-new">
+    <h2>Post a request</h2>
+    <div class="dash-fields">
+      <label>What do you need?<input id="rqTitle" type="text" placeholder="e.g. Wurlitzer 700 butterfly hammer flange"></label>
+      <div class="dash-row">
+        <label>Maker / brand <span class="opt">(optional)</span><input id="rqMaker" type="text" placeholder="e.g. Wurlitzer"></label>
+        <label>I'd pledge (USD) <span class="opt">(what it's worth to you)</span><input id="rqPledge" type="number" min="0" step="1" placeholder="25"></label>
+      </div>
+      <label>Details <span class="opt">(dimensions, photos elsewhere, what it fits, why it matters)</span><textarea id="rqDetails" rows="3" placeholder="Describe the part well enough that a maker could take it on."></textarea></label>
+      <div class="dash-row">
+        <label>Your name<input id="rqName" type="text" autocomplete="name"></label>
+        <label>Your email <span class="opt">(so a maker can reach you)</span><input id="rqEmail" type="email" autocomplete="email"></label>
+      </div>
+      <div class="dash-actions">
+        <button class="au-btn primary" id="rqPost">POST REQUEST</button>
+        <span id="rqStatus" class="dash-status"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Open requests -->
+  <div class="shelf-head full req-head"><h2>Open requests</h2></div>
+  <div class="req-list" id="reqList"><div class="cm-empty">Loading…</div></div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span>A permanent, community-owned record of the craft.</span>
+    <span><a href="about.html">About this library</a> · <a href="profile.html">Contribute</a> · <a href="index.html#newsletter">Monthly updates</a> · <a href="terms.html">Terms &amp; disclaimers</a></span>
+  </div>
+</footer>
+
+<div class="redbar">
+  A FREE COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
+</div>
+
+<script src="config.js?v=20260724141742"></script>
+<script src="data.js?v=20260724141742"></script>
+<script src="auth.js?v=20260724141742"></script>
+<script src="backend.js?v=20260724141742"></script>
+<script src="activity.js?v=20260724141742"></script>
+<script src="feedback.js?v=20260724141742"></script>
+<script src="requests.js?v=20260724141742"></script>
+</body>
+</html>

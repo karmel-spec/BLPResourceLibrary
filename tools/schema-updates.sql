@@ -133,3 +133,61 @@ create policy "admins update prints" on print_requests
   for update using (auth.jwt() ->> 'email' in
     ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
 create index if not exists print_requests_status_idx on print_requests (status, created_at desc);
+
+-- Monetization v3: print partner network, per-item print price, ratings,
+-- and the part-request pledge board.
+alter table contributors add column if not exists print_partner boolean not null default false;
+alter table contributors add column if not exists print_equipment jsonb not null default '[]'::jsonb;
+alter table contributors add column if not exists print_region text;
+alter table contributors add column if not exists print_from numeric;
+alter table submissions add column if not exists print_price numeric;
+
+-- Ratings: one 1-5 star rating per signed-in user per item; public read.
+create table if not exists ratings (
+  item_ref text not null,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  stars smallint not null check (stars between 1 and 5),
+  created_at timestamptz default now(),
+  primary key (item_ref, user_id)
+);
+alter table ratings enable row level security;
+drop policy if exists "read ratings" on ratings;
+create policy "read ratings" on ratings for select using (true);
+drop policy if exists "rate own" on ratings;
+create policy "rate own" on ratings for insert to authenticated with check (auth.uid() = user_id);
+drop policy if exists "update own rating" on ratings;
+create policy "update own rating" on ratings for update to authenticated using (auth.uid() = user_id);
+
+-- Part requests ("wanted" board) + honor-system pledges. Public board.
+create table if not exists part_requests (
+  id bigint generated always as identity primary key,
+  title text not null,
+  maker text,
+  details text,
+  requester_name text,
+  requester_email text,
+  status text not null default 'open' check (status in ('open','claimed','filled')),
+  created_at timestamptz default now()
+);
+alter table part_requests enable row level security;
+drop policy if exists "read requests" on part_requests;
+create policy "read requests" on part_requests for select using (true);
+drop policy if exists "post requests" on part_requests;
+create policy "post requests" on part_requests for insert to anon, authenticated with check (true);
+drop policy if exists "admins manage requests" on part_requests;
+create policy "admins manage requests" on part_requests for update using (auth.jwt() ->> 'email' in
+  ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+
+create table if not exists part_pledges (
+  id bigint generated always as identity primary key,
+  request_id bigint not null references part_requests(id) on delete cascade,
+  amount numeric not null check (amount > 0),
+  name text,
+  email text,
+  created_at timestamptz default now()
+);
+alter table part_pledges enable row level security;
+drop policy if exists "read pledges" on part_pledges;
+create policy "read pledges" on part_pledges for select using (true);
+drop policy if exists "add pledges" on part_pledges;
+create policy "add pledges" on part_pledges for insert to anon, authenticated with check (true);

@@ -60,11 +60,12 @@
     el.querySelector("#prSend").addEventListener("click", send);
   }
 
-  function fulfillmentFor(by) {
+  function fulfillmentFor(by, itemPrice) {
     const c = (typeof CONTRIBUTORS !== "undefined" && CONTRIBUTORS[by]) || {};
     if (c.offers_print) {
       const name = c.name || "The maker";
-      const from = c.print_from ? ` — from <b>$${c.print_from} + shipping</b> (overnight ships faster for more)` : "";
+      const base = itemPrice || c.print_from;
+      const from = base ? ` — from <b>$${base} + shipping</b> (overnight ships faster for more)` : "";
       return { who: "maker", name,
         sub: `${name} prints &amp; ships this item to order${from}. Send a request and they'll email you a final quote including materials and shipping.`,
         fine: `This is a request, not a charge. ${name} will email you a final quote (print + shipping) before anything is made or charged. Any download fee for the file itself is paid separately to the maker.` };
@@ -78,7 +79,7 @@
   function open(btn) {
     if (!el) build();
     ctx = { id: btn.dataset.id, title: btn.dataset.title, by: btn.dataset.by };
-    const f = fulfillmentFor(ctx.by);
+    const f = fulfillmentFor(ctx.by, parseFloat(btn.dataset.printprice) || null);
     ctx.fulfiller = f.who; ctx.fulfillerName = f.name;
     el.querySelector("#prTitle").textContent = `Print & ship: ${ctx.title}`;
     el.querySelector("#prSub").innerHTML = f.sub;

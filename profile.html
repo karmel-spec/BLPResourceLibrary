@@ -6,8 +6,9 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260724120049">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='4' y='4' width='92' height='92' rx='14' fill='%2314181b' stroke='%239e2020' stroke-width='6'/><rect x='16' y='22' width='68' height='58' rx='2' fill='%23f4f2ec'/><line x1='29.6' y1='22' x2='29.6' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='43.2' y1='22' x2='43.2' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='56.8' y1='22' x2='56.8' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='70.4' y1='22' x2='70.4' y2='80' stroke='%2314181b' stroke-width='2'/><rect x='25' y='22' width='9' height='34' fill='%2314181b'/><rect x='38.7' y='22' width='9' height='34' fill='%2314181b'/><rect x='65.9' y='22' width='9' height='34' fill='%2314181b'/></svg>">
+<link rel="stylesheet" href="styles.css?v=20260724141742">
+<link rel="icon" href="icon.svg?v=20260724135928" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260724135928">
 </head>
 <body>
 
@@ -25,6 +26,7 @@
       <a href="index.html">INDEX</a>
       <a href="index.html#library">CATALOG</a>
       <a href="contributors.html">CONTRIBUTORS</a>
+      <a href="requests.html">REQUESTS</a>
       <a href="about.html">ABOUT</a>
       <a class="cta" href="profile.html">CONTRIBUTE</a>
     </nav>
@@ -98,6 +100,20 @@
           <div class="pc-lab">Print &amp; ship <span class="opt">(optional)</span></div>
           <label class="chk"><input type="checkbox" id="pfOffersPrint"> I can <b>print &amp; ship my own items</b> to people who can't make them</label>
           <label class="chk"><input type="checkbox" id="pfCommunityPrint"> Let <b>Brigham Larson Pianos or another Print Partner</b> fulfill print requests for my items when I can't</label>
+          <label class="chk"><input type="checkbox" id="pfPrintPartner"> Join the <b>Print Partner network</b> — I'll take on paid print &amp; ship jobs for <b>other makers' items</b> too</label>
+          <div class="pp-details" id="ppDetails" hidden>
+            <div class="pc-lab">My equipment <span class="opt">(check all that apply)</span></div>
+            <div class="pp-eq">
+              <label class="chk"><input type="checkbox" id="pfEqFdm"> 3D printer — filament (PLA / PETG / ABS / nylon)</label>
+              <label class="chk"><input type="checkbox" id="pfEqResin"> 3D printer — resin / SLA</label>
+              <label class="chk"><input type="checkbox" id="pfEqCncWood"> CNC — wood</label>
+              <label class="chk"><input type="checkbox" id="pfEqCncMetal"> CNC — metal (aluminum / brass)</label>
+            </div>
+            <div class="pp-row">
+              <label>Region I ship from <span class="opt">(e.g. Utah, USA)</span><input id="pfPrintRegion" type="text" placeholder="State / country"></label>
+              <label>Prints from (USD) <span class="opt">(base price, optional)</span><input id="pfPrintFrom" type="number" min="0" step="1" placeholder="75"></label>
+            </div>
+          </div>
           <label>What I can print <span class="opt">(optional — machines &amp; materials, e.g. "FDM: PLA, PETG; resin; CNC aluminum")</span><input id="pfPrintNotes" type="text" placeholder="e.g. FDM printer (PLA, PETG), SLA resin"></label>
           <label class="chk ack"><input type="checkbox" id="pfAckPrintNetwork"> <span>I understand that if I <b>don't</b> offer print &amp; ship myself, requests to print &amp; ship my items may be fulfilled by Brigham Larson Pianos or the <b>Print Partner network</b> of other contributors. <span class="req">(required)</span></span></label>
         </div>
@@ -171,6 +187,51 @@
         <button class="au-btn primary" id="upSubmit">SUBMIT TO THE LIBRARY</button>
         <span id="upStatus" class="dash-status"></span>
       </div>
+    </div>
+  </div>
+
+  <!-- Bulk upload -->
+  <div id="dashBulk" class="dash-block" hidden>
+    <h2>Bulk upload</h2>
+    <p class="dash-note">Sharing a whole folder of models? Pick all the files at once —
+    files with the same name (e.g. <span class="mono">flange.step</span> + <span class="mono">flange.stl</span>)
+    are grouped into one item automatically. Set the shared details once; you can rename
+    or edit anything after they're in review.</p>
+    <div class="dash-fields">
+      <label>Files <span class="opt">(select many — F3D, STEP, STL, 3MF, DXF, PDF, ZIP)</span>
+        <input id="bkFiles" type="file" multiple accept=".f3d,.step,.stp,.stl,.3mf,.pdf,.zip,.dxf"></label>
+      <div id="bkPreview" class="bk-preview" hidden></div>
+      <div class="dash-row">
+        <label>Category for all<select id="bkCat">
+          <option value="parts">Replacement Part</option>
+          <option value="fixtures">Jig / Fixture</option>
+          <option value="player">Player Piano</option>
+          <option value="cabinet">Cabinet</option>
+          <option value="research">Research</option>
+        </select></label>
+        <label>Maker / brand <span class="opt">(optional, for all)</span><input id="bkMaker" type="text" placeholder="e.g. Baldwin"></label>
+      </div>
+      <div class="dash-row">
+        <label>Pricing for all<select id="bkPricing">
+          <option value="free">Free</option>
+          <option value="tip">Free + tip jar</option>
+          <option value="pwyw">Pay what you want</option>
+          <option value="paid">Set a price</option>
+        </select></label>
+        <label>Price (USD) <span class="opt">(if priced)</span><input id="bkPrice" type="number" min="0" step="1" placeholder="15"></label>
+      </div>
+      <label>License for all<select id="bkLicense">
+        <option value="">No license note</option>
+        <option value="personal">Personal / professional use</option>
+        <option value="commercial">Commercial use OK</option>
+        <option value="noresale">No reselling the file</option>
+        <option value="cc0">Public domain (CC0)</option>
+      </select></label>
+      <div class="dash-actions">
+        <button class="au-btn primary" id="bkSubmit">UPLOAD ALL TO THE LIBRARY</button>
+        <span id="bkStatus" class="dash-status"></span>
+      </div>
+      <div class="bk-bar" id="bkBarWrap" hidden><div class="bk-fill" id="bkFill"></div></div>
     </div>
   </div>
 
@@ -263,13 +324,13 @@
   A FREE COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260724120049"></script>
-<script src="data.js?v=20260724120049"></script>
-<script src="auth.js?v=20260724120049"></script>
-<script src="backend.js?v=20260724120049"></script>
-<script src="activity.js?v=20260724120049"></script>
-<script src="feedback.js?v=20260724120049"></script>
-<script src="profile.js?v=20260724120049"></script>
+<script src="config.js?v=20260724141742"></script>
+<script src="data.js?v=20260724141742"></script>
+<script src="auth.js?v=20260724141742"></script>
+<script src="backend.js?v=20260724141742"></script>
+<script src="activity.js?v=20260724141742"></script>
+<script src="feedback.js?v=20260724141742"></script>
+<script src="profile.js?v=20260724141742"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");

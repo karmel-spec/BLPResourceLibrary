@@ -76,7 +76,32 @@
 
   // ---- Modal ----------------------------------------------------------------
   const modal = () => document.getElementById("commentModal");
-  function open(id, title) { openId = id; openTitle = title; renderModal(); modal().hidden = false; document.body.style.overflow = "hidden"; }
+  function open(id, title) { openId = id; openTitle = title; renderModal(); injectRating(id); modal().hidden = false; document.body.style.overflow = "hidden"; }
+
+  // 1-5 star rating row at the top of the feedback modal (signed-in users).
+  function injectRating(id) {
+    const head = document.querySelector("#commentModal .modal-head");
+    if (!head) return;
+    let row = document.getElementById("rateRow");
+    if (!row) {
+      row = document.createElement("div");
+      row.id = "rateRow";
+      row.className = "rate-row";
+      head.appendChild(row);
+    }
+    const render = () => {
+      const me = window.Auth && window.Auth.user && window.Auth.user();
+      const myS = window.Ratings ? window.Ratings.mine(id) : 0;
+      const n = window.Ratings ? window.Ratings.count(id) : 0;
+      const a = window.Ratings ? window.Ratings.avg(id) : 0;
+      row.innerHTML = `<span class="rate-lab mono">${n ? `${a.toFixed(1)}★ · ${n} RATING${n===1?"":"S"}` : "NOT RATED YET"}</span>
+        <span class="rate-stars" title="${me ? "Click to rate" : "Sign in to rate"}">${[1,2,3,4,5].map((k) =>
+          `<button class="rate-star${k <= myS ? " on" : ""}" data-star="${k}" ${me ? "" : "disabled"}>${k <= myS ? "★" : "☆"}</button>`).join("")}</span>`;
+      row.querySelectorAll(".rate-star").forEach((b) =>
+        b.onclick = async () => { await window.Ratings.rate(id, parseInt(b.dataset.star, 10)); render(); });
+    };
+    if (window.Ratings) window.Ratings.load().then(render); else row.innerHTML = "";
+  }
   function close() { modal().hidden = true; openId = null; document.body.style.overflow = ""; }
 
   function renderModal() {

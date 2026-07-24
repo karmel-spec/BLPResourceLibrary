@@ -37,7 +37,7 @@
   window.Auth.onChange(async (user) => {
     $("dashSignedOut").hidden = !!user;
     if (!user) {
-      ["dashProfile", "dashUpload", "dashMine", "dashAdmin"].forEach((id) => $(id).hidden = true);
+      ["dashProfile", "dashUpload", "dashBulk", "dashMine", "dashAdmin"].forEach((id) => $(id).hidden = true);
       return;
     }
     if (!sb()) {
@@ -50,11 +50,14 @@
     fillProfileForm(user);
     $("dashProfile").hidden = false;
     $("dashUpload").hidden = !profile;      // profile first, then uploads
+    $("dashBulk").hidden = !profile;
     $("dashMine").hidden = !profile;
     if (profile) loadMine();
     if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); initActivityLog(); initBetaFeedback(); initPrintRequests(); }
   });
   $("dashSignIn").onclick = () => window.Auth.signIn();
+
+  $("pfPrintPartner").addEventListener("change", () => { $("ppDetails").hidden = !$("pfPrintPartner").checked; });
 
   // Show the price field only when "Suggested price" is chosen.
   document.querySelectorAll('input[name="upPricing"]').forEach((r) =>
@@ -79,6 +82,15 @@
     $("pfOffersPrint").checked = !!profile?.offers_print;
     $("pfCommunityPrint").checked = !!profile?.allow_community_print;
     $("pfPrintNotes").value = profile?.print_notes || "";
+    $("pfPrintPartner").checked = !!profile?.print_partner;
+    $("ppDetails").hidden = !profile?.print_partner;
+    const eq = profile?.print_equipment || [];
+    $("pfEqFdm").checked = eq.includes("fdm");
+    $("pfEqResin").checked = eq.includes("resin");
+    $("pfEqCncWood").checked = eq.includes("cnc-wood");
+    $("pfEqCncMetal").checked = eq.includes("cnc-metal");
+    $("pfPrintRegion").value = profile?.print_region || "";
+    $("pfPrintFrom").value = profile?.print_from ?? "";
     $("pfAckPrintNetwork").checked = !!profile?.ack_print_network;
     const photo = photoUrl || profile?.photo_url || user.avatar || "";
     $("pfPhoto").src = photo || PHOTO_PLACEHOLDER;
@@ -131,6 +143,11 @@
       offers_print: $("pfOffersPrint").checked,
       allow_community_print: $("pfCommunityPrint").checked,
       print_notes: $("pfPrintNotes").value.trim() || null,
+      print_partner: $("pfPrintPartner").checked,
+      print_equipment: [["fdm","pfEqFdm"],["resin","pfEqResin"],["cnc-wood","pfEqCncWood"],["cnc-metal","pfEqCncMetal"]]
+        .filter(([,id]) => $(id).checked).map(([k]) => k),
+      print_region: $("pfPrintRegion").value.trim() || null,
+      print_from: parseFloat($("pfPrintFrom").value) || null,
       ack_print_network: true,
     };
     if (photoUrl) row.photo_url = photoUrl;
@@ -352,6 +369,77 @@
     el.textContent = msg;
     el.classList.toggle("err", !!isErr);
   }
+
+  // ---- Bulk upload -----------------------------------------------------------------
+  // Groups selected files by basename (flange.step + flange.stl -> one item),
+  // uploads every file to storage, and inserts one submission per group with
+  // the shared defaults. Progress bar tracks per-file uploads.
+  function bulkGroups() {
+    const groups = {};
+    for (const f of $("bkFiles").files) {
+      const base = f.name.replace(/\.[^.]+$/, "");
+      (groups[base] = groups[base] || []).push(f);
+    }
+    return groups;
+  }
+  function prettyTitle(base) {
+    return base.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim()
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+  $("bkFiles").addEventListener("change", () => {
+    const groups = bulkGroups();
+    const names = Object.keys(groups);
+    $("bkPreview").hidden = !names.length;
+    $("bkPreview").innerHTML = names.length
+      ? `<b>${names.length} item${names.length === 1 ? "" : "s"}</b> from ${$("bkFiles").files.length} files:<br>` +
+        names.map((n) => `• ${prettyTitle(n)} <span>(${groups[n].map((f) => f.name.split(".").pop().toUpperCase()).join(", ")})</span>`).join("<br>")
+      : "";
+  });
+  $("bkSubmit").onclick = async () => {
+    const groups = bulkGroups();
+    const names = Object.keys(groups);
+    if (!names.length) return setStatus("bkStatus", "Pick some files first.", true);
+    const pricing = $("bkPricing").value;
+    const priceVal = parseFloat($("bkPrice").value);
+    if ((pricing === "paid") && !(priceVal > 0)) return setStatus("bkStatus", "Enter a price, or switch pricing to Free.", true);
+    const totalFiles = $("bkFiles").files.length;
+    let doneFiles = 0, ok = 0, failed = [];
+    $("bkBarWrap").hidden = false; $("bkFill").style.width = "0%";
+    $("bkSubmit").disabled = true;
+    for (const base of names) {
+      try {
+        const files = {};
+        for (const f of groups[base]) {
+          const ext = (f.name.split(".").pop() || "file").toLowerCase().replace("stp", "step");
+          const path = `${uid()}/${Date.now()}-${slugify(base)}.${ext}`;
+          setStatus("bkStatus", `Uploading ${prettyTitle(base)} (${++doneFiles}/${totalFiles})…`);
+          const { error } = await sb().storage.from("contributions").upload(path, f);
+          if (error) throw error;
+          files[ext] = sb().storage.from("contributions").getPublicUrl(path).data.publicUrl;
+          $("bkFill").style.width = Math.round((doneFiles / totalFiles) * 100) + "%";
+        }
+        const { error } = await sb().from("submissions").insert({
+          contributor_id: uid(), title: prettyTitle(base),
+          category: $("bkCat").value, maker: $("bkMaker").value.trim() || null,
+          description: null, files,
+          pricing, price: (pricing === "paid" || pricing === "pwyw") && priceVal > 0 ? priceVal : null,
+          license: $("bkLicense").value || null,
+        });
+        if (error) throw error;
+        ok++;
+      } catch (err) { failed.push(prettyTitle(base) + " (" + err.message + ")"); }
+    }
+    $("bkSubmit").disabled = false;
+    $("bkFill").style.width = "100%";
+    if (ok) {
+      notifyLibrarians(`Bulk upload: ${ok} item${ok === 1 ? "" : "s"}`);
+      if (window.Activity) window.Activity.log("submission", `bulk: ${ok} items`);
+    }
+    setStatus("bkStatus", failed.length
+      ? `${ok} submitted ✓ — ${failed.length} failed: ${failed.join("; ")}`
+      : `All ${ok} item${ok === 1 ? "" : "s"} submitted ✓ The librarians will review them shortly.`, !!failed.length);
+    if (ok) { $("bkFiles").value = ""; $("bkPreview").hidden = true; loadMine(); }
+  };
 
   // ---- Newsletter prep (admins only) ---------------------------------------------
   // Builds a plain-text digest of everything added in the chosen period, can email

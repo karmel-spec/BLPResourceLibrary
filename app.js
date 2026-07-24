@@ -131,7 +131,7 @@ function payRow(r) {
 }
 function printBtn(r) {
   if (r.youtube || !PRINTABLE_CATS.includes(r.cat)) return "";
-  return `<button class="printship-btn" data-id="${r.id}" data-title="${attr(r.title)}" data-by="${r.by || ""}">🖨 Pay to print &amp; ship</button>`;
+  return `<button class="printship-btn" data-id="${r.id}" data-title="${attr(r.title)}" data-by="${r.by || ""}" data-printprice="${r.print_price || ""}">🖨 Pay to print &amp; ship</button>`;
 }
 
 function card(r) {
@@ -165,6 +165,7 @@ function card(r) {
       <button class="feedback-btn" data-id="${r.id}" data-title="${attr(r.title)}">
         <span class="fb-ic">💬</span> Feedback <span class="fb-n"></span>
       </button>
+      <span class="rate-chip mono" data-rate-id="${r.id}"></span>
     </div>
   </div>`;
 }
@@ -208,6 +209,7 @@ function renderAcquisitions() {
     .slice(0, ACQUISITION_COUNT);
   document.getElementById("acquisitions").innerHTML = items.map(card).join("");
   if (window.Comments) window.Comments.refreshBadges();
+  if (window.Ratings) window.Ratings.load().then(() => window.Ratings.refreshChips());
 }
 
 function renderGrid() {
@@ -229,6 +231,7 @@ function renderGrid() {
       : "The Full Catalog";
   }
   if (window.Comments) window.Comments.refreshBadges();
+  if (window.Ratings) window.Ratings.load().then(() => window.Ratings.refreshChips());
 }
 
 function render() { renderTabs(); renderGrid(); }

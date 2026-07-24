@@ -56,6 +56,7 @@ async function renderProfilePage() {
           <div class="ps"><b>${files}</b>CAD FILES</div>
           <div class="ps"><b>${vids}</b>TRAINING VIDEOS</div>
           <div class="ps"><b>${mine.length}</b>TOTAL SHARED</div>
+          <div class="ps" id="psRating" hidden><b id="psRatingVal">—</b>MAKER RATING</div>
         </div>
       </div>
     </div>
@@ -65,6 +66,14 @@ async function renderProfilePage() {
     </div>
   </div>`;
   document.getElementById("grid").innerHTML = mine.map(card).join("");
+  if (window.Ratings) window.Ratings.load().then(() => {
+    const rr = window.Ratings.forContributor(mine.map((r) => r.id));
+    if (rr.count) {
+      document.getElementById("psRating").hidden = false;
+      document.getElementById("psRatingVal").textContent = rr.avg.toFixed(1) + "★";
+    }
+    window.Ratings.refreshChips();
+  });
 }
 
 function fmtDate(iso) {
@@ -143,7 +152,7 @@ function payRow(r) {
 }
 function printBtn(r) {
   if (r.youtube || !PRINTABLE_CATS.includes(r.cat)) return "";
-  return `<button class="printship-btn" data-id="${r.id}" data-title="${esc2(r.title)}" data-by="${r.by || ""}">🖨 Pay to print &amp; ship</button>`;
+  return `<button class="printship-btn" data-id="${r.id}" data-title="${esc2(r.title)}" data-by="${r.by || ""}" data-printprice="${r.print_price || ""}">🖨 Pay to print &amp; ship</button>`;
 }
 
 function card(r) {
@@ -176,10 +185,12 @@ function card(r) {
       <button class="feedback-btn" data-id="${r.id}" data-title="${String(r.title).replace(/"/g, "&quot;")}">
         <span class="fb-ic">💬</span> Feedback <span class="fb-n"></span>
       </button>
+      <span class="rate-chip mono" data-rate-id="${r.id}"></span>
     </div>
   </div>`;
 }
 
 renderProfilePage().then(() => {
   if (window.Comments) window.Comments.refreshBadges();
+  if (window.Ratings) window.Ratings.load().then(() => window.Ratings.refreshChips());
 });
