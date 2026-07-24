@@ -157,7 +157,10 @@ h1 span { color: var(--red); }
   font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; padding: 2px 7px; border: 1px solid #3a4449;
 }
 .pc .thumb.cad { background: #d7dde0; }
-.pc .thumb.cad img { opacity: 1; }
+/* CAD renders: never crop the model — contain it, centered, on a light
+   neutral that matches the render background. Videos keep cover. */
+.pc .thumb.cad { background: #eceded; }
+.pc .thumb.cad img { opacity: 1; object-fit: contain; object-position: center; }
 .pc .thumb .badge3d {
   position: absolute; left: 8px; top: 8px; background: var(--red); color: #fff;
   font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 1px; padding: 2px 7px;
@@ -533,6 +536,14 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 }
 .price-badge.free { background: #e7efe7; color: #1c7c33; border: 1px solid #b7d6bd; }
 .price-badge.paid { background: var(--red); color: #fff; }
+/* On thumbnails the badge becomes a bold corner tag (top-right, opposite 3D MODEL) */
+.pc .thumb .price-badge {
+  position: absolute; right: 8px; top: 8px; font-size: 12px; font-weight: 700;
+  letter-spacing: 1.5px; padding: 4px 11px; border: none; box-shadow: 0 2px 6px rgba(20,24,27,.25);
+}
+.pc .thumb .price-badge.free { background: #14181b; color: #7ee08a; }
+.pc .thumb .price-badge.pwyw { background: #14181b; color: #f4f2ec; }
+.pc .thumb .price-badge.paid { background: var(--red); color: #fff; }
 .pay-row { margin: 10px 0 2px; padding: 9px 11px; border: 1px solid var(--line); background: rgba(255,255,255,.6); }
 .pay-row.paid { border-color: var(--red); background: rgba(158,32,32,.05); }
 .pay-ask { font-size: 12.5px; color: var(--ink); display: block; }

@@ -142,8 +142,8 @@ function card(r) {
     const href = primaryHref(r);
     const img = `<img loading="lazy" src="${r.thumb}" alt="${r.title}"><span class="badge3d">3D MODEL</span>`;
     thumb = href
-      ? `<div class="thumb cad"><a href="${href}" target="_blank" rel="noopener">${img}</a></div>`
-      : `<div class="thumb cad">${img}</div>`;
+      ? `<div class="thumb cad"><a href="${href}" target="_blank" rel="noopener">${img}</a>${priceBadge(r)}</div>`
+      : `<div class="thumb cad">${img}${priceBadge(r)}</div>`;
   }
   const meta = r.youtube
     ? `<div class="maker">${topicLabel(r.sub)}</div>`
@@ -153,7 +153,7 @@ function card(r) {
     <div class="head"><span><b>${r.id}</b> / ${catLabel(r.cat)}</span><span>${r.youtube ? "YOUTUBE" : "FUSION 360"}</span></div>
     ${thumb}
     <div class="body">
-      <h3>${r.title} ${priceBadge(r)}</h3>
+      <h3>${r.title} ${(!r.thumb && !r.youtube) ? priceBadge(r) : ""}</h3>
       ${meta}
       ${r.desc ? `<p>${r.desc}</p>` : `<p class="spacer"></p>`}
       <div class="dl">${links}</div>
