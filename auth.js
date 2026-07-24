@@ -170,7 +170,7 @@ if (!location.hash) {
         <button class="modal-close" id="agClose" aria-label="Close">×</button>
         <div class="ag-head mono">MEMBER CHECK-IN</div>
         <h3 id="agTitle">Sign in to continue</h3>
-        <p class="ag-copy">The library is free, forever. We ask for a quick sign-in
+        <p class="ag-copy">We ask for a quick sign-in
         before <b id="agAction">downloads</b> so shared knowledge carries a name —
         the same reason every card credits its contributor.</p>
         <button class="au-btn primary block" id="agSignIn">${SUPABASE_READY ? "SIGN IN WITH GOOGLE" : "SIGN IN (DEMO)"}</button>

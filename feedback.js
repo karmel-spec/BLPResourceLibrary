@@ -29,6 +29,10 @@
     // Fixed tab in the bottom-right corner — out of the header, always reachable.
     document.body.appendChild(btn);
 
+    // Nav / hamburger-menu entry opens the same popup.
+    document.querySelectorAll(".nav-beta").forEach((a) =>
+      a.addEventListener("click", (e) => { e.preventDefault(); open(); }));
+
     // Modal
     el = document.createElement("div");
     el.className = "fb-backdrop";

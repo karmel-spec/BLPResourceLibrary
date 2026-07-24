@@ -480,7 +480,7 @@ ${items.length ? `Here's what your fellow technicians added to the library this 
 
 ${lines.join("\n") || "  (no new items this period)"}
 
-Browse everything, download files, and preview parts in 3D — free, always:
+Browse everything, download files, and preview parts in 3D:
 https://pianotechnologylibrary.com
 
 Have something of your own to share? Every contribution is credited and linked to you:
