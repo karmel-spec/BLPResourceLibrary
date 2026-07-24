@@ -97,26 +97,41 @@ function fileLinks(r) {
 // Honor-system pricing: a FREE/$price badge on the card, and a "pay the maker"
 // panel that links to the contributor's own payment links (Venmo/Zelle/etc.).
 // The library never processes payment — it's peer-to-peer, download stays open.
+const PRINTABLE_CATS = ["parts", "fixtures", "cabinet", "player"];
+const LICENSE_LABEL = {
+  personal: "Personal / professional use", commercial: "Commercial use OK",
+  noresale: "No reselling the file", cc0: "Public domain (CC0)",
+};
 function priceBadge(r) {
   if (r.youtube) return "";
   if (r.pricing === "paid" && r.price) return `<span class="price-badge paid">$${r.price}</span>`;
+  if (r.pricing === "pwyw") return `<span class="price-badge pwyw" title="Pay what you want">PWYW</span>`;
   return `<span class="price-badge free">FREE</span>`;
+}
+function licenseLine(r) {
+  const l = LICENSE_LABEL[r.license];
+  return l ? `<div class="lic-line mono">⚖ ${l}</div>` : "";
 }
 function payRow(r) {
   if (r.youtube) return "";
   const c = (typeof CONTRIBUTORS !== "undefined" && CONTRIBUTORS[r.by]) || {};
   const pays = c.payment_links || [];
   const links = pays.map((l) => `<a class="pay-link" href="${l.url}" target="_blank" rel="noopener">${attr(l.label)}</a>`).join("");
+  const missing = `<div class="pay-note mono">Payment link coming soon — check their profile.</div>`;
   if (r.pricing === "paid" && r.price) {
-    return `<div class="pay-row paid">
-      <div class="pay-ask">💛 The maker suggests <b>$${r.price}</b> — pay them directly if this helps you:</div>
-      ${links ? `<div class="pay-links">${links}</div>` : `<div class="pay-note mono">Payment link coming soon — check their profile.</div>`}
-    </div>`;
+    return `<div class="pay-row paid"><div class="pay-ask">💛 The maker asks <b>$${r.price}</b> — pay them directly if this helps you:</div>${links ? `<div class="pay-links">${links}</div>` : missing}</div>`;
   }
-  if (links) {
+  if (r.pricing === "pwyw") {
+    return `<div class="pay-row paid"><div class="pay-ask">💛 Pay what you want${r.price ? ` <b>(suggested $${r.price})</b>` : ""} — send the maker whatever it's worth to you:</div>${links ? `<div class="pay-links">${links}</div>` : missing}</div>`;
+  }
+  if (r.pricing === "tip" && links) {
     return `<div class="pay-row tip"><span class="pay-ask">☕ Free to download — if it saved you time, thank the maker:</span><div class="pay-links">${links}</div></div>`;
   }
   return "";
+}
+function printBtn(r) {
+  if (r.youtube || !PRINTABLE_CATS.includes(r.cat)) return "";
+  return `<button class="printship-btn" data-id="${r.id}" data-title="${attr(r.title)}" data-by="${r.by || ""}">🖨 Pay to print &amp; ship</button>`;
 }
 
 function card(r) {
@@ -142,7 +157,9 @@ function card(r) {
       ${meta}
       ${r.desc ? `<p>${r.desc}</p>` : `<p class="spacer"></p>`}
       <div class="dl">${links}</div>
+      ${printBtn(r)}
       ${payRow(r)}
+      ${licenseLine(r)}
       ${r.dateAdded ? `<div class="added">ADDED ${fmtDate(r.dateAdded).toUpperCase()}</div>` : ""}
       ${byline(r)}
       <button class="feedback-btn" data-id="${r.id}" data-title="${attr(r.title)}">

@@ -37,6 +37,9 @@
       website: row.website || "",
       links: Array.isArray(row.links) ? row.links : [],
       payment_links: Array.isArray(row.payment_links) ? row.payment_links : [],
+      offers_print: !!row.offers_print,
+      allow_community_print: !!row.allow_community_print,
+      print_notes: row.print_notes || "",
       community: true,
     };
   }
@@ -53,8 +56,9 @@
       formats: Object.keys(files).map((k) => k.toUpperCase()),
       by: slugById[row.contributor_id] || null,
       dateAdded: (row.created_at || "").slice(0, 10),
-      pricing: row.pricing === "paid" ? "paid" : "free",
+      pricing: ["free", "tip", "pwyw", "paid"].includes(row.pricing) ? row.pricing : "free",
       price: row.price != null ? Number(row.price) : null,
+      license: row.license || null,
       community: true,
     };
     if (Object.keys(files).length) r.files = files;

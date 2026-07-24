@@ -108,26 +108,42 @@ function fileLinks(r) {
   return parts.join("");
 }
 
+const PRINTABLE_CATS = ["parts", "fixtures", "cabinet", "player"];
+const LICENSE_LABEL = {
+  personal: "Personal / professional use", commercial: "Commercial use OK",
+  noresale: "No reselling the file", cc0: "Public domain (CC0)",
+};
+const esc2 = (s) => String(s).replace(/"/g, "&quot;");
 function priceBadge(r) {
   if (r.youtube) return "";
   if (r.pricing === "paid" && r.price) return `<span class="price-badge paid">$${r.price}</span>`;
+  if (r.pricing === "pwyw") return `<span class="price-badge pwyw" title="Pay what you want">PWYW</span>`;
   return `<span class="price-badge free">FREE</span>`;
+}
+function licenseLine(r) {
+  const l = LICENSE_LABEL[r.license];
+  return l ? `<div class="lic-line mono">⚖ ${l}</div>` : "";
 }
 function payRow(r) {
   if (r.youtube) return "";
   const c = (typeof CONTRIBUTORS !== "undefined" && CONTRIBUTORS[r.by]) || {};
   const pays = c.payment_links || [];
-  const links = pays.map((l) => `<a class="pay-link" href="${l.url}" target="_blank" rel="noopener">${String(l.label).replace(/"/g, "&quot;")}</a>`).join("");
+  const links = pays.map((l) => `<a class="pay-link" href="${l.url}" target="_blank" rel="noopener">${esc2(l.label)}</a>`).join("");
+  const missing = `<div class="pay-note mono">Payment link coming soon — check their profile.</div>`;
   if (r.pricing === "paid" && r.price) {
-    return `<div class="pay-row paid">
-      <div class="pay-ask">💛 The maker suggests <b>$${r.price}</b> — pay them directly if this helps you:</div>
-      ${links ? `<div class="pay-links">${links}</div>` : `<div class="pay-note mono">Payment link coming soon — check their profile.</div>`}
-    </div>`;
+    return `<div class="pay-row paid"><div class="pay-ask">💛 The maker asks <b>$${r.price}</b> — pay them directly if this helps you:</div>${links ? `<div class="pay-links">${links}</div>` : missing}</div>`;
   }
-  if (links) {
+  if (r.pricing === "pwyw") {
+    return `<div class="pay-row paid"><div class="pay-ask">💛 Pay what you want${r.price ? ` <b>(suggested $${r.price})</b>` : ""} — send the maker whatever it's worth to you:</div>${links ? `<div class="pay-links">${links}</div>` : missing}</div>`;
+  }
+  if (r.pricing === "tip" && links) {
     return `<div class="pay-row tip"><span class="pay-ask">☕ Free to download — if it saved you time, thank the maker:</span><div class="pay-links">${links}</div></div>`;
   }
   return "";
+}
+function printBtn(r) {
+  if (r.youtube || !PRINTABLE_CATS.includes(r.cat)) return "";
+  return `<button class="printship-btn" data-id="${r.id}" data-title="${esc2(r.title)}" data-by="${r.by || ""}">🖨 Pay to print &amp; ship</button>`;
 }
 
 function card(r) {
@@ -149,10 +165,13 @@ function card(r) {
     <div class="head"><span><b>${r.id}</b> / ${catLabel(r.cat)}</span><span>${r.youtube ? "YOUTUBE" : "FUSION 360"}</span></div>
     ${thumb}
     <div class="body">
-      <h3>${r.title}</h3>
+      <h3>${r.title} ${priceBadge(r)}</h3>
       ${meta}
       ${r.desc ? `<p>${r.desc}</p>` : `<p class="spacer"></p>`}
       <div class="dl">${links}</div>
+      ${printBtn(r)}
+      ${payRow(r)}
+      ${licenseLine(r)}
       ${r.dateAdded ? `<div class="added">ADDED ${fmtDate(r.dateAdded).toUpperCase()}</div>` : ""}
       <button class="feedback-btn" data-id="${r.id}" data-title="${String(r.title).replace(/"/g, "&quot;")}">
         <span class="fb-ic">💬</span> Feedback <span class="fb-n"></span>

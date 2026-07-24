@@ -6,7 +6,7 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260724112513">
+<link rel="stylesheet" href="styles.css?v=20260724115300">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='4' y='4' width='92' height='92' rx='14' fill='%2314181b' stroke='%239e2020' stroke-width='6'/><rect x='16' y='22' width='68' height='58' rx='2' fill='%23f4f2ec'/><line x1='29.6' y1='22' x2='29.6' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='43.2' y1='22' x2='43.2' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='56.8' y1='22' x2='56.8' y2='80' stroke='%2314181b' stroke-width='2'/><line x1='70.4' y1='22' x2='70.4' y2='80' stroke='%2314181b' stroke-width='2'/><rect x='25' y='22' width='9' height='34' fill='%2314181b'/><rect x='38.7' y='22' width='9' height='34' fill='%2314181b'/><rect x='65.9' y='22' width='9' height='34' fill='%2314181b'/></svg>">
 </head>
 <body>
@@ -93,6 +93,15 @@
         <label>Links <span class="opt">(optional — one per line, e.g. YOUTUBE https://…)</span><textarea id="pfLinks" rows="3" placeholder="YOUTUBE https://youtube.com/@you&#10;INSTAGRAM https://instagram.com/you"></textarea></label>
         <label>Payment links <span class="opt">(optional — one per line, e.g. VENMO https://venmo.com/u/you)</span><textarea id="pfPay" rows="3" placeholder="VENMO https://venmo.com/u/you&#10;ZELLE https://…&#10;PAYPAL https://paypal.me/you&#10;CASHAPP https://cash.app/$you"></textarea></label>
         <p class="fine">These appear on your profile and on your paid items so people can pay you directly. Payments happen between you and the user — the library doesn't process or take a cut. See the <a href="terms.html" target="_blank" rel="noopener">Terms</a>.</p>
+
+        <div class="print-optin">
+          <div class="pc-lab">Print &amp; ship <span class="opt">(optional)</span></div>
+          <label class="chk"><input type="checkbox" id="pfOffersPrint"> I can <b>print &amp; ship my own items</b> to people who can't make them</label>
+          <label class="chk"><input type="checkbox" id="pfCommunityPrint"> Let <b>Brigham Larson Pianos or another Print Partner</b> fulfill print requests for my items when I can't</label>
+          <label>What I can print <span class="opt">(optional — machines &amp; materials, e.g. "FDM: PLA, PETG; resin; CNC aluminum")</span><input id="pfPrintNotes" type="text" placeholder="e.g. FDM printer (PLA, PETG), SLA resin"></label>
+          <label class="chk ack"><input type="checkbox" id="pfAckPrintNetwork"> <span>I understand that if I <b>don't</b> offer print &amp; ship myself, requests to print &amp; ship my items may be fulfilled by Brigham Larson Pianos or the <b>Print Partner network</b> of other contributors. <span class="req">(required)</span></span></label>
+        </div>
+
         <div class="dash-actions">
           <button class="au-btn primary" id="pfSave">SAVE PROFILE</button>
           <a id="pfView" class="au-btn" hidden>VIEW PUBLIC PROFILE</a>
@@ -135,13 +144,26 @@
       <label>Preview image <span class="opt">(optional — a render or photo for the card)</span><input id="upThumb" type="file" accept="image/*"></label>
       <label>YouTube link <span class="opt">(optional — for training videos)</span><input id="upYoutube" type="url" placeholder="https://youtube.com/watch?v=…"></label>
       <div class="price-choice">
-        <label class="pc-opt"><input type="radio" name="upPricing" value="free" checked> <b>Free download</b> — share it freely with the community</label>
-        <label class="pc-opt"><input type="radio" name="upPricing" value="paid"> <b>Suggested price</b> — ask for support when people download</label>
+        <div class="pc-lab">How would you like to offer this download?</div>
+        <label class="pc-opt"><input type="radio" name="upPricing" value="free" checked> <b>Free</b> — share it freely, no strings</label>
+        <label class="pc-opt"><input type="radio" name="upPricing" value="tip"> <b>Free + tip jar</b> — free to download, but invite a thank-you tip</label>
+        <label class="pc-opt"><input type="radio" name="upPricing" value="pwyw"> <b>Pay what you want</b> — free to download, with a suggested amount</label>
+        <label class="pc-opt"><input type="radio" name="upPricing" value="paid"> <b>Set a price</b> — ask a specific amount (honor-system on this platform)</label>
         <div class="pc-price" id="upPriceWrap" hidden>
-          <label>Suggested price (USD) $ <input id="upPrice" type="number" min="0" step="1" placeholder="15"></label>
-          <p class="fine">Honor-system: the price and your payment links show on the item, and the file stays downloadable. Add your payment links in your profile above so people can pay you.</p>
+          <label><span id="upPriceLab">Suggested price</span> (USD) $ <input id="upPrice" type="number" min="0" step="1" placeholder="15"></label>
+          <p class="fine">Payments go directly to you through your payment links — the library never processes money or takes a cut, and the file stays downloadable. Add your Venmo/Zelle/etc. in your profile above.</p>
+          <label class="chk ack"><input type="checkbox" id="upAckHonor"> <span>I understand the library is in <b>beta</b> and monetization is <b>honor-system only</b> — nothing currently prevents someone from downloading without paying. I set prices at my own risk. <span class="req">(required to charge)</span></span></label>
         </div>
       </div>
+      <label>License <span class="opt">(how others may use it)</span>
+        <select id="upLicense">
+          <option value="personal">Personal / professional use — no redistribution</option>
+          <option value="commercial">Commercial use OK</option>
+          <option value="noresale">Use freely, but no reselling the file</option>
+          <option value="cc0">Public domain (CC0) — do anything</option>
+          <option value="">Not specified</option>
+        </select>
+      </label>
       <p class="fine upload-agree">By submitting, you confirm this is your own work or that you
       have the right to share it, and that it doesn't include anyone else's proprietary designs.
       See our <a href="terms.html" target="_blank" rel="noopener">Terms &amp; disclaimers</a>.</p>
@@ -215,6 +237,19 @@
     </div>
     <div class="beta-list" id="betaList"></div>
   </div>
+
+  <!-- Print & ship requests (admins only) -->
+  <div id="dashPrint" class="dash-block admin" hidden>
+    <h2>Print &amp; ship requests <span class="mono admin-tag">LIBRARIAN</span></h2>
+    <p class="dash-note">Requests to print &amp; ship physical items. Ones routed to
+    Brigham Larson Pianos are yours to fulfill; ones routed to a maker are for
+    your reference. Reply to the requester with a quote, then mark done.</p>
+    <div class="log-controls">
+      <div class="log-filters" id="prqFilters"></div>
+      <button class="au-btn" id="prqRefresh">↻ REFRESH</button>
+    </div>
+    <div class="beta-list" id="prqList"></div>
+  </div>
 </div>
 
 <footer>
@@ -228,13 +263,13 @@
   A FREE COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260724112513"></script>
-<script src="data.js?v=20260724112513"></script>
-<script src="auth.js?v=20260724112513"></script>
-<script src="backend.js?v=20260724112513"></script>
-<script src="activity.js?v=20260724112513"></script>
-<script src="feedback.js?v=20260724112513"></script>
-<script src="profile.js?v=20260724112513"></script>
+<script src="config.js?v=20260724115300"></script>
+<script src="data.js?v=20260724115300"></script>
+<script src="auth.js?v=20260724115300"></script>
+<script src="backend.js?v=20260724115300"></script>
+<script src="activity.js?v=20260724115300"></script>
+<script src="feedback.js?v=20260724115300"></script>
+<script src="profile.js?v=20260724115300"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");

@@ -98,3 +98,38 @@ alter table contributors add column if not exists payment_links jsonb not null d
 alter table contributors add column if not exists pricing_mode text not null default 'free';
 alter table submissions add column if not exists pricing text not null default 'free' check (pricing in ('free','paid'));
 alter table submissions add column if not exists price numeric;
+
+-- Monetization v2: extra pricing modes, per-item license, contributor print
+-- opt-in flags + acknowledgment, and a print_requests table.
+alter table submissions drop constraint if exists submissions_pricing_check;
+alter table submissions add constraint submissions_pricing_check check (pricing in ('free','tip','pwyw','paid'));
+alter table submissions add column if not exists license text;
+alter table submissions add column if not exists ack_honor boolean not null default false;
+
+alter table contributors add column if not exists offers_print boolean not null default false;
+alter table contributors add column if not exists allow_community_print boolean not null default false;
+alter table contributors add column if not exists print_notes text;
+alter table contributors add column if not exists ack_print_network boolean not null default false;
+
+create table if not exists print_requests (
+  id bigint generated always as identity primary key,
+  item_ref text, item_title text, contributor_slug text,
+  fulfiller text,                 -- 'maker' | 'blp'
+  requester_name text, requester_email text, shipping_address text,
+  material text, quantity int default 1, shipping_speed text, notes text,
+  status text not null default 'open' check (status in ('open','done')),
+  created_at timestamptz default now()
+);
+alter table print_requests enable row level security;
+drop policy if exists "anyone can request print" on print_requests;
+create policy "anyone can request print" on print_requests
+  for insert to anon, authenticated with check (true);
+drop policy if exists "admins read prints" on print_requests;
+create policy "admins read prints" on print_requests
+  for select using (auth.jwt() ->> 'email' in
+    ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+drop policy if exists "admins update prints" on print_requests;
+create policy "admins update prints" on print_requests
+  for update using (auth.jwt() ->> 'email' in
+    ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+create index if not exists print_requests_status_idx on print_requests (status, created_at desc);

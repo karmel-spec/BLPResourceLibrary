@@ -23,6 +23,11 @@ const CONFIG = {
 
   // Where "new submission — please review" alert emails go (via formsubmit.co).
   NOTIFY_EMAIL: "info@brighamlarsonpianos.com",
+
+  // Print & ship: where requests are routed (BLP is the anchor fulfiller), and
+  // the starting price BLP quotes from when it fulfills a print itself.
+  PRINT_EMAIL: "info@brighamlarsonpianos.com",
+  PRINT_BASE_FROM: 75,
 };
 
 // True once real Supabase credentials have been filled in above.

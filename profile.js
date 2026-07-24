@@ -52,14 +52,16 @@
     $("dashUpload").hidden = !profile;      // profile first, then uploads
     $("dashMine").hidden = !profile;
     if (profile) loadMine();
-    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); initActivityLog(); initBetaFeedback(); }
+    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); initActivityLog(); initBetaFeedback(); initPrintRequests(); }
   });
   $("dashSignIn").onclick = () => window.Auth.signIn();
 
   // Show the price field only when "Suggested price" is chosen.
   document.querySelectorAll('input[name="upPricing"]').forEach((r) =>
     r.addEventListener("change", () => {
-      $("upPriceWrap").hidden = document.querySelector('input[name="upPricing"]:checked').value !== "paid";
+      const v = document.querySelector('input[name="upPricing"]:checked').value;
+      $("upPriceWrap").hidden = !(v === "paid" || v === "pwyw");
+      $("upPriceLab").textContent = v === "paid" ? "Price" : "Suggested price";
     }));
 
   // ---- profile editor --------------------------------------------------------
@@ -74,6 +76,10 @@
       .map((l) => `${l.label} ${l.url}`).join("\n");
     $("pfPay").value = (profile?.payment_links || [])
       .map((l) => `${l.label} ${l.url}`).join("\n");
+    $("pfOffersPrint").checked = !!profile?.offers_print;
+    $("pfCommunityPrint").checked = !!profile?.allow_community_print;
+    $("pfPrintNotes").value = profile?.print_notes || "";
+    $("pfAckPrintNetwork").checked = !!profile?.ack_print_network;
     const photo = photoUrl || profile?.photo_url || user.avatar || "";
     $("pfPhoto").src = photo || PHOTO_PLACEHOLDER;
     $("pfPhotoBtnText").textContent = photo ? "CHANGE PHOTO" : "ADD PHOTO";
@@ -103,6 +109,8 @@
   $("pfSave").onclick = async () => {
     const name = $("pfName").value.trim();
     if (!name) return setStatus("pfStatus", "Please enter your name.", true);
+    if (!$("pfAckPrintNetwork").checked)
+      return setStatus("pfStatus", "Please check the print-network acknowledgment before saving.", true);
     setStatus("pfStatus", "Saving…");
     const parseLinks = (val) => val.split("\n").map((l) => l.trim()).filter(Boolean)
       .map((l) => { const i = l.indexOf(" ");
@@ -120,6 +128,10 @@
       bio: $("pfBio").value.trim() || null,
       links,
       payment_links,
+      offers_print: $("pfOffersPrint").checked,
+      allow_community_print: $("pfCommunityPrint").checked,
+      print_notes: $("pfPrintNotes").value.trim() || null,
+      ack_print_network: true,
     };
     if (photoUrl) row.photo_url = photoUrl;
     else if (!profile) row.photo_url = window.Auth.user().avatar || null;
@@ -184,6 +196,8 @@
       }
       setStatus("upStatus", "Submitting…");
       const pricing = document.querySelector('input[name="upPricing"]:checked')?.value || "free";
+      if ((pricing === "paid" || pricing === "pwyw") && !$("upAckHonor").checked)
+        return setStatus("upStatus", "Please check the honor-system acknowledgment to charge for this item.", true);
       const priceVal = parseFloat($("upPrice").value);
       const row = {
         contributor_id: uid(),
@@ -193,7 +207,8 @@
         description: $("upDesc").value.trim() || null,
         files, thumb_url, youtube: youtube || null,
         pricing,
-        price: pricing === "paid" && priceVal > 0 ? priceVal : null,
+        price: (pricing === "paid" || pricing === "pwyw") && priceVal > 0 ? priceVal : null,
+        license: $("upLicense").value || null,
       };
       if (newVersionOf) {
         row.version = (newVersionOf.version || 1) + 1;
@@ -558,5 +573,53 @@ Brigham Larson Pianos & the Piano Technology Library
     const { error } = await sb().from("beta_feedback").update({ status }).eq("id", id);
     if (error) { alert("Update failed: " + error.message); return; }
     loadBeta();
+  }
+
+  // ---- Print & ship requests (admins only) ---------------------------------------
+  let prqFilter = "open";
+  function initPrintRequests() {
+    $("dashPrint").hidden = false;
+    const filters = ["open", "done", "all"];
+    $("prqFilters").innerHTML = filters.map((f) =>
+      `<button class="log-filter${f === prqFilter ? " on" : ""}" data-prq="${f}">${f.toUpperCase()}</button>`).join("");
+    $("prqFilters").querySelectorAll("[data-prq]").forEach((b) =>
+      b.onclick = () => { prqFilter = b.dataset.prq; loadPrq(); });
+    $("prqRefresh").onclick = loadPrq;
+    loadPrq();
+  }
+  async function loadPrq() {
+    $("prqFilters").querySelectorAll("[data-prq]").forEach((b) =>
+      b.classList.toggle("on", b.dataset.prq === prqFilter));
+    $("prqList").innerHTML = `<div class="cm-empty">Loading…</div>`;
+    let q = sb().from("print_requests").select("*").order("created_at", { ascending: false }).limit(200);
+    if (prqFilter !== "all") q = q.eq("status", prqFilter);
+    const { data, error } = await q;
+    if (error) { $("prqList").innerHTML = `<div class="cm-empty">Could not load requests: ${esc(error.message)}</div>`; return; }
+    const rows = data || [];
+    $("prqList").innerHTML = rows.length
+      ? rows.map(prqRow).join("")
+      : `<div class="cm-empty">No ${prqFilter === "all" ? "" : prqFilter + " "}print requests${prqFilter === "open" ? " — nothing waiting. 🖨" : "."}</div>`;
+    $("prqList").querySelectorAll("[data-done]").forEach((b) => b.onclick = () => setPrqStatus(b.dataset.done, "done"));
+    $("prqList").querySelectorAll("[data-reopen]").forEach((b) => b.onclick = () => setPrqStatus(b.dataset.reopen, "open"));
+  }
+  function prqRow(r) {
+    const done = r.status === "done";
+    const to = r.fulfiller === "maker" ? `Maker (${esc(r.contributor_slug || "")})` : "Brigham Larson Pianos";
+    return `<div class="beta-row${done ? " done" : ""}">
+      <span class="beta-ic">🖨</span>
+      <div class="beta-main">
+        <span class="beta-cat mono">${esc(to)}${r.shipping_speed === "overnight" ? " · OVERNIGHT" : ""}</span>
+        <span class="beta-msg"><b>${esc(r.item_title)}</b> ×${r.quantity || 1} · ${esc(r.material || "")}</span>
+        <span class="mono beta-meta">${esc(r.requester_name || "")} · <a href="mailto:${esc(r.requester_email)}">${esc(r.requester_email)}</a> · ${fmtWhen(r.created_at)}</span>
+        <span class="mono beta-meta">Ship to: ${esc(r.shipping_address || "")}</span>
+        ${r.notes ? `<span class="mono beta-meta">Notes: ${esc(r.notes)}</span>` : ""}
+      </div>
+      <button class="au-btn beta-toggle" ${done ? `data-reopen="${r.id}"` : `data-done="${r.id}"`}>${done ? "REOPEN" : "✓ DONE"}</button>
+    </div>`;
+  }
+  async function setPrqStatus(id, status) {
+    const { error } = await sb().from("print_requests").update({ status }).eq("id", id);
+    if (error) { alert("Update failed: " + error.message); return; }
+    loadPrq();
   }
 })();
