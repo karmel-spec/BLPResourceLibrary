@@ -47,6 +47,10 @@ async function renderProfilePage() {
           <div class="prof-links">
             ${(c.links || []).map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join("")}
           </div>
+          ${(c.payment_links || []).length ? `<div class="prof-pay">
+            <span class="prof-pay-lab">SUPPORT THIS MAKER</span>
+            ${(c.payment_links || []).map(l => `<a class="pay-link" href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join("")}
+          </div>` : ""}
         </div>
         <div class="prof-stats">
           <div class="ps"><b>${files}</b>CAD FILES</div>
@@ -102,6 +106,28 @@ function fileLinks(r) {
     parts.unshift(`<a class="preview-btn preview-link" href="${r.fusion}" target="_blank" rel="noopener">◉ PREVIEW 3D</a>`);
   }
   return parts.join("");
+}
+
+function priceBadge(r) {
+  if (r.youtube) return "";
+  if (r.pricing === "paid" && r.price) return `<span class="price-badge paid">$${r.price}</span>`;
+  return `<span class="price-badge free">FREE</span>`;
+}
+function payRow(r) {
+  if (r.youtube) return "";
+  const c = (typeof CONTRIBUTORS !== "undefined" && CONTRIBUTORS[r.by]) || {};
+  const pays = c.payment_links || [];
+  const links = pays.map((l) => `<a class="pay-link" href="${l.url}" target="_blank" rel="noopener">${String(l.label).replace(/"/g, "&quot;")}</a>`).join("");
+  if (r.pricing === "paid" && r.price) {
+    return `<div class="pay-row paid">
+      <div class="pay-ask">💛 The maker suggests <b>$${r.price}</b> — pay them directly if this helps you:</div>
+      ${links ? `<div class="pay-links">${links}</div>` : `<div class="pay-note mono">Payment link coming soon — check their profile.</div>`}
+    </div>`;
+  }
+  if (links) {
+    return `<div class="pay-row tip"><span class="pay-ask">☕ Free to download — if it saved you time, thank the maker:</span><div class="pay-links">${links}</div></div>`;
+  }
+  return "";
 }
 
 function card(r) {

@@ -94,6 +94,31 @@ function fileLinks(r) {
   return parts.join("");
 }
 
+// Honor-system pricing: a FREE/$price badge on the card, and a "pay the maker"
+// panel that links to the contributor's own payment links (Venmo/Zelle/etc.).
+// The library never processes payment — it's peer-to-peer, download stays open.
+function priceBadge(r) {
+  if (r.youtube) return "";
+  if (r.pricing === "paid" && r.price) return `<span class="price-badge paid">$${r.price}</span>`;
+  return `<span class="price-badge free">FREE</span>`;
+}
+function payRow(r) {
+  if (r.youtube) return "";
+  const c = (typeof CONTRIBUTORS !== "undefined" && CONTRIBUTORS[r.by]) || {};
+  const pays = c.payment_links || [];
+  const links = pays.map((l) => `<a class="pay-link" href="${l.url}" target="_blank" rel="noopener">${attr(l.label)}</a>`).join("");
+  if (r.pricing === "paid" && r.price) {
+    return `<div class="pay-row paid">
+      <div class="pay-ask">💛 The maker suggests <b>$${r.price}</b> — pay them directly if this helps you:</div>
+      ${links ? `<div class="pay-links">${links}</div>` : `<div class="pay-note mono">Payment link coming soon — check their profile.</div>`}
+    </div>`;
+  }
+  if (links) {
+    return `<div class="pay-row tip"><span class="pay-ask">☕ Free to download — if it saved you time, thank the maker:</span><div class="pay-links">${links}</div></div>`;
+  }
+  return "";
+}
+
 function card(r) {
   let thumb = "";
   if (r.youtube) {
@@ -113,10 +138,11 @@ function card(r) {
     <div class="head"><span><b>${r.id}</b> / ${catLabel(r.cat)}</span><span>${r.youtube ? "YOUTUBE" : "FUSION 360"}</span></div>
     ${thumb}
     <div class="body">
-      <h3>${r.title}</h3>
+      <h3>${r.title} ${priceBadge(r)}</h3>
       ${meta}
       ${r.desc ? `<p>${r.desc}</p>` : `<p class="spacer"></p>`}
       <div class="dl">${links}</div>
+      ${payRow(r)}
       ${r.dateAdded ? `<div class="added">ADDED ${fmtDate(r.dateAdded).toUpperCase()}</div>` : ""}
       ${byline(r)}
       <button class="feedback-btn" data-id="${r.id}" data-title="${attr(r.title)}">

@@ -525,6 +525,34 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 .nl-msg { flex-basis: 100%; margin-top: 10px; font-size: 11px; letter-spacing: .5px; color: #7fd39a; min-height: 14px; }
 @media (max-width: 900px) { .nl-inner { flex-direction: column; align-items: flex-start; } }
 
+/* ---- Monetization: badges, pay rows, payment links ---- */
+.price-badge {
+  display: inline-block; vertical-align: middle; font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 600; letter-spacing: .5px; padding: 2px 6px; border-radius: 2px;
+}
+.price-badge.free { background: #e7efe7; color: #1c7c33; border: 1px solid #b7d6bd; }
+.price-badge.paid { background: var(--red); color: #fff; }
+.pay-row { margin: 10px 0 2px; padding: 9px 11px; border: 1px solid var(--line); background: rgba(255,255,255,.6); }
+.pay-row.paid { border-color: var(--red); background: rgba(158,32,32,.05); }
+.pay-ask { font-size: 12.5px; color: var(--ink); display: block; }
+.pay-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pay-link {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .3px;
+  border: 1.5px solid var(--ink); background: #fff; color: var(--ink);
+  padding: 5px 10px; text-decoration: none;
+}
+.pay-link:hover { background: var(--ink); color: #fff; }
+.pay-note { font-size: 10.5px; color: var(--ink-soft); margin-top: 6px; }
+/* Contributor profile "support this maker" row */
+.prof-pay { margin-top: 12px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.prof-pay-lab { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--red); margin-right: 4px; }
+/* Upload pricing chooser */
+.price-choice { border: 1px solid var(--line); padding: 12px 14px; margin: 4px 0 2px; background: rgba(255,255,255,.5); }
+.price-choice .pc-opt { display: block; padding: 4px 0; cursor: pointer; font-size: 13.5px; }
+.price-choice .pc-opt input { margin-right: 7px; }
+.pc-price { margin: 8px 0 2px 24px; }
+.pc-price input { width: 90px; border: 1.5px solid var(--ink); padding: 6px 8px; font-family: 'IBM Plex Mono', monospace; }
+
 /* ---- Legal / terms page ---- */
 .prose.legal ul { margin: 8px 0 16px; padding-left: 22px; }
 .prose.legal li { margin-bottom: 7px; line-height: 1.55; }

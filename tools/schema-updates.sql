@@ -90,3 +90,11 @@ create policy "admins update feedback" on beta_feedback
     ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
 
 create index if not exists beta_feedback_status_idx on beta_feedback (status, created_at desc);
+
+-- Monetization (honor system): payment links on profiles + per-item pricing.
+-- Payments are peer-to-peer (Venmo/Zelle/etc.) directly between users; the
+-- library never processes money. Downloads stay open — pricing is a suggestion.
+alter table contributors add column if not exists payment_links jsonb not null default '[]'::jsonb;
+alter table contributors add column if not exists pricing_mode text not null default 'free';
+alter table submissions add column if not exists pricing text not null default 'free' check (pricing in ('free','paid'));
+alter table submissions add column if not exists price numeric;

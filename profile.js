@@ -56,6 +56,12 @@
   });
   $("dashSignIn").onclick = () => window.Auth.signIn();
 
+  // Show the price field only when "Suggested price" is chosen.
+  document.querySelectorAll('input[name="upPricing"]').forEach((r) =>
+    r.addEventListener("change", () => {
+      $("upPriceWrap").hidden = document.querySelector('input[name="upPricing"]:checked').value !== "paid";
+    }));
+
   // ---- profile editor --------------------------------------------------------
   function fillProfileForm(user) {
     $("profHeading").textContent = profile ? "Your public profile" : "Create your public profile";
@@ -65,6 +71,8 @@
     $("pfSite").value = profile?.website || "";
     $("pfBio").value = profile?.bio || "";
     $("pfLinks").value = (profile?.links || [])
+      .map((l) => `${l.label} ${l.url}`).join("\n");
+    $("pfPay").value = (profile?.payment_links || [])
       .map((l) => `${l.label} ${l.url}`).join("\n");
     const photo = photoUrl || profile?.photo_url || user.avatar || "";
     $("pfPhoto").src = photo || PHOTO_PLACEHOLDER;
@@ -96,11 +104,13 @@
     const name = $("pfName").value.trim();
     if (!name) return setStatus("pfStatus", "Please enter your name.", true);
     setStatus("pfStatus", "Saving…");
-    const links = $("pfLinks").value.split("\n").map((l) => l.trim()).filter(Boolean)
+    const parseLinks = (val) => val.split("\n").map((l) => l.trim()).filter(Boolean)
       .map((l) => { const i = l.indexOf(" ");
         return i < 0 ? { label: "LINK", url: l }
                      : { label: l.slice(0, i).toUpperCase(), url: l.slice(i + 1).trim() }; })
       .filter((l) => /^https?:\/\//.test(l.url));
+    const links = parseLinks($("pfLinks").value);
+    const payment_links = parseLinks($("pfPay").value);
     const row = {
       id: uid(),
       name,
@@ -109,6 +119,7 @@
       website: $("pfSite").value.trim() || null,
       bio: $("pfBio").value.trim() || null,
       links,
+      payment_links,
     };
     if (photoUrl) row.photo_url = photoUrl;
     else if (!profile) row.photo_url = window.Auth.user().avatar || null;
@@ -172,6 +183,8 @@
         thumb_url = sb().storage.from("contributions").getPublicUrl(path).data.publicUrl;
       }
       setStatus("upStatus", "Submitting…");
+      const pricing = document.querySelector('input[name="upPricing"]:checked')?.value || "free";
+      const priceVal = parseFloat($("upPrice").value);
       const row = {
         contributor_id: uid(),
         title,
@@ -179,6 +192,8 @@
         maker: $("upMaker").value.trim() || null,
         description: $("upDesc").value.trim() || null,
         files, thumb_url, youtube: youtube || null,
+        pricing,
+        price: pricing === "paid" && priceVal > 0 ? priceVal : null,
       };
       if (newVersionOf) {
         row.version = (newVersionOf.version || 1) + 1;
