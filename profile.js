@@ -87,6 +87,16 @@
     $("pfSite").value = profile?.website || "";
     $("pfBio").value = profile?.bio || "";
     $("pfCreds").value = profile?.credentials_note || "";
+    const orgs = profile?.memberships || [];
+    document.querySelectorAll(".pfOrg").forEach((c) => c.checked = orgs.includes(c.value));
+    const certs = profile?.certifications || [];
+    document.querySelectorAll(".pfCert").forEach((c) => c.checked = certs.includes(c.value));
+    $("pfYears").value = profile?.years_experience ?? "";
+    // Payment links unlock after approval
+    const isApproved = profile && (profile.status === "approved" || profile.status == null);
+    const payLabel = $("pfPay").closest("label");
+    payLabel.hidden = !isApproved;
+    if (payLabel.nextElementSibling) payLabel.nextElementSibling.hidden = !isApproved;
     $("pfLinks").value = (profile?.links || [])
       .map((l) => `${l.label} ${l.url}`).join("\n");
     $("pfPay").value = (profile?.payment_links || [])
@@ -151,6 +161,10 @@
       website: $("pfSite").value.trim() || null,
       bio: $("pfBio").value.trim() || null,
       credentials_note: $("pfCreds").value.trim() || null,
+      memberships: [...document.querySelectorAll(".pfOrg:checked")].map((c) => c.value),
+      certifications: [...document.querySelectorAll(".pfCert:checked")].map((c) => c.value),
+      years_experience: parseInt($("pfYears").value, 10) || null,
+      email: window.Auth.user().email || null,
       links,
       payment_links,
       offers_print: $("pfOffersPrint").checked,
@@ -188,8 +202,13 @@
       }
       const nowApproved = profile.status === "approved" || profile.status == null;
       setStatus("pfStatus", nowApproved ? "Saved ✓ Your profile is live."
-        : "Application received ✓ A librarian will review your credentials — uploads open once you're approved.");
-      if (wasNew && !nowApproved) notifyLibrarians("NEW CONTRIBUTOR APPLICATION: " + name + (($("pfCreds").value.trim()) ? " — " + $("pfCreds").value.trim().slice(0, 150) : " — (no credentials given)"));
+        : "Application received ✓ An approved member of the Piano Technology Library community will review your request — you'll get an approval email or a request for more information shortly.");
+      if (wasNew && !nowApproved) {
+        const orgsTxt = [...document.querySelectorAll(".pfOrg:checked")].map((c) => c.value).join(", ") || "none";
+        const certsTxt = [...document.querySelectorAll(".pfCert:checked")].map((c) => c.value).join(", ") || "none";
+        notifyLibrarians(`NEW CONTRIBUTOR APPLICATION: ${name} · Member of: ${orgsTxt} · Certs: ${certsTxt} · ${$("pfYears").value || "?"} yrs` +
+          (($("pfCreds").value.trim()) ? ` · ${$("pfCreds").value.trim().slice(0, 120)}` : ""));
+      }
       if (window.Activity) window.Activity.log(wasNew ? "profile_created" : "profile_updated", (profile.name || name) + " (@" + profile.slug + ")");
       fillProfileForm(window.Auth.user());
       const ap = profile.status === "approved" || profile.status == null;
@@ -464,7 +483,7 @@
   async function loadApps() {
     $("dashApps").hidden = false;
     const { data, error } = await sb().from("contributors")
-      .select("id, name, slug, credentials_note, website, created_at, status")
+      .select("id, name, slug, credentials_note, website, created_at, status, memberships, certifications, years_experience, email")
       .eq("status", "pending").order("created_at");
     if (error) { $("appsList").innerHTML = `<div class="cm-empty">${esc(error.message)}</div>`; return; }
     $("appsList").innerHTML = (data || []).length ? data.map((c) => `
@@ -472,7 +491,7 @@
         <div class="sub-main">
           <b>${esc(c.name)}</b>
           <span class="mono sub-meta">APPLIED ${esc((c.created_at || "").slice(0, 10))}${c.website ? " · " + esc(c.website) : ""}</span>
-          <span class="sub-links">${c.credentials_note ? esc(c.credentials_note) : "<i>No credentials provided</i>"}</span>
+          <span class="sub-links">Member of: ${(c.memberships || []).join(", ") || "—"} · Certs: ${(c.certifications || []).join(", ") || "—"} · ${c.years_experience != null ? c.years_experience + " yrs" : "yrs ?"}${c.credentials_note ? " · " + esc(c.credentials_note) : ""}</span>
         </div>
         <span class="sub-actions">
           <button class="au-btn primary" data-appok="${c.id}">✓ APPROVE</button>
@@ -483,10 +502,19 @@
     $("appsList").querySelectorAll("[data-appno]").forEach((b) => b.onclick = () => decideApp(b.dataset.appno, "declined"));
   }
   async function decideApp(id, status) {
-    const { error } = await sb().from("contributors")
-      .update({ status, verified_at: status === "approved" ? new Date().toISOString() : null }).eq("id", id);
+    const { data: row, error } = await sb().from("contributors")
+      .update({ status, verified_at: status === "approved" ? new Date().toISOString() : null })
+      .eq("id", id).select("name, email").maybeSingle();
     if (error) { alert("Update failed: " + error.message); return; }
     if (window.Activity) window.Activity.log(status === "approved" ? "contributor_approved" : "contributor_declined", id);
+    // Open a prefilled email so the applicant hears back (sent from the admin's own mail).
+    if (row && row.email) {
+      const first = (row.name || "").split(" ")[0];
+      const mail = status === "approved"
+        ? `mailto:${row.email}?subject=${encodeURIComponent("You're approved — Piano Technology Library")}&body=${encodeURIComponent(`Hi ${first},\n\nYour contributor request at pianotechnologylibrary.com is approved — uploads are now open on your dashboard:\nhttps://pianotechnologylibrary.com/profile\n\nWelcome, and thanks for helping the craft.\n\n— Piano Technology Library`)}`
+        : `mailto:${row.email}?subject=${encodeURIComponent("Your Piano Technology Library contributor request")}&body=${encodeURIComponent(`Hi ${first},\n\nThanks for your contributor request at pianotechnologylibrary.com. Before we can approve it, could you share a bit more about your professional background — association memberships, certifications, your shop or website?\n\nJust reply to this email.\n\n— Piano Technology Library`)}`;
+      window.open(mail, "_blank");
+    }
     loadApps();
   }
 

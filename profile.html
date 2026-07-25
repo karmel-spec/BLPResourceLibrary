@@ -6,7 +6,7 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260725152202">
+<link rel="stylesheet" href="styles.css?v=20260725152557">
 <link rel="icon" href="icon.svg?v=20260724135928" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260724135928">
 <!-- Google tag (gtag.js) -->
@@ -103,7 +103,35 @@
         <label>Location <span class="opt">(optional)</span><input id="pfLoc" type="text" placeholder="City, Country"></label>
         <label>Website <span class="opt">(optional)</span><input id="pfSite" type="url" placeholder="https://…"></label>
         <label>Bio <span class="opt">(optional)</span><textarea id="pfBio" rows="4" placeholder="Tell other technicians who you are, what you work on, and what you love about the craft."></textarea></label>
-        <label>Professional credentials <span class="opt">(PTG member # / RPT, guild, shop website, years in the trade — helps the librarians verify you)</span><textarea id="pfCreds" rows="2" placeholder="e.g. PTG member #12345 (RPT), 15 years rebuilding, shop: mypianoshop.com"></textarea></label>
+        <div class="cred-block">
+          <div class="pc-lab">Member of <span class="opt">(check all that apply)</span></div>
+          <div class="cred-grid">
+            <label class="chk"><input type="checkbox" class="pfOrg" value="PTG"> Piano Technicians Guild (PTG) — USA / International</label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="PTA"> Pianoforte Tuners' Association (PTA) — UK</label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="IMIT"> Institute of Musical Instrument Technology (IMIT) — UK</label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="Europiano"> Europiano (European national associations)</label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="BDK"> Bund Deutscher Klavierbauer (BDK) — Germany</label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="APTTA"> Australasian Piano Tuners &amp; Technicians (APTTA)</label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="NZPTG"> NZ Piano Tuners &amp; Technicians Guild</label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="JPTA"> Japan Piano Tuners Association (JPTA)</label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="CAPT"> Canadian Association of Piano Technicians</label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="Other"> Other association <span class="opt">(name it below)</span></label>
+            <label class="chk"><input type="checkbox" class="pfOrg" value="Independent"> Not a member yet — independent professional</label>
+          </div>
+          <div class="pc-lab">Certifications <span class="opt">(check all that apply)</span></div>
+          <div class="cred-grid">
+            <label class="chk"><input type="checkbox" class="pfCert" value="RPT"> RPT — Registered Piano Technician (PTG)</label>
+            <label class="chk"><input type="checkbox" class="pfCert" value="Manufacturer"> Manufacturer factory certification <span class="opt">(Steinway, Yamaha, Kawai, …)</span></label>
+            <label class="chk"><input type="checkbox" class="pfCert" value="School"> Piano technology school diploma <span class="opt">(North Bennet Street, ITEMM, …)</span></label>
+            <label class="chk"><input type="checkbox" class="pfCert" value="Apprenticeship"> Formal apprenticeship under a master technician</label>
+            <label class="chk"><input type="checkbox" class="pfCert" value="Other"> Other certification <span class="opt">(name it below)</span></label>
+          </div>
+          <div class="dash-row">
+            <label>Professional years of experience<input id="pfYears" type="number" min="0" max="70" step="1" placeholder="0"></label>
+            <label>More detail <span class="opt">(member #s, cert names, anything else)</span><input id="pfCreds" type="text" placeholder="e.g. PTG member #12345 since 2010"></label>
+          </div>
+          <p class="fine">Your website and social links go in the fields below. <b>Payment links unlock after you're approved.</b></p>
+        </div>
         <label>Links <span class="opt">(optional — one per line, e.g. YOUTUBE https://…)</span><textarea id="pfLinks" rows="3" placeholder="YOUTUBE https://youtube.com/@you&#10;INSTAGRAM https://instagram.com/you"></textarea></label>
         <label>Payment links <span class="opt">(optional — one per line, e.g. VENMO https://venmo.com/u/you)</span><textarea id="pfPay" rows="3" placeholder="VENMO https://venmo.com/u/you&#10;ZELLE https://…&#10;PAYPAL https://paypal.me/you&#10;CASHAPP https://cash.app/$you"></textarea></label>
         <p class="fine">These appear on your profile and on your paid items so people can pay you directly. Payments happen between you and the user — the library doesn't process or take a cut. See the <a href="terms.html" target="_blank" rel="noopener">Terms</a>.</p>
@@ -142,10 +170,10 @@
   <!-- Awaiting approval notice -->
   <div id="dashPending" class="dash-block pending-note" hidden>
     <h2>⏳ Application received</h2>
-    <p class="dash-note">The library is for piano professionals, so a librarian reviews each
-    new contributor before uploads open up — usually within a day. Make sure your
-    <b>professional credentials</b> above are filled in (PTG membership, guild, shop website,
-    or anything that shows your work), then sit tight. We'll take it from there.</p>
+    <p class="dash-note">The library is for piano professionals. An approved member of the
+    Piano Technology Library community will review your contributor request, and you'll
+    receive an approval email or a request for more information shortly. The more complete
+    your <b>memberships, certifications, and experience</b> above, the smoother the review.</p>
   </div>
 
   <!-- Upload a contribution -->
@@ -359,7 +387,7 @@
 <script src="backend.js?v=20260725152202"></script>
 <script src="activity.js?v=20260725152202"></script>
 <script src="feedback.js?v=20260725152202"></script>
-<script src="profile.js?v=20260725152202"></script>
+<script src="profile.js?v=20260725152557"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");

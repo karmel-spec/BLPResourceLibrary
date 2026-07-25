@@ -197,6 +197,10 @@ create policy "add pledges" on part_pledges for insert to anon, authenticated wi
 alter table contributors add column if not exists status text not null default 'pending' check (status in ('pending','approved','declined'));
 alter table contributors add column if not exists credentials_note text;
 alter table contributors add column if not exists verified_at timestamptz;
+alter table contributors add column if not exists memberships jsonb not null default '[]'::jsonb;
+alter table contributors add column if not exists certifications jsonb not null default '[]'::jsonb;
+alter table contributors add column if not exists years_experience int;
+alter table contributors add column if not exists email text;
 update contributors set status = 'approved', verified_at = now() where verified_at is null and created_at < '2026-07-26';
 
 drop policy if exists "admins manage contributors" on contributors;

@@ -665,6 +665,14 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 .bk-fill { height: 100%; width: 0%; background: var(--red); transition: width .2s; }
 
 /* ---- Verified contributors ---- */
+.cred-block { border: 1px solid var(--line); padding: 14px 16px; margin: 4px 0 10px; background: rgba(255,255,255,.5); }
+.cred-block .pc-lab { margin-top: 10px; }
+.cred-block .pc-lab:first-child { margin-top: 0; }
+.cred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 18px; margin: 6px 0 4px; }
+.cred-grid .chk { font-size: 13px; }
+#pfYears { width: 110px; font-family: 'IBM Plex Mono', monospace; }
+@media (max-width: 700px) { .cred-grid { grid-template-columns: 1fr; } }
+
 .vf-badge {
   display: inline-block; vertical-align: 2px; margin-left: 6px;
   font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .5px;
