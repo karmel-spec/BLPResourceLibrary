@@ -41,7 +41,7 @@ async function renderProfilePage() {
         </div>
         <div class="prof-info">
           <div class="dwg">${dwgLine}</div>
-          <h1>${c.name}</h1>
+          <h1>${c.name} <span class="vf-badge big" title="Verified piano professional">✓ VERIFIED</span></h1>
           ${credLine ? `<div class="prof-cred">${credLine}</div>` : ""}
           ${c.bio ? `<p class="prof-bio">${c.bio}</p>` : ""}
           <div class="prof-links">

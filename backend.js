@@ -37,6 +37,7 @@
       website: row.website || "",
       links: Array.isArray(row.links) ? row.links : [],
       payment_links: Array.isArray(row.payment_links) ? row.payment_links : [],
+      status: row.status || "approved",
       offers_print: !!row.offers_print,
       allow_community_print: !!row.allow_community_print,
       print_notes: row.print_notes || "",
@@ -44,8 +45,6 @@
       print_equipment: Array.isArray(row.print_equipment) ? row.print_equipment : [],
       print_region: row.print_region || "",
       print_from: row.print_from != null ? Number(row.print_from) : null,
-      allow_community_print: !!row.allow_community_print,
-      print_notes: row.print_notes || "",
       community: true,
     };
   }
@@ -94,7 +93,11 @@
           const slugById = {};
           (contribs || []).forEach((c) => {
             slugById[c.id] = c.slug;
-            window.Community.contributors[c.slug] = profileFromRow(c);
+            // Only verified (approved) contributors appear publicly; legacy
+            // rows without a status were grandfathered as approved.
+            if (!c.status || c.status === "approved") {
+              window.Community.contributors[c.slug] = profileFromRow(c);
+            }
           });
           window.Community.resources =
             (subs || []).map((s) => resourceFromRow(s, slugById));

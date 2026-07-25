@@ -191,3 +191,22 @@ drop policy if exists "read pledges" on part_pledges;
 create policy "read pledges" on part_pledges for select using (true);
 drop policy if exists "add pledges" on part_pledges;
 create policy "add pledges" on part_pledges for insert to anon, authenticated with check (true);
+
+-- Verified contributors: uploads restricted to librarian-approved piano
+-- professionals. Existing contributors are grandfathered as approved.
+alter table contributors add column if not exists status text not null default 'pending' check (status in ('pending','approved','declined'));
+alter table contributors add column if not exists credentials_note text;
+alter table contributors add column if not exists verified_at timestamptz;
+update contributors set status = 'approved', verified_at = now() where verified_at is null and created_at < '2026-07-26';
+
+drop policy if exists "admins manage contributors" on contributors;
+create policy "admins manage contributors" on contributors
+  for update using (auth.jwt() ->> 'email' in
+    ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+
+-- RESTRICTIVE gate: ANDed with existing insert policies, so even if another
+-- policy would allow the insert, unapproved contributors cannot submit items.
+drop policy if exists "approved contributors only" on submissions;
+create policy "approved contributors only" on submissions
+  as restrictive for insert to authenticated
+  with check (exists (select 1 from contributors c where c.id = auth.uid() and c.status = 'approved'));

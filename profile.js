@@ -37,7 +37,7 @@
   window.Auth.onChange(async (user) => {
     $("dashSignedOut").hidden = !!user;
     if (!user) {
-      ["dashProfile", "dashUpload", "dashBulk", "dashMine", "dashAdmin"].forEach((id) => $(id).hidden = true);
+      ["dashProfile", "dashUpload", "dashBulk", "dashMine", "dashAdmin", "dashPending", "dashApps"].forEach((id) => $(id).hidden = true);
       return;
     }
     if (!sb()) {
@@ -49,11 +49,22 @@
     profile = await window.Community.myProfile(user.id);
     fillProfileForm(user);
     $("dashProfile").hidden = false;
-    $("dashUpload").hidden = !profile;      // profile first, then uploads
-    $("dashBulk").hidden = !profile;
+    // Uploads open only for APPROVED contributors (piano professionals,
+    // verified by a librarian). Legacy rows without a status count as approved.
+    const approved = profile && (profile.status === "approved" || profile.status == null);
+    const pending = profile && profile.status === "pending";
+    $("dashPending").hidden = !pending;
+    if (profile && profile.status === "declined") {
+      $("dashPending").hidden = false;
+      $("dashPending").querySelector("h2").textContent = "Application not approved";
+      $("dashPending").querySelector("p").innerHTML =
+        "A librarian couldn't verify your professional credentials. If that's a mistake, add more detail above (PTG #, shop website) and save again, or email <a href='mailto:info@brighamlarsonpianos.com'>info@brighamlarsonpianos.com</a>.";
+    }
+    $("dashUpload").hidden = !approved;
+    $("dashBulk").hidden = !approved;
     $("dashMine").hidden = !profile;
     if (profile) loadMine();
-    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); initActivityLog(); initBetaFeedback(); initPrintRequests(); }
+    if (window.Auth.isAdmin()) { $("dashAdmin").hidden = false; loadQueue(); initNewsletter(); initActivityLog(); initBetaFeedback(); initPrintRequests(); loadApps(); }
   });
   $("dashSignIn").onclick = () => window.Auth.signIn();
 
@@ -75,6 +86,7 @@
     $("pfLoc").value = profile?.location || "";
     $("pfSite").value = profile?.website || "";
     $("pfBio").value = profile?.bio || "";
+    $("pfCreds").value = profile?.credentials_note || "";
     $("pfLinks").value = (profile?.links || [])
       .map((l) => `${l.label} ${l.url}`).join("\n");
     $("pfPay").value = (profile?.payment_links || [])
@@ -138,6 +150,7 @@
       location: $("pfLoc").value.trim() || null,
       website: $("pfSite").value.trim() || null,
       bio: $("pfBio").value.trim() || null,
+      credentials_note: $("pfCreds").value.trim() || null,
       links,
       payment_links,
       offers_print: $("pfOffersPrint").checked,
@@ -173,10 +186,16 @@
         if (error) throw error;
         profile = data;
       }
-      setStatus("pfStatus", "Saved ✓ Your profile is live.");
+      const nowApproved = profile.status === "approved" || profile.status == null;
+      setStatus("pfStatus", nowApproved ? "Saved ✓ Your profile is live."
+        : "Application received ✓ A librarian will review your credentials — uploads open once you're approved.");
+      if (wasNew && !nowApproved) notifyLibrarians("NEW CONTRIBUTOR APPLICATION: " + name + (($("pfCreds").value.trim()) ? " — " + $("pfCreds").value.trim().slice(0, 150) : " — (no credentials given)"));
       if (window.Activity) window.Activity.log(wasNew ? "profile_created" : "profile_updated", (profile.name || name) + " (@" + profile.slug + ")");
       fillProfileForm(window.Auth.user());
-      $("dashUpload").hidden = false;
+      const ap = profile.status === "approved" || profile.status == null;
+      $("dashUpload").hidden = !ap;
+      $("dashBulk").hidden = !ap;
+      $("dashPending").hidden = ap;
       $("dashMine").hidden = false;
       loadMine();
     } catch (err) { setStatus("pfStatus", "Save failed: " + err.message, true); }
@@ -440,6 +459,36 @@
       : `All ${ok} item${ok === 1 ? "" : "s"} submitted ✓ The librarians will review them shortly.`, !!failed.length);
     if (ok) { $("bkFiles").value = ""; $("bkPreview").hidden = true; loadMine(); }
   };
+
+  // ---- Contributor applications (admins only) --------------------------------------
+  async function loadApps() {
+    $("dashApps").hidden = false;
+    const { data, error } = await sb().from("contributors")
+      .select("id, name, slug, credentials_note, website, created_at, status")
+      .eq("status", "pending").order("created_at");
+    if (error) { $("appsList").innerHTML = `<div class="cm-empty">${esc(error.message)}</div>`; return; }
+    $("appsList").innerHTML = (data || []).length ? data.map((c) => `
+      <div class="sub-row">
+        <div class="sub-main">
+          <b>${esc(c.name)}</b>
+          <span class="mono sub-meta">APPLIED ${esc((c.created_at || "").slice(0, 10))}${c.website ? " · " + esc(c.website) : ""}</span>
+          <span class="sub-links">${c.credentials_note ? esc(c.credentials_note) : "<i>No credentials provided</i>"}</span>
+        </div>
+        <span class="sub-actions">
+          <button class="au-btn primary" data-appok="${c.id}">✓ APPROVE</button>
+          <button class="au-btn" data-appno="${c.id}">DECLINE</button>
+        </span>
+      </div>`).join("") : `<div class="cm-empty">No applications waiting — new contributors will appear here.</div>`;
+    $("appsList").querySelectorAll("[data-appok]").forEach((b) => b.onclick = () => decideApp(b.dataset.appok, "approved"));
+    $("appsList").querySelectorAll("[data-appno]").forEach((b) => b.onclick = () => decideApp(b.dataset.appno, "declined"));
+  }
+  async function decideApp(id, status) {
+    const { error } = await sb().from("contributors")
+      .update({ status, verified_at: status === "approved" ? new Date().toISOString() : null }).eq("id", id);
+    if (error) { alert("Update failed: " + error.message); return; }
+    if (window.Activity) window.Activity.log(status === "approved" ? "contributor_approved" : "contributor_declined", id);
+    loadApps();
+  }
 
   // ---- Newsletter prep (admins only) ---------------------------------------------
   // Builds a plain-text digest of everything added in the chosen period, can email

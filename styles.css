@@ -664,6 +664,15 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 .bk-bar { height: 10px; border: 1.5px solid var(--ink); background: #fff; margin-top: 10px; overflow: hidden; }
 .bk-fill { height: 100%; width: 0%; background: var(--red); transition: width .2s; }
 
+/* ---- Verified contributors ---- */
+.vf-badge {
+  display: inline-block; vertical-align: 2px; margin-left: 6px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .5px;
+  background: #e7efe7; color: #1c7c33; border: 1px solid #b7d6bd; padding: 2px 6px; border-radius: 2px;
+}
+.vf-badge.big { font-size: 11px; vertical-align: 8px; }
+.pending-note { border-color: var(--red); background: #fdf9f4; }
+
 /* ---- Legal / terms page ---- */
 .prose.legal ul { margin: 8px 0 16px; padding-left: 22px; }
 .prose.legal li { margin-bottom: 7px; line-height: 1.55; }

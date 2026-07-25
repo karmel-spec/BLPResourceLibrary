@@ -6,7 +6,7 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260724155448">
+<link rel="stylesheet" href="styles.css?v=20260725152202">
 <link rel="icon" href="icon.svg?v=20260724135928" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260724135928">
 <!-- Google tag (gtag.js) -->
@@ -103,6 +103,7 @@
         <label>Location <span class="opt">(optional)</span><input id="pfLoc" type="text" placeholder="City, Country"></label>
         <label>Website <span class="opt">(optional)</span><input id="pfSite" type="url" placeholder="https://…"></label>
         <label>Bio <span class="opt">(optional)</span><textarea id="pfBio" rows="4" placeholder="Tell other technicians who you are, what you work on, and what you love about the craft."></textarea></label>
+        <label>Professional credentials <span class="opt">(PTG member # / RPT, guild, shop website, years in the trade — helps the librarians verify you)</span><textarea id="pfCreds" rows="2" placeholder="e.g. PTG member #12345 (RPT), 15 years rebuilding, shop: mypianoshop.com"></textarea></label>
         <label>Links <span class="opt">(optional — one per line, e.g. YOUTUBE https://…)</span><textarea id="pfLinks" rows="3" placeholder="YOUTUBE https://youtube.com/@you&#10;INSTAGRAM https://instagram.com/you"></textarea></label>
         <label>Payment links <span class="opt">(optional — one per line, e.g. VENMO https://venmo.com/u/you)</span><textarea id="pfPay" rows="3" placeholder="VENMO https://venmo.com/u/you&#10;ZELLE https://…&#10;PAYPAL https://paypal.me/you&#10;CASHAPP https://cash.app/$you"></textarea></label>
         <p class="fine">These appear on your profile and on your paid items so people can pay you directly. Payments happen between you and the user — the library doesn't process or take a cut. See the <a href="terms.html" target="_blank" rel="noopener">Terms</a>.</p>
@@ -136,6 +137,15 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Awaiting approval notice -->
+  <div id="dashPending" class="dash-block pending-note" hidden>
+    <h2>⏳ Application received</h2>
+    <p class="dash-note">The library is for piano professionals, so a librarian reviews each
+    new contributor before uploads open up — usually within a day. Make sure your
+    <b>professional credentials</b> above are filled in (PTG membership, guild, shop website,
+    or anything that shows your work), then sit tight. We'll take it from there.</p>
   </div>
 
   <!-- Upload a contribution -->
@@ -252,6 +262,14 @@
     <div id="mineList" class="sub-list"></div>
   </div>
 
+  <!-- Contributor applications (admins only) -->
+  <div id="dashApps" class="dash-block admin" hidden>
+    <h2>Contributor applications <span class="mono admin-tag">LIBRARIAN</span></h2>
+    <p class="dash-note">New contributors — piano professionals only. Check their credentials
+    (PTG directory: ptg.org), then approve to open uploads for them.</p>
+    <div id="appsList" class="sub-list"></div>
+  </div>
+
   <!-- Admin queue -->
   <div id="dashAdmin" class="dash-block admin" hidden>
     <h2>Review queue <span class="mono admin-tag">LIBRARIAN</span></h2>
@@ -335,13 +353,13 @@
   A COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260724154727"></script>
-<script src="data.js?v=20260724154727"></script>
-<script src="auth.js?v=20260724154727"></script>
-<script src="backend.js?v=20260724154727"></script>
-<script src="activity.js?v=20260724154727"></script>
-<script src="feedback.js?v=20260724154727"></script>
-<script src="profile.js?v=20260724154727"></script>
+<script src="config.js?v=20260725152202"></script>
+<script src="data.js?v=20260725152202"></script>
+<script src="auth.js?v=20260725152202"></script>
+<script src="backend.js?v=20260725152202"></script>
+<script src="activity.js?v=20260725152202"></script>
+<script src="feedback.js?v=20260725152202"></script>
+<script src="profile.js?v=20260725152202"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");
