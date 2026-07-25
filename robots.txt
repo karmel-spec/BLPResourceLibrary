@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /icon-options.html
+
+Sitemap: https://pianotechnologylibrary.com/sitemap.xml
