@@ -365,7 +365,7 @@
       .eq("contributor_id", uid()).order("created_at", { ascending: false });
     $("mineList").innerHTML = (data || []).length
       ? data.map((s) => subRow(s, false)).join("")
-      : `<div class="cm-empty">Nothing shared yet — your first contribution goes right above. 🔧</div>`;
+      : `<div class="cm-empty">Nothing shared yet — your first contributions will go live to your virtual workbench once your contributor profile is approved. 🔧</div>`;
     $("mineList").querySelectorAll("[data-newver]").forEach((b) =>
       b.onclick = () => startNewVersion((data || []).find((s) => s.id === b.dataset.newver)));
     $("mineList").querySelectorAll("[data-edit]").forEach((b) =>
