@@ -171,6 +171,7 @@
           page: location.pathname,
           screenshot,
         };
+        if (!row.screenshot) delete row.screenshot; // key absent = works before the column migration
         let { error } = await window.__supabase.from("beta_feedback").insert(row);
         if (error && /screenshot/i.test(error.message || "")) {
           // screenshot column not migrated yet — keep the note, drop the image

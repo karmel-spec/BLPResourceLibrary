@@ -294,3 +294,45 @@ alter table submissions add constraint submissions_distribution_check check (dis
 
 -- Beta feedback: optional screenshot (small compressed data-URL)
 alter table beta_feedback add column if not exists screenshot text;
+
+-- Contributors may edit their own items (title, tags, video, pricing, …)
+drop policy if exists "own submissions update" on submissions;
+create policy "own submissions update" on submissions
+  for update to authenticated using (contributor_id = auth.uid());
+
+-- ============================================================================
+-- Privacy hardening: no personal emails readable through the public API.
+-- Column-level grants keep directory data public while application PII
+-- (emails, credential notes) is reachable only via the two functions below.
+-- ============================================================================
+revoke select on table part_requests from anon, authenticated;
+grant select (id, title, maker, details, requester_name, status, created_at)
+  on table part_requests to anon, authenticated;
+
+revoke select on table part_pledges from anon, authenticated;
+grant select (id, request_id, amount, created_at)
+  on table part_pledges to anon, authenticated;
+
+revoke select on table contributors from anon, authenticated;
+grant select (id, name, slug, credential, location, website, bio, photo_url,
+  links, payment_links, pricing_mode, offers_print, allow_community_print,
+  print_notes, print_partner, print_equipment, print_region, print_from,
+  status, verified_at, created_at)
+  on table contributors to anon, authenticated;
+
+-- Members read their own full row (application fields included)
+create or replace function my_profile()
+returns setof contributors language sql security definer set search_path = public
+as $$ select * from contributors where id = auth.uid() $$;
+grant execute on function my_profile() to authenticated;
+
+-- Librarians read pending applications, PII included
+create or replace function admin_pending_applications()
+returns setof contributors language sql security definer set search_path = public
+as $$
+  select * from contributors where status = 'pending'
+  and (auth.jwt() ->> 'email') in
+    ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com')
+  order by created_at
+$$;
+grant execute on function admin_pending_applications() to authenticated;

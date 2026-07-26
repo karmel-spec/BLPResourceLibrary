@@ -31,7 +31,7 @@
     const list = $("reqList");
     if (!client) { list.innerHTML = `<div class="cm-empty">The request board isn't connected yet — check back soon.</div>`; return; }
     const [{ data: reqs, error }, { data: pledges }] = await Promise.all([
-      client.from("part_requests").select("*").neq("status", "filled").order("created_at", { ascending: false }).limit(100),
+      client.from("part_requests").select("id,title,maker,details,requester_name,status,created_at").neq("status", "filled").order("created_at", { ascending: false }).limit(100),
       client.from("part_pledges").select("request_id, amount"),
     ]);
     if (error) { list.innerHTML = `<div class="cm-empty">Request board coming online shortly.</div>`; return; }

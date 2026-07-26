@@ -28,6 +28,16 @@ const CONFIG = {
   // the starting price BLP quotes from when it fulfills a print itself.
   PRINT_EMAIL: "info@brighamlarsonpianos.com",
   PRINT_BASE_FROM: 75,
+
+  // PTL's own social profiles — shown in the footer of every page once added.
+  // Paste each platform as { label, url } when the profile goes live, e.g.:
+  //   { label: "INSTAGRAM", url: "https://www.instagram.com/pianotechnologylibrary" },
+  //   { label: "YOUTUBE",   url: "https://www.youtube.com/@pianotechnologylibrary" },
+  //   { label: "FACEBOOK",  url: "https://www.facebook.com/pianotechnologylibrary" },
+  //   { label: "TIKTOK",    url: "https://www.tiktok.com/@pianotechnologylibrary" },
+  //   { label: "X",         url: "https://x.com/pianotechlib" },
+  //   { label: "LINKEDIN",  url: "https://www.linkedin.com/company/pianotechnologylibrary" },
+  SOCIAL_LINKS: [],
 };
 
 // True once real Supabase credentials have been filled in above.

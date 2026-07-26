@@ -180,6 +180,18 @@
     chatAllowed,
   };
 
+  // ---- PTL social profiles in the footer (populated from CONFIG.SOCIAL_LINKS) ----
+  (function renderSocial() {
+    const links = (typeof CONFIG !== "undefined" && CONFIG.SOCIAL_LINKS) || [];
+    const foot = document.querySelector("footer .footer-inner");
+    if (!links.length || !foot || foot.querySelector(".footer-social")) return;
+    const div = document.createElement("div");
+    div.className = "footer-social mono";
+    div.innerHTML = "FOLLOW THE LIBRARY: " + links.map((l) =>
+      `<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join(" · ");
+    foot.appendChild(div);
+  })();
+
   // ---- boot ----------------------------------------------------------------------
   if (window.Auth) window.Auth.onChange(async (user) => {
     if (!user) { document.body.classList.remove("ptl-consumer"); return; }

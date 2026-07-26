@@ -82,9 +82,9 @@
       .select("email,name,choice,created_at").order("created_at", { ascending: false });
     if (error || !data) return;
     const emails = [...new Set(data.map((v) => v.email).filter(Boolean))];
-    const subject = encodeURIComponent("🔴 LIVE NOW — Brigham's weekly piano tech AMA");
+    const subject = encodeURIComponent("🔴 LIVE NOW — Ask Piano Pros, the weekly PTL AMA");
     const body = encodeURIComponent(
-      "Brigham is live right now — come ask him anything:\n\n" + LIVE_URL +
+      "The PTL contributors are live right now — come ask the pros anything:\n\n" + LIVE_URL +
       "\n\nTuning, rebuilding, CNC & 3D printing, shop business — bring your questions." +
       "\n\n— Piano Technology Library\npianotechnologylibrary.com");
     $("amaAdmin").hidden = false;

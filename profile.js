@@ -79,6 +79,10 @@
 
   $("pfPrintPartner").addEventListener("change", () => { $("ppDetails").hidden = !$("pfPrintPartner").checked; });
 
+  // The bulk block reuses the single-upload tag vocabulary (one source of truth).
+  const bkGrid = $("bkTagGrid");
+  if (bkGrid) bkGrid.innerHTML = document.querySelector("#dashUpload .tag-grid").innerHTML.replaceAll('class="upTag"', 'class="bkTag"');
+
   // Show the price field only when "Suggested price" is chosen.
   document.querySelectorAll('input[name="upPricing"]').forEach((r) =>
     r.addEventListener("change", () => {
@@ -199,16 +203,16 @@
           slug = slugify(name) + "-" + n;
         }
         row.slug = slug;
-        const { data, error } = await sb().from("contributors").insert(row).select().single();
+        const { error } = await sb().from("contributors").insert(row);
         if (error) throw error;
-        profile = data;
       } else {
         delete row.id;
-        const { data, error } = await sb().from("contributors")
-          .update(row).eq("id", uid()).select().single();
+        const { error } = await sb().from("contributors").update(row).eq("id", uid());
         if (error) throw error;
-        profile = data;
       }
+      // Re-read through my_profile() — returning=representation would trip the
+      // column privacy grants, and the fresh row has all our own fields anyway.
+      profile = await window.Community.myProfile(uid());
       const nowApproved = profile.status === "approved" || profile.status == null;
       setStatus("pfStatus", nowApproved ? "Saved ✓ Your profile is live."
         : "Application received ✓ An approved member of the Piano Technology Library community will review your request — you'll get an approval email or a request for more information shortly.");
@@ -335,6 +339,126 @@
       : `<div class="cm-empty">Nothing shared yet — your first contribution goes right above. 🔧</div>`;
     $("mineList").querySelectorAll("[data-newver]").forEach((b) =>
       b.onclick = () => startNewVersion((data || []).find((s) => s.id === b.dataset.newver)));
+    $("mineList").querySelectorAll("[data-edit]").forEach((b) =>
+      b.onclick = () => openEdit((data || []).find((s) => String(s.id) === String(b.dataset.edit))));
+  }
+
+  // ---- edit an existing item ---------------------------------------------------
+  // Title, description, tags, video, pricing, license, distribution — the files
+  // themselves are replaced through the "upload new version" flow instead.
+  let editingId = null;
+  function editEl() {
+    let el = document.getElementById("itemEdit");
+    if (el) return el;
+    el = document.createElement("div");
+    el.id = "itemEdit";
+    el.className = "modal-backdrop";
+    el.hidden = true;
+    el.innerHTML = `
+      <div class="modal ie-modal">
+        <button class="modal-close" id="ieClose" aria-label="Close">×</button>
+        <div class="modal-head"><div class="mono mh-id">EDIT ITEM</div><h3 id="ieHeading"></h3></div>
+        <div class="dash-fields ie-fields">
+          <label>Title<input id="ieTitle" type="text"></label>
+          <label>Maker / brand <span class="opt">(optional)</span><input id="ieMaker" type="text"></label>
+          <label>Description<textarea id="ieDesc" rows="3"></textarea></label>
+          <label>Video link <span class="opt">(optional — a YouTube how-to or demo)</span><input id="ieYoutube" type="url" placeholder="https://youtube.com/watch?v=…"></label>
+          <div class="tag-block">
+            <div class="pc-lab">Search tags</div>
+            <div class="tag-grid" id="ieTagGrid"></div>
+            <label>Extra tags <span class="opt">(comma-separated)</span><input id="ieTagsExtra" type="text"></label>
+          </div>
+          <div class="dash-row">
+            <label>Pricing<select id="iePricing">
+              <option value="free">Free</option>
+              <option value="tip">Free + tip jar</option>
+              <option value="pwyw">Pay what you want</option>
+              <option value="paid">Set a price</option>
+            </select></label>
+            <label>Price (USD) <span class="opt">(if priced)</span><input id="iePrice" type="number" min="0" step="1"></label>
+          </div>
+          <div class="dash-row">
+            <label>License<select id="ieLicense">
+              <option value="personal">Personal / professional use — no redistribution</option>
+              <option value="commercial">Commercial use OK</option>
+              <option value="noresale">Use freely, but no reselling the file</option>
+              <option value="cc0">Public domain (CC0) — do anything</option>
+              <option value="">Not specified</option>
+            </select></label>
+            <label>Availability<select id="ieDist">
+              <option value="download">Download</option>
+              <option value="print-only">Print &amp; ship only (no download)</option>
+            </select></label>
+          </div>
+          <div class="dash-actions">
+            <button class="au-btn primary" id="ieSave">SAVE CHANGES</button>
+            <span id="ieStatus" class="dash-status"></span>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(el);
+    el.querySelector("#ieTagGrid").innerHTML =
+      document.querySelector("#dashUpload .tag-grid").innerHTML.replaceAll('class="upTag"', 'class="ieTag"');
+    const close = () => { el.hidden = true; };
+    el.querySelector("#ieClose").onclick = close;
+    el.addEventListener("click", (e) => { if (e.target === el) close(); });
+    el.querySelector("#ieSave").onclick = saveEdit;
+    return el;
+  }
+
+  const CURATED_TAGS = () => [...document.querySelectorAll("#dashUpload .upTag")].map((c) => c.value);
+  function openEdit(s) {
+    if (!s) return;
+    const el = editEl();
+    editingId = s.id;
+    el.querySelector("#ieHeading").textContent = s.title;
+    $("ieTitle").value = s.title || "";
+    $("ieMaker").value = s.maker || "";
+    $("ieDesc").value = s.description || "";
+    $("ieYoutube").value = s.youtube ? `https://www.youtube.com/watch?v=${s.youtube}` : "";
+    const tags = Array.isArray(s.tags) ? s.tags : [];
+    const curated = CURATED_TAGS();
+    el.querySelectorAll(".ieTag").forEach((c) => c.checked = tags.includes(c.value));
+    $("ieTagsExtra").value = tags.filter((t) => !curated.includes(t)).join(", ");
+    $("iePricing").value = ["free", "tip", "pwyw", "paid"].includes(s.pricing) ? s.pricing : "free";
+    $("iePrice").value = s.price ?? "";
+    $("ieLicense").value = s.license || "";
+    $("ieDist").value = s.distribution === "print-only" ? "print-only" : "download";
+    $("ieStatus").textContent = "";
+    el.hidden = false;
+  }
+
+  async function saveEdit() {
+    const title = $("ieTitle").value.trim();
+    if (!title) return setStatus("ieStatus", "The item needs a title.", true);
+    const pricing = $("iePricing").value;
+    const priceVal = parseFloat($("iePrice").value);
+    const tags = [...new Set([
+      ...[...document.querySelectorAll(".ieTag:checked")].map((c) => c.value),
+      ...$("ieTagsExtra").value.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean),
+    ])];
+    const patch = {
+      title,
+      maker: $("ieMaker").value.trim() || null,
+      description: $("ieDesc").value.trim() || null,
+      youtube: normalizeYoutube($("ieYoutube").value.trim()) || null,
+      pricing,
+      price: (pricing === "paid" || pricing === "pwyw") && priceVal > 0 ? priceVal : null,
+      license: $("ieLicense").value || null,
+      tags,
+      distribution: $("ieDist").value,
+    };
+    setStatus("ieStatus", "Saving…");
+    let { error } = await sb().from("submissions").update(patch).eq("id", editingId);
+    if (error && /tags|distribution/i.test(error.message || "")) {
+      delete patch.tags; delete patch.distribution;
+      ({ error } = await sb().from("submissions").update(patch).eq("id", editingId));
+    }
+    if (error) return setStatus("ieStatus", "Save failed: " + error.message, true);
+    setStatus("ieStatus", "Saved ✓ Changes are live in the catalog.");
+    if (window.Activity) window.Activity.log("submission", `edited: ${title}`);
+    loadMine();
+    setTimeout(() => { const el = document.getElementById("itemEdit"); if (el) el.hidden = true; }, 900);
   }
 
   // ---- version control -----------------------------------------------------------
@@ -407,7 +531,7 @@
     const actions = admin
       ? `<span class="sub-actions"><button class="au-btn primary" data-approve="${s.id}">APPROVE</button>
          <button class="au-btn" data-reject="${s.id}">REJECT</button></span>`
-      : `<span class="sub-actions"><span class="sub-status s-${esc(s.status)}">${STATUS_LABEL[s.status] || esc(s.status)}</span>${
+      : `<span class="sub-actions"><span class="sub-status s-${esc(s.status)}">${STATUS_LABEL[s.status] || esc(s.status)}</span><button class="au-btn" data-edit="${s.id}">✎ EDIT</button>${
           s.status === "approved" ? `<button class="au-btn" data-newver="${s.id}">⬆ UPLOAD NEW VERSION</button>` : ""
         }</span>`;
     return `<div class="sub-row">
@@ -476,13 +600,23 @@
           files[ext] = sb().storage.from("contributions").getPublicUrl(path).data.publicUrl;
           $("bkFill").style.width = Math.round((doneFiles / totalFiles) * 100) + "%";
         }
-        const { error } = await sb().from("submissions").insert({
+        const bkTags = [...new Set([
+          ...[...document.querySelectorAll(".bkTag:checked")].map((c) => c.value),
+          ...($("bkTagsExtra").value || "").split(",").map((t) => t.trim().toLowerCase()).filter(Boolean),
+        ])];
+        const bkRow = {
           contributor_id: uid(), title: prettyTitle(base),
           category: $("bkCat").value, maker: $("bkMaker").value.trim() || null,
           description: null, files,
           pricing, price: (pricing === "paid" || pricing === "pwyw") && priceVal > 0 ? priceVal : null,
           license: $("bkLicense").value || null,
-        });
+          tags: bkTags,
+        };
+        let { error } = await sb().from("submissions").insert(bkRow);
+        if (error && /tags/i.test(error.message || "")) {
+          delete bkRow.tags;
+          ({ error } = await sb().from("submissions").insert(bkRow));
+        }
         if (error) throw error;
         ok++;
       } catch (err) { failed.push(prettyTitle(base) + " (" + err.message + ")"); }
@@ -500,12 +634,19 @@
   };
 
   // ---- Contributor applications (admins only) --------------------------------------
+  let appsById = {};
   async function loadApps() {
     $("dashApps").hidden = false;
-    const { data, error } = await sb().from("contributors")
+    // Application PII (email, credentials) comes through the admin-only
+    // security-definer function; direct select is the pre-migration fallback.
+    let { data, error } = await sb().rpc("admin_pending_applications");
+    if (error) ({ data, error } = await sb().from("contributors")
       .select("id, name, slug, credentials_note, website, created_at, status, memberships, certifications, years_experience, email")
-      .eq("status", "pending").order("created_at");
+      .eq("status", "pending").order("created_at"));
     if (error) { $("appsList").innerHTML = `<div class="cm-empty">${esc(error.message)}</div>`; return; }
+    data = (data || []).filter((c) => c.status === "pending");
+    appsById = {};
+    data.forEach((c) => { appsById[c.id] = c; });
     $("appsList").innerHTML = (data || []).length ? data.map((c) => `
       <div class="sub-row">
         <div class="sub-main">
@@ -522,9 +663,10 @@
     $("appsList").querySelectorAll("[data-appno]").forEach((b) => b.onclick = () => decideApp(b.dataset.appno, "declined"));
   }
   async function decideApp(id, status) {
-    const { data: row, error } = await sb().from("contributors")
+    const row = appsById[id] || {};
+    const { error } = await sb().from("contributors")
       .update({ status, verified_at: status === "approved" ? new Date().toISOString() : null })
-      .eq("id", id).select("name, email").maybeSingle();
+      .eq("id", id);
     if (error) { alert("Update failed: " + error.message); return; }
     if (window.Activity) window.Activity.log(status === "approved" ? "contributor_approved" : "contributor_declined", id);
     // Open a prefilled email so the applicant hears back (sent from the admin's own mail).

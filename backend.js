@@ -25,6 +25,13 @@
     return client();
   }
 
+  // The public directory never needs application PII (email, credentials_note,
+  // memberships…) — and once the privacy grants run, selecting those columns
+  // anonymously is refused outright.
+  const PUBLIC_CONTRIB_COLS = "id,name,slug,credential,location,website,bio,photo_url,links," +
+    "payment_links,pricing_mode,offers_print,allow_community_print,print_notes,print_partner," +
+    "print_equipment,print_region,print_from,status,verified_at,created_at";
+
   function profileFromRow(row) {
     return {
       id: row.id,
@@ -91,7 +98,7 @@
         if (!sb) return window.Community;
         try {
           const [{ data: contribs }, { data: subs }] = await Promise.all([
-            sb.from("contributors").select("*"),
+            sb.from("contributors").select(PUBLIC_CONTRIB_COLS),
             sb.from("submissions").select("*").eq("status", "approved")
               .order("created_at", { ascending: false }),
           ]);
@@ -124,7 +131,11 @@
     async myProfile(uid) {
       const sb = client();
       if (!sb || !uid) return null;
-      const { data } = await sb.from("contributors").select("*").eq("id", uid).maybeSingle();
+      // Own full row (incl. application fields) comes through the security-definer
+      // my_profile() function; direct select works as a pre-migration fallback.
+      let { data, error } = await sb.rpc("my_profile");
+      if (!error && Array.isArray(data)) return data[0] || null;
+      ({ data } = await sb.from("contributors").select("*").eq("id", uid).maybeSingle());
       return data || null;
     },
   };
