@@ -146,10 +146,13 @@ if (!location.hash) {
         `<button class="au-btn" id="authSignOut">SIGN OUT</button>`;
       document.getElementById("authSignOut").onclick = () => window.Auth.signOut();
     } else {
-      // Signed out: keep the nav clean — sign-in is offered contextually via
-      // the auth gate the first time the visitor takes an action.
-      slot.innerHTML = SUPABASE_READY ? "" :
-        `<span class="au-demo" title="Add Supabase keys to enable real Google login">DEMO</span>`;
+      // Signed out: a visible Google sign-in up top (the contextual auth gate
+      // still catches first actions for anyone who skips it).
+      slot.innerHTML = SUPABASE_READY
+        ? `<button class="au-btn primary" id="authSignIn" title="Sign in with your Google account">SIGN IN</button>`
+        : `<span class="au-demo" title="Add Supabase keys to enable real Google login">DEMO</span>`;
+      const b = document.getElementById("authSignIn");
+      if (b) b.onclick = () => window.Auth.signIn();
     }
   }
   window.Auth.onChange(renderAuthSlot);
