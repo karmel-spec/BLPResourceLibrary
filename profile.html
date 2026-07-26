@@ -6,9 +6,9 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260725152557">
-<link rel="icon" href="icon.svg?v=20260724135928" type="image/svg+xml">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260724135928">
+<link rel="stylesheet" href="styles.css?v=20260726150437">
+<link rel="icon" href="icon.svg?v=20260726150437" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260726150437">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FJJ4GVNQXK"></script>
 <script>
@@ -85,6 +85,15 @@
       <p>Don't worry about polish — worry about usefulness. The best entries include the reasoning, not just the geometry: what the part is, what it fits, how you made it, and anything that would trip up the next person. A clear photo and a sentence of context turn a file into a resource.</p>
       <p class="fine">Prefer email? Reach us at <a href="mailto:karmel@brighamlarsonpianos.com">karmel@brighamlarsonpianos.com</a> and we'll help you get your contribution in.</p>
     </div>
+  </div>
+
+  <!-- Library-member view: signed-in readers who aren't piano professionals -->
+  <div id="dashConsumer" class="dash-block pending-note" hidden>
+    <h2>You're a member of the library</h2>
+    <p>Your account gives you full reading privileges — downloads, training videos,
+    part requests, ratings, and email updates as new work arrives. Contributor
+    workbenches are reserved for working piano professionals.</p>
+    <p class="fine">Piano technician after all, or becoming one? <button class="linklike" id="dashRedo">Update how you're connected to the trade</button> and the contributor application will open up.</p>
   </div>
 
   <!-- Profile editor -->
@@ -381,13 +390,14 @@
   A COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260725152202"></script>
-<script src="data.js?v=20260725152202"></script>
-<script src="auth.js?v=20260725152202"></script>
-<script src="backend.js?v=20260725152202"></script>
-<script src="activity.js?v=20260725152202"></script>
-<script src="feedback.js?v=20260725152202"></script>
-<script src="profile.js?v=20260725152557"></script>
+<script src="config.js?v=20260726150437"></script>
+<script src="data.js?v=20260726150437"></script>
+<script src="auth.js?v=20260726150437"></script>
+<script src="backend.js?v=20260726150437"></script>
+<script src="activity.js?v=20260726150437"></script>
+<script src="feedback.js?v=20260726150437"></script>
+<script src="welcome.js?v=20260726150437"></script>
+<script src="profile.js?v=20260726150437"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");

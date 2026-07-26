@@ -37,7 +37,7 @@
   window.Auth.onChange(async (user) => {
     $("dashSignedOut").hidden = !!user;
     if (!user) {
-      ["dashProfile", "dashUpload", "dashBulk", "dashMine", "dashAdmin", "dashPending", "dashApps"].forEach((id) => $(id).hidden = true);
+      ["dashProfile", "dashUpload", "dashBulk", "dashMine", "dashAdmin", "dashPending", "dashApps", "dashConsumer"].forEach((id) => $(id).hidden = true);
       return;
     }
     if (!sb()) {
@@ -47,6 +47,15 @@
       return;
     }
     profile = await window.Community.myProfile(user.id);
+    // Library members who aren't piano professionals get a reader view — no
+    // contributor application (role from the welcome intake card, welcome.js).
+    if (!profile && !window.Auth.isAdmin() && window.Welcome && await window.Welcome.isConsumer()) {
+      $("dashConsumer").hidden = false;
+      const redo = $("dashRedo");
+      if (redo) redo.onclick = () => window.Welcome.show();
+      return;
+    }
+    $("dashConsumer").hidden = true;
     fillProfileForm(user);
     $("dashProfile").hidden = false;
     // Uploads open only for APPROVED contributors (piano professionals,

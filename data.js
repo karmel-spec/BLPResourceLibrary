@@ -974,5 +974,10 @@ const CONTRIBUTORS = {
     offers_print: true,
     print_from: 75,
     print_notes: "CNC machining and 3D printing (filament & resin); many materials on request.",
+    // Tip jar on every free BLP download and video. Paste real links here to
+    // activate, e.g. { label: "VENMO", url: "https://venmo.com/u/…" } — until
+    // then cards show the jar with a "coming soon" note.
+    tip_all: true,
+    payment_links: [],
   },
 };

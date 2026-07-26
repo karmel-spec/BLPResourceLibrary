@@ -113,19 +113,26 @@ function licenseLine(r) {
   return l ? `<div class="lic-line mono">⚖ ${l}</div>` : "";
 }
 function payRow(r) {
-  if (r.youtube) return "";
   const c = (typeof CONTRIBUTORS !== "undefined" && CONTRIBUTORS[r.by]) || {};
   const pays = c.payment_links || [];
   const links = pays.map((l) => `<a class="pay-link" href="${l.url}" target="_blank" rel="noopener">${attr(l.label)}</a>`).join("");
   const missing = `<div class="pay-note mono">Payment link coming soon — check their profile.</div>`;
+  const who = (c.name || "the maker").split(" ")[0];
+  // Videos: tip jar only, and only for makers who tip-jar their whole catalog.
+  if (r.youtube) {
+    if (!c.tip_all) return "";
+    return `<div class="pay-row tip"><span class="pay-ask">☕ Free to watch — if it helped, tip ${who}:</span>${links ? `<div class="pay-links">${links}</div>` : `<div class="pay-note mono">Tip jar opening soon.</div>`}</div>`;
+  }
   if (r.pricing === "paid" && r.price) {
     return `<div class="pay-row paid"><div class="pay-ask">💛 The maker asks <b>$${r.price}</b> — pay them directly if this helps you:</div>${links ? `<div class="pay-links">${links}</div>` : missing}</div>`;
   }
   if (r.pricing === "pwyw") {
     return `<div class="pay-row paid"><div class="pay-ask">💛 Pay what you want${r.price ? ` <b>(suggested $${r.price})</b>` : ""} — send the maker whatever it's worth to you:</div>${links ? `<div class="pay-links">${links}</div>` : missing}</div>`;
   }
-  if (r.pricing === "tip" && links) {
-    return `<div class="pay-row tip"><span class="pay-ask">☕ Free to download — if it saved you time, thank the maker:</span><div class="pay-links">${links}</div></div>`;
+  // Per-item tip mode, plus every free download from a tip-all maker.
+  if (r.pricing === "tip" || (c.tip_all && (!r.pricing || r.pricing === "free"))) {
+    if (!links && !c.tip_all) return "";
+    return `<div class="pay-row tip"><span class="pay-ask">☕ Free to download — if it saved you time, thank ${who}:</span>${links ? `<div class="pay-links">${links}</div>` : `<div class="pay-note mono">Tip jar opening soon.</div>`}</div>`;
   }
   return "";
 }

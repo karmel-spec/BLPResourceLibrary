@@ -214,3 +214,74 @@ drop policy if exists "approved contributors only" on submissions;
 create policy "approved contributors only" on submissions
   as restrictive for insert to authenticated
   with check (exists (select 1 from contributors c where c.id = auth.uid() and c.status = 'approved'));
+
+-- ============================================================================
+-- July 26, 2026 (evening) — Tech Chat + AMA broadcast-hour vote
+-- ============================================================================
+
+-- Tech Chat: the back room. Readable and writable ONLY by approved
+-- contributors and admins — everyone else gets RLS-refused, and the nav
+-- link never even renders for them.
+create table if not exists community_chat (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  author text,
+  message text not null check (char_length(message) between 1 and 2000),
+  created_at timestamptz default now()
+);
+alter table community_chat enable row level security;
+
+drop policy if exists "verified read chat" on community_chat;
+create policy "verified read chat" on community_chat
+  for select to authenticated using (
+    exists (select 1 from contributors c where c.id = auth.uid() and c.status = 'approved')
+    or auth.jwt() ->> 'email' in
+      ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+
+drop policy if exists "verified write chat" on community_chat;
+create policy "verified write chat" on community_chat
+  for insert to authenticated with check (
+    user_id = auth.uid() and (
+      exists (select 1 from contributors c where c.id = auth.uid() and c.status = 'approved')
+      or auth.jwt() ->> 'email' in
+        ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com')));
+
+drop policy if exists "own or admin delete chat" on community_chat;
+create policy "own or admin delete chat" on community_chat
+  for delete to authenticated using (
+    user_id = auth.uid() or auth.jwt() ->> 'email' in
+      ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+
+create index if not exists community_chat_created_idx on community_chat (created_at);
+
+-- AMA vote: one row per member (upsert on user_id). Emails are the reminder
+-- list — visible to admins only; voters see just their own row. Public
+-- tallies come from the ama_counts() function so emails never leak.
+create table if not exists ama_votes (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  email text not null,
+  name text,
+  choice text not null check (choice in ('wed-7am','wed-noon','wed-4pm')),
+  created_at timestamptz default now()
+);
+alter table ama_votes enable row level security;
+
+drop policy if exists "own vote insert" on ama_votes;
+create policy "own vote insert" on ama_votes
+  for insert to authenticated with check (user_id = auth.uid());
+
+drop policy if exists "own vote update" on ama_votes;
+create policy "own vote update" on ama_votes
+  for update to authenticated using (user_id = auth.uid());
+
+drop policy if exists "own or admin read votes" on ama_votes;
+create policy "own or admin read votes" on ama_votes
+  for select to authenticated using (
+    user_id = auth.uid() or auth.jwt() ->> 'email' in
+      ('brigham@brighamlarsonpianos.com','karmel@brighamlarsonpianos.com','brighamlarson@gmail.com','karmel.larson@gmail.com'));
+
+create or replace function ama_counts()
+returns table (choice text, votes bigint)
+language sql security definer set search_path = public
+as $$ select choice, count(*) from ama_votes group by choice $$;
+grant execute on function ama_counts() to anon, authenticated;

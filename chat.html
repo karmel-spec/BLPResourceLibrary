@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contributor — Piano Technology Library</title>
+<title>Tech Chat — Piano Technology Library</title>
+<meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=20260726150437">
@@ -33,7 +34,7 @@
     <nav id="nav">
       <a href="index.html">INDEX</a>
       <a href="index.html#library">CATALOG</a>
-      <a class="on" href="contributors.html">CONTRIBUTORS</a>
+      <a href="contributors.html">CONTRIBUTORS</a>
       <a href="requests.html">REQUESTS</a>
       <a href="contributors.html#print-partners">PRINT PARTNERS</a>
       <a href="index.html#newsletter">GET UPDATES</a>
@@ -44,30 +45,30 @@
   </div>
 </header>
 
-<div class="invite-bar">
-  <div class="invite-inner">
-    <div class="invite-text">
-      <b>Are you a piano technician?</b>
-      <span>Join the library — share your parts, jigs, and know-how with the trade, credited and linked to you.</span>
-    </div>
-    <a class="invite-btn" href="profile.html">Become a contributor →</a>
+<main class="page chat-page">
+  <div class="page-head">
+    <div class="dwg">THE BACK ROOM · VERIFIED PIANO TECHNICIANS ONLY</div>
+    <h1>Tech <span>Chat</span></h1>
+    <p class="lede">Where the library gets built. Talk shop with other verified
+    contributors — propose features, coordinate part projects, swap techniques,
+    and help grow this resource for every piano technician.</p>
   </div>
-</div>
 
-<div id="profile"></div>
-<div class="grid" id="grid"></div>
-
-<div class="modal-backdrop" id="commentModal" hidden>
-  <div class="modal">
-    <button class="modal-close" id="modalClose" aria-label="Close">×</button>
-    <div class="modal-head">
-      <div class="mono mh-id" id="cmId"></div>
-      <h3 id="cmTitle"></h3>
-    </div>
-    <div class="cm-list" id="cmList"></div>
-    <div class="cm-form" id="cmForm"></div>
+  <div id="chatGate" class="dash-block pending-note">
+    <h2>Checking your library card…</h2>
+    <p class="mono" id="chatGateMsg">One moment.</p>
   </div>
-</div>
+
+  <div id="chatRoom" hidden>
+    <div class="chat-list" id="chatList"><div class="cm-empty">Loading the conversation…</div></div>
+    <div class="chat-compose">
+      <textarea id="chatMsg" rows="2" maxlength="2000" placeholder="Say it to the room…"></textarea>
+      <button class="au-btn primary" id="chatSend">SEND</button>
+    </div>
+    <p class="fine">Visible to verified contributors and librarians only. Keep it professional,
+    generous, and on the craft — see the <a href="terms.html">community guidelines</a>.</p>
+  </div>
+</main>
 
 <footer>
   <div class="footer-inner">
@@ -87,13 +88,8 @@
 <script src="activity.js?v=20260726150437"></script>
 <script src="feedback.js?v=20260726150437"></script>
 <script src="welcome.js?v=20260726150437"></script>
-<script src="print.js?v=20260726150437"></script>
-<script src="viewer.js?v=20260726150437"></script>
-<script src="ratings.js?v=20260726150437"></script>
-<script src="comments.js?v=20260726150437"></script>
-<script src="contributor.js?v=20260726150437"></script>
+<script src="chat.js?v=20260726150437"></script>
 <script>
-  // Mobile nav toggle (shared behavior)
   const nt = document.getElementById("navToggle"), nv = document.getElementById("nav");
   if (nt) nt.addEventListener("click", () => {
     const open = nv.classList.toggle("open");
