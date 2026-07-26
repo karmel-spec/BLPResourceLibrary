@@ -1052,3 +1052,4 @@ header + .ama-band { margin-top: 0; border-top: none; }
 .footer-social a { color: #c9d4dc; }
 .ie-modal { max-width: 640px; }
 .ie-fields { padding: 14px 18px 18px; overflow-y: auto; }
+.pp-approve { margin: 6px 0 10px 26px; padding: 10px 12px; border: 1.5px dashed var(--line); background: #fbfaf7; }

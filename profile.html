@@ -6,9 +6,9 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260726160830">
-<link rel="icon" href="icon.svg?v=20260726160830" type="image/svg+xml">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260726160830">
+<link rel="stylesheet" href="styles.css?v=20260726162937">
+<link rel="icon" href="icon.svg?v=20260726162937" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260726162937">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FJJ4GVNQXK"></script>
 <script>
@@ -148,7 +148,11 @@
         <div class="print-optin">
           <div class="pc-lab">Print &amp; ship <span class="opt">(optional)</span></div>
           <label class="chk"><input type="checkbox" id="pfOffersPrint"> I can <b>print &amp; ship my own items</b> to people who can't make them</label>
-          <label class="chk"><input type="checkbox" id="pfCommunityPrint"> Let <b>Brigham Larson Pianos or another Print Partner</b> fulfill print requests for my items when I can't</label>
+          <label class="chk"><input type="checkbox" id="pfCommunityPrint"> Approve <b>these contributors in the Print Partner network</b> to fulfill print requests for my items when I can't</label>
+          <div class="pp-approve" id="ppApprove" hidden>
+            <div class="pc-lab">Partners you approve <span class="opt">(check each one you trust with your work)</span></div>
+            <div class="cred-grid" id="ppApproveList"><span class="mono opt">Loading the partner roster…</span></div>
+          </div>
           <label class="chk"><input type="checkbox" id="pfPrintPartner"> Join the <b>Print Partner network</b> — I'll take on paid print &amp; ship jobs for <b>other makers' items</b> too</label>
           <div class="pp-details" id="ppDetails" hidden>
             <div class="pc-lab">My equipment <span class="opt">(check all that apply)</span></div>
@@ -428,14 +432,14 @@
   A COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260726160830"></script>
-<script src="data.js?v=20260726160830"></script>
-<script src="auth.js?v=20260726160830"></script>
-<script src="backend.js?v=20260726160830"></script>
-<script src="activity.js?v=20260726160830"></script>
-<script src="feedback.js?v=20260726160830"></script>
-<script src="welcome.js?v=20260726160830"></script>
-<script src="profile.js?v=20260726160830"></script>
+<script src="config.js?v=20260726162937"></script>
+<script src="data.js?v=20260726162937"></script>
+<script src="auth.js?v=20260726162937"></script>
+<script src="backend.js?v=20260726162937"></script>
+<script src="activity.js?v=20260726162937"></script>
+<script src="feedback.js?v=20260726162937"></script>
+<script src="welcome.js?v=20260726162937"></script>
+<script src="profile.js?v=20260726162937"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");

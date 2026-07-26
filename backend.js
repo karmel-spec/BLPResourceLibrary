@@ -52,6 +52,7 @@
       print_equipment: Array.isArray(row.print_equipment) ? row.print_equipment : [],
       print_region: row.print_region || "",
       print_from: row.print_from != null ? Number(row.print_from) : null,
+      approved_printers: Array.isArray(row.approved_printers) ? row.approved_printers : [],
       community: true,
     };
   }
@@ -97,8 +98,11 @@
         const sb = await waitForClient();
         if (!sb) return window.Community;
         try {
+          // approved_printers may not be migrated yet — retry without it
+          let contribRes = await sb.from("contributors").select(PUBLIC_CONTRIB_COLS + ",approved_printers");
+          if (contribRes.error) contribRes = await sb.from("contributors").select(PUBLIC_CONTRIB_COLS);
           const [{ data: contribs }, { data: subs }] = await Promise.all([
-            sb.from("contributors").select(PUBLIC_CONTRIB_COLS),
+            Promise.resolve(contribRes),
             sb.from("submissions").select("*").eq("status", "approved")
               .order("created_at", { ascending: false }),
           ]);

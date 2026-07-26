@@ -78,6 +78,7 @@
   $("dashSignIn").onclick = () => window.Auth.signIn();
 
   $("pfPrintPartner").addEventListener("change", () => { $("ppDetails").hidden = !$("pfPrintPartner").checked; });
+  $("pfCommunityPrint").addEventListener("change", () => { $("ppApprove").hidden = !$("pfCommunityPrint").checked; });
 
   // The bulk block reuses the single-upload tag vocabulary (one source of truth).
   const bkGrid = $("bkTagGrid");
@@ -116,6 +117,8 @@
       .map((l) => `${l.label} ${l.url}`).join("\n");
     $("pfOffersPrint").checked = !!profile?.offers_print;
     $("pfCommunityPrint").checked = !!profile?.allow_community_print;
+    $("ppApprove").hidden = !profile?.allow_community_print;
+    renderPartnerRoster();
     $("pfPrintNotes").value = profile?.print_notes || "";
     $("pfPrintPartner").checked = !!profile?.print_partner;
     $("ppDetails").hidden = !profile?.print_partner;
@@ -134,6 +137,23 @@
       $("pfView").hidden = false;
       $("pfView").href = "contributor.html?id=" + profile.slug;
     }
+  }
+
+  // Print Partner roster — the maker checks each partner they trust to
+  // fulfill their items. Brigham Larson Pianos is the network's anchor.
+  async function renderPartnerRoster() {
+    const list = $("ppApproveList");
+    if (!list || list.dataset.ready) return;
+    if (window.Community) await window.Community.load();
+    const mySlug = profile?.slug;
+    const partners = Object.entries(CONTRIBUTORS)
+      .filter(([slug, c]) => (c.print_partner || c.offers_print) && slug !== mySlug)
+      .map(([slug, c]) => ({ slug, name: c.name, region: c.print_region || c.location || "" }));
+    const approved = profile?.approved_printers || [];
+    list.dataset.ready = "1";
+    list.innerHTML = partners.length ? partners.map((p) =>
+      `<label class="chk"><input type="checkbox" class="pfPartnerOk" value="${p.slug}"${approved.includes(p.slug) ? " checked" : ""}> ${p.name}${p.region ? ` <span class="opt">(${p.region})</span>` : ""}</label>`
+    ).join("") : `<span class="mono opt">No print partners in the network yet — Brigham Larson Pianos will appear here.</span>`;
   }
 
   let photoUrl = null; // set when a new photo is uploaded this session
@@ -189,6 +209,7 @@
       print_region: $("pfPrintRegion").value.trim() || null,
       print_from: parseFloat($("pfPrintFrom").value) || null,
       ack_print_network: true,
+      approved_printers: [...document.querySelectorAll(".pfPartnerOk:checked")].map((c) => c.value),
     };
     if (photoUrl) row.photo_url = photoUrl;
     else if (!profile) row.photo_url = window.Auth.user().avatar || null;
@@ -203,11 +224,19 @@
           slug = slugify(name) + "-" + n;
         }
         row.slug = slug;
-        const { error } = await sb().from("contributors").insert(row);
+        let { error } = await sb().from("contributors").insert(row);
+        if (error && /approved_printers/i.test(error.message || "")) {
+          delete row.approved_printers;
+          ({ error } = await sb().from("contributors").insert(row));
+        }
         if (error) throw error;
       } else {
         delete row.id;
-        const { error } = await sb().from("contributors").update(row).eq("id", uid());
+        let { error } = await sb().from("contributors").update(row).eq("id", uid());
+        if (error && /approved_printers/i.test(error.message || "")) {
+          delete row.approved_printers;
+          ({ error } = await sb().from("contributors").update(row).eq("id", uid()));
+        }
         if (error) throw error;
       }
       // Re-read through my_profile() — returning=representation would trip the

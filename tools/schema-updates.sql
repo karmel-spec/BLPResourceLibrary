@@ -336,3 +336,7 @@ as $$
   order by created_at
 $$;
 grant execute on function admin_pending_applications() to authenticated;
+
+-- Maker-approved Print Partner roster (slugs of trusted partners)
+alter table contributors add column if not exists approved_printers jsonb not null default '[]'::jsonb;
+grant select (approved_printers) on table contributors to anon, authenticated;
