@@ -153,7 +153,7 @@
     list.dataset.ready = "1";
     list.innerHTML = partners.length ? partners.map((p) =>
       `<label class="chk"><input type="checkbox" class="pfPartnerOk" value="${p.slug}"${approved.includes(p.slug) ? " checked" : ""}> ${p.name}${p.region ? ` <span class="opt">(${p.region})</span>` : ""}</label>`
-    ).join("") : `<span class="mono opt">No print partners in the network yet — Brigham Larson Pianos will appear here.</span>`;
+    ).join("") : `<span class="mono opt">No print partners in the network yet — partners appear here as they join.</span>`;
   }
 
   let photoUrl = null; // set when a new photo is uploaded this session
