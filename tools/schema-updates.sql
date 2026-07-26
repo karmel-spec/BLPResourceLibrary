@@ -285,3 +285,12 @@ returns table (choice text, votes bigint)
 language sql security definer set search_path = public
 as $$ select choice, count(*) from ama_votes group by choice $$;
 grant execute on function ama_counts() to anon, authenticated;
+
+-- Search tags + print-&-ship-only distribution mode for uploads
+alter table submissions add column if not exists tags jsonb not null default '[]'::jsonb;
+alter table submissions add column if not exists distribution text not null default 'download';
+alter table submissions drop constraint if exists submissions_distribution_check;
+alter table submissions add constraint submissions_distribution_check check (distribution in ('download','print-only'));
+
+-- Beta feedback: optional screenshot (small compressed data-URL)
+alter table beta_feedback add column if not exists screenshot text;

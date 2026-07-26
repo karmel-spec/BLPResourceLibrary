@@ -6,9 +6,9 @@
 <title>My Contributor Dashboard — Piano Technology Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260726151335">
-<link rel="icon" href="icon.svg?v=20260726151335" type="image/svg+xml">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260726151335">
+<link rel="stylesheet" href="styles.css?v=20260726152008">
+<link rel="icon" href="icon.svg?v=20260726152008" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260726152008">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FJJ4GVNQXK"></script>
 <script>
@@ -214,9 +214,42 @@
         <label>Maker / Brand <span class="opt">(optional)</span><input id="upMaker" type="text" placeholder="e.g. Baldwin"></label>
       </div>
       <label>Description<textarea id="upDesc" rows="3" placeholder="What is it, what problem does it solve, anything the next technician should know."></textarea></label>
+      <div class="tag-block">
+        <div class="pc-lab">Search tags <span class="opt">(check all that fit — this is how technicians find it)</span></div>
+        <div class="tag-grid">
+          <label class="chk"><input type="checkbox" class="upTag" value="tool"> Tool</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="jig"> Jig</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="fixture"> Fixture</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="template"> Template / gauge</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="hammer"> Hammer</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="shank &amp; flange"> Shank &amp; flange</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="wippen"> Wippen</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="damper"> Damper</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="keys &amp; keytops"> Keys &amp; keytops</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="action"> Action</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="pedal &amp; trapwork"> Pedal &amp; trapwork</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="soundboard &amp; bridge"> Soundboard &amp; bridge</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="tuning"> Tuning</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="regulation"> Regulation</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="voicing"> Voicing</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="stringing"> Stringing</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="grand"> Grand</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="upright"> Upright</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="player piano"> Player piano</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="hardware"> Hardware</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="3d print"> 3D print</label>
+          <label class="chk"><input type="checkbox" class="upTag" value="cnc"> CNC</label>
+        </div>
+        <label>Your own tags <span class="opt">(optional — comma-separated, anything that helps search)</span><input id="upTagsExtra" type="text" placeholder="e.g. capstan, let-off rack, Mason &amp; Hamlin"></label>
+      </div>
       <label>Files <span class="opt">(F3D, STEP, STL, 3MF, PDF, ZIP — up to 50MB each)</span><input id="upFiles" type="file" multiple accept=".f3d,.step,.stp,.stl,.3mf,.pdf,.zip,.dxf"></label>
       <label>Preview image <span class="opt">(optional — a render or photo for the card)</span><input id="upThumb" type="file" accept="image/*"></label>
-      <label>YouTube link <span class="opt">(optional — for training videos)</span><input id="upYoutube" type="url" placeholder="https://youtube.com/watch?v=…"></label>
+      <label>Video link <span class="opt">(optional — a YouTube video of the item: how to use it, how it's made, or the training video itself)</span><input id="upYoutube" type="url" placeholder="https://youtube.com/watch?v=…"></label>
+      <div class="price-choice">
+        <div class="pc-lab">How can others get it?</div>
+        <label class="pc-opt"><input type="radio" name="upDist" value="download" checked> <b>Download</b> — the files are downloadable straight from the card</label>
+        <label class="pc-opt"><input type="radio" name="upDist" value="print-only"> <b>Print &amp; ship only</b> — featured and 3D-previewable, but the files stay yours: the download button is grayed out and the only way to get it is a print &amp; ship order</label>
+      </div>
       <div class="price-choice">
         <div class="pc-lab">How would you like to offer this download?</div>
         <label class="pc-opt"><input type="radio" name="upPricing" value="free" checked> <b>Free</b> — share it freely, no strings</label>
@@ -390,14 +423,14 @@
   A COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260726151335"></script>
-<script src="data.js?v=20260726151335"></script>
-<script src="auth.js?v=20260726151335"></script>
-<script src="backend.js?v=20260726151335"></script>
-<script src="activity.js?v=20260726151335"></script>
-<script src="feedback.js?v=20260726151335"></script>
-<script src="welcome.js?v=20260726151335"></script>
-<script src="profile.js?v=20260726151335"></script>
+<script src="config.js?v=20260726152008"></script>
+<script src="data.js?v=20260726152008"></script>
+<script src="auth.js?v=20260726152008"></script>
+<script src="backend.js?v=20260726152008"></script>
+<script src="activity.js?v=20260726152008"></script>
+<script src="feedback.js?v=20260726152008"></script>
+<script src="welcome.js?v=20260726152008"></script>
+<script src="profile.js?v=20260726152008"></script>
 <script>
   document.getElementById("navToggle").onclick = function () {
     const nav = document.getElementById("nav");

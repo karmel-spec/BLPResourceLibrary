@@ -16,7 +16,7 @@
     { key: "other",     icon: "💬", label: "Something else" },
   ];
 
-  let el = null, chosen = "bug";
+  let el = null, chosen = "bug", screenshot = null;
 
   function build() {
     // Header button
@@ -55,6 +55,11 @@
           <textarea id="fbMsg" rows="5" placeholder="What happened, or what would you love to see? The more detail, the better."></textarea>
           <label class="fb-lab" for="fbEmail">Your email <span class="fb-opt">(optional — so we can follow up)</span></label>
           <input id="fbEmail" type="email" placeholder="you@email.com" autocomplete="email">
+          <label class="fb-lab">Screenshot <span class="fb-opt">(optional — a picture says it faster)</span></label>
+          <div class="fb-shot-row">
+            <label class="au-btn fb-shot-btn">📷 ATTACH SCREENSHOT<input type="file" id="fbShot" accept="image/*" hidden></label>
+            <span class="fb-shot-preview" id="fbShotPreview" hidden><img id="fbShotImg" alt="Screenshot preview"><button type="button" id="fbShotClear" title="Remove">×</button></span>
+          </div>
           <div class="fb-actions">
             <button class="au-btn primary" id="fbSend">SEND FEEDBACK</button>
             <span class="fb-status" id="fbStatus"></span>
@@ -84,6 +89,45 @@
     el.querySelector("#fbAgain").addEventListener("click", () => {
       el.querySelector("#fbDone").hidden = true;
       el.querySelector("#fbBody").hidden = false;
+    });
+
+    // Screenshot attach: compressed client-side to a small JPEG so it fits
+    // comfortably in the punch-list row (no storage bucket round-trip).
+    el.querySelector("#fbShot").addEventListener("change", async (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      try {
+        screenshot = await compressImage(f);
+        el.querySelector("#fbShotImg").src = screenshot;
+        el.querySelector("#fbShotPreview").hidden = false;
+      } catch (err) {
+        screenshot = null;
+        el.querySelector("#fbStatus").textContent = "Couldn't read that image — try a PNG or JPG.";
+      }
+    });
+    el.querySelector("#fbShotClear").addEventListener("click", () => {
+      screenshot = null;
+      el.querySelector("#fbShot").value = "";
+      el.querySelector("#fbShotPreview").hidden = true;
+    });
+  }
+
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const MAX = 1200;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * scale);
+        c.height = Math.round(img.height * scale);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL("image/jpeg", 0.72));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("bad image")); };
+      img.src = url;
     });
   }
 
@@ -125,6 +169,7 @@
           actor_email: email || (u ? u.email : null),
           actor_name: u ? u.name : null,
           page: location.pathname,
+          screenshot,
         });
         dbOk = !error;
       } catch (e) { /* fall through to email */ }
@@ -143,6 +188,7 @@
           Feedback: msg,
           From: email || (u ? `${u.name} <${u.email}>` : "Anonymous visitor"),
           Page: location.href,
+          Screenshot: screenshot ? "📷 Attached — view it in the dashboard punch-list" : "None",
         }),
       });
       const j = await r.json();
@@ -154,6 +200,9 @@
     el.querySelector("#fbSend").disabled = false;
     if (dbOk || emailed) {
       el.querySelector("#fbMsg").value = "";
+      screenshot = null;
+      el.querySelector("#fbShot").value = "";
+      el.querySelector("#fbShotPreview").hidden = true;
       el.querySelector("#fbBody").hidden = true;
       el.querySelector("#fbDone").hidden = false;
     } else {

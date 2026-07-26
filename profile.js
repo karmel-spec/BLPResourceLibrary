@@ -263,6 +263,10 @@
       if ((pricing === "paid" || pricing === "pwyw") && !$("upAckHonor").checked)
         return setStatus("upStatus", "Please check the honor-system acknowledgment to charge for this item.", true);
       const priceVal = parseFloat($("upPrice").value);
+      const tags = [...new Set([
+        ...[...document.querySelectorAll(".upTag:checked")].map((c) => c.value),
+        ...$("upTagsExtra").value.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean),
+      ])];
       const row = {
         contributor_id: uid(),
         title,
@@ -273,6 +277,8 @@
         pricing,
         price: (pricing === "paid" || pricing === "pwyw") && priceVal > 0 ? priceVal : null,
         license: $("upLicense").value || null,
+        tags,
+        distribution: document.querySelector('input[name="upDist"]:checked')?.value || "download",
       };
       if (newVersionOf) {
         row.version = (newVersionOf.version || 1) + 1;
@@ -737,6 +743,7 @@ Brigham Larson Pianos & the Piano Technology Library
       <div class="beta-main">
         <span class="beta-cat mono">${esc(m.label.toUpperCase())}</span>
         <span class="beta-msg">${esc(r.message)}</span>
+        ${r.screenshot && /^data:image\//.test(r.screenshot) ? `<span class="beta-shot"><a href="${r.screenshot}" target="_blank" rel="noopener"><img src="${r.screenshot}" alt="Screenshot" title="Open full size"></a></span>` : ""}
         <span class="mono beta-meta">${esc(who)}${r.actor_email && r.actor_name ? " · " + esc(r.actor_email) : ""} · ${esc(r.page || "")} · ${fmtWhen(r.created_at)}</span>
       </div>
       <button class="au-btn beta-toggle" ${done ? `data-reopen="${r.id}"` : `data-done="${r.id}"`}>${done ? "REOPEN" : "✓ DONE"}</button>

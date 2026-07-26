@@ -65,11 +65,16 @@
       price: row.price != null ? Number(row.price) : null,
       license: row.license || null,
       print_price: row.print_price != null ? Number(row.print_price) : null,
+      tags: Array.isArray(row.tags) ? row.tags : [],
+      distribution: row.distribution === "print-only" ? "print-only" : "download",
       community: true,
     };
     if (Object.keys(files).length) r.files = files;
     if (row.thumb_url) r.thumb = row.thumb_url;
-    if (row.youtube) { r.youtube = row.youtube; r.sub = r.sub || "community"; }
+    if (row.youtube) {
+      if (cat === "video") { r.youtube = row.youtube; r.sub = r.sub || "community"; }
+      else r.video = row.youtube; // how-to video attached to a downloadable item
+    }
     return r;
   }
 

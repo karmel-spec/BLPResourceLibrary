@@ -29,12 +29,23 @@ function renderTabs() {
   }
 }
 
+// Implicit search vocabulary per category, so plain words like "tools" match
+// jigs & fixtures even before an item carries any tags of its own.
+const CAT_SYNONYMS = {
+  parts: "part parts replacement component obsolete",
+  fixtures: "tool tools jig jigs fixture fixtures shop aid template gauge",
+  player: "player pneumatic roll bellows valve",
+  cabinet: "cabinet furniture case hardware trim",
+  research: "research drawing drawings documentation study measurement",
+  video: "video videos training tutorial lesson technique how-to",
+};
 function matches(r) {
   if (activeCat !== "all" && r.cat !== activeCat) return false;
   if (activeCat === "video" && activeTopic !== "all" && r.sub !== activeTopic) return false;
   if (!query) return true;
   const contrib = CONTRIBUTORS[r.by]?.name || "";
-  const hay = `${r.id} ${r.title} ${r.maker || ""} ${r.desc || ""} ${r.sub || ""} ${contrib}`.toLowerCase();
+  const tags = (r.tags || []).join(" ");
+  const hay = `${r.id} ${r.title} ${r.maker || ""} ${r.desc || ""} ${r.sub || ""} ${contrib} ${tags} ${CAT_SYNONYMS[r.cat] || ""}`.toLowerCase();
   return query.toLowerCase().split(/\s+/).every(w => hay.includes(w));
 }
 
@@ -70,6 +81,17 @@ function fileLinks(r) {
   if (r.youtube) {
     return `<a class="r" href="https://www.youtube.com/watch?v=${r.youtube}" target="_blank" rel="noopener">▶ WATCH</a>`;
   }
+  // Print & ship only: featured and previewable, but the files stay with the
+  // maker — downloads are off and orders go through the print & ship form.
+  if (r.distribution === "print-only") {
+    const p = [];
+    if ((r.files || {}).stl) {
+      p.push(`<button class="preview-btn" data-stl="${r.files.stl}" data-title="${String(r.title).replace(/"/g, "&quot;")}" data-id="${r.id}" data-thumb="${r.thumb || ""}">◉ PREVIEW 3D</button>`);
+    }
+    if (r.video) p.push(`<a class="r" href="https://www.youtube.com/watch?v=${r.video}" target="_blank" rel="noopener">▶ HOW-TO VIDEO</a>`);
+    p.push(`<span class="dl-off" title="The maker offers this made-to-order — downloads are off">⬇ DOWNLOAD OFF · PRINT &amp; SHIP ONLY</span>`);
+    return p.join("");
+  }
   const parts = [];
   const hasFusion = r.fusion && r.fusion !== "PASTE_a360_SHARE_LINK";
   const files = r.files || {};
@@ -91,6 +113,8 @@ function fileLinks(r) {
     // No hosted STL — Autodesk's share page has its own online 3D viewer.
     parts.unshift(`<a class="preview-btn preview-link" href="${r.fusion}" target="_blank" rel="noopener">◉ PREVIEW 3D</a>`);
   }
+  // A maker-attached how-to video (using the tool, making the part).
+  if (r.video) parts.push(`<a class="r" href="https://www.youtube.com/watch?v=${r.video}" target="_blank" rel="noopener">▶ HOW-TO VIDEO</a>`);
   return parts.join("");
 }
 
@@ -104,6 +128,7 @@ const LICENSE_LABEL = {
 };
 function priceBadge(r) {
   if (r.youtube) return "";
+  if (r.distribution === "print-only") return `<span class="price-badge printonly" title="Made to order by the maker">🖨 PRINT &amp; SHIP</span>`;
   if (r.pricing === "paid" && r.price) return `<span class="price-badge paid">$${r.price}</span>`;
   if (r.pricing === "pwyw") return `<span class="price-badge pwyw" title="Pay what you want">PWYW</span>`;
   return `<span class="price-badge free">FREE</span>`;
@@ -112,7 +137,13 @@ function licenseLine(r) {
   const l = LICENSE_LABEL[r.license];
   return l ? `<div class="lic-line mono">⚖ ${l}</div>` : "";
 }
+function tagChips(r) {
+  const tags = r.tags || [];
+  if (!tags.length) return "";
+  return `<div class="tag-line mono">${tags.map((t) => `<span class="tag-chip" data-tag="${attr(t)}">#${attr(t)}</span>`).join("")}</div>`;
+}
 function payRow(r) {
+  if (r.distribution === "print-only") return "";
   const c = (typeof CONTRIBUTORS !== "undefined" && CONTRIBUTORS[r.by]) || {};
   const pays = c.payment_links || [];
   const links = pays.map((l) => `<a class="pay-link" href="${l.url}" target="_blank" rel="noopener">${attr(l.label)}</a>`).join("");
@@ -137,7 +168,7 @@ function payRow(r) {
   return "";
 }
 function printBtn(r) {
-  if (r.youtube || !PRINTABLE_CATS.includes(r.cat)) return "";
+  if (r.youtube || (!PRINTABLE_CATS.includes(r.cat) && r.distribution !== "print-only")) return "";
   return `<button class="printship-btn" data-id="${r.id}" data-title="${attr(r.title)}" data-by="${r.by || ""}" data-printprice="${r.print_price || ""}">🖨 Pay to print &amp; ship</button>`;
 }
 
@@ -167,6 +198,7 @@ function card(r) {
       ${printBtn(r)}
       ${payRow(r)}
       ${licenseLine(r)}
+      ${tagChips(r)}
       ${r.dateAdded ? `<div class="added">ADDED ${fmtDate(r.dateAdded).toUpperCase()}</div>` : ""}
       ${byline(r)}
       <button class="feedback-btn" data-id="${r.id}" data-title="${attr(r.title)}">
