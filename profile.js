@@ -285,7 +285,12 @@
         row.replaces = newVersionOf.id;
         row.replace_action = document.querySelector('input[name="verAction"]:checked').value;
       }
-      const { error } = await sb().from("submissions").insert(row);
+      let { error } = await sb().from("submissions").insert(row);
+      if (error && /tags|distribution/i.test(error.message || "")) {
+        // tag/distribution columns not migrated yet — submit without them
+        delete row.tags; delete row.distribution;
+        ({ error } = await sb().from("submissions").insert(row));
+      }
       if (error) throw error;
       if (window.Activity) window.Activity.log("submission", title + (row.version ? ` (v${row.version})` : ""));
       notifyLibrarians(title + (row.version ? ` (v${row.version})` : ""));

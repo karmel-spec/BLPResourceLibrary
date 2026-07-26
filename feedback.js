@@ -163,14 +163,20 @@
     let dbOk = false;
     if (window.__supabase) {
       try {
-        const { error } = await window.__supabase.from("beta_feedback").insert({
+        const row = {
           category: chosen,
           message: msg,
           actor_email: email || (u ? u.email : null),
           actor_name: u ? u.name : null,
           page: location.pathname,
           screenshot,
-        });
+        };
+        let { error } = await window.__supabase.from("beta_feedback").insert(row);
+        if (error && /screenshot/i.test(error.message || "")) {
+          // screenshot column not migrated yet — keep the note, drop the image
+          delete row.screenshot;
+          ({ error } = await window.__supabase.from("beta_feedback").insert(row));
+        }
         dbOk = !error;
       } catch (e) { /* fall through to email */ }
     }
