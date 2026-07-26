@@ -504,6 +504,8 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 
 /* ---- Monthly-update signup band ---- */
 .nl-band { background: #14181b; border-top: 3px solid var(--red); margin-top: 40px; }
+header + .nl-band { margin-top: 0; border-bottom: 3px solid var(--red); }
+header + .nl-band .nl-inner { padding: 22px 24px; }
 .nl-inner {
   max-width: var(--container); margin: 0 auto; padding: 34px 24px;
   display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap;
@@ -1005,6 +1007,11 @@ header nav a.nav-chat { color: #d8b64e; }
 .ama-tz { font-size: 10px; letter-spacing: .5px; color: #6a747c; }
 .ama-bar { height: 6px; background: #e8e4da; margin-top: 8px; }
 .ama-bar i { display: block; height: 100%; background: var(--red); transition: width .4s; }
+.ama-bar i.seed {
+  background: repeating-linear-gradient(45deg, var(--red) 0 6px, #c04a3a 6px 12px);
+  background-size: 200% 100%; animation: ama-pulse 1.8s ease-in-out infinite;
+}
+@keyframes ama-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
 .ama-n { font-size: 10.5px; letter-spacing: 1px; color: #4a545c; margin-top: 4px; }
 .ama-cast { font-size: 11px; letter-spacing: 1px; font-weight: 600; color: var(--red); margin-top: 6px; }
 .ama-opt.mine .ama-cast { color: #1c7c33; }

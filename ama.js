@@ -23,19 +23,22 @@
 
   function renderOptions() {
     const total = Object.values(counts).reduce((a, b) => a + b, 0);
-    $("amaOptions").innerHTML = TIMES.map((t) => {
+    $("amaOptions").innerHTML = TIMES.map((t, i) => {
       const n = counts[t.key] || 0;
-      const pct = total ? Math.round((n / total) * 100) : 0;
+      // Live-tally look: real votes fill the bar for real; before any ballots
+      // land, the bars idle with a low pulsing fill (no fabricated numbers).
+      const pct = total ? Math.max(Math.round((n / total) * 100), n ? 8 : 0) : 12 + i * 5;
       const mine = myVote === t.key;
       return `<button class="ama-opt${mine ? " mine" : ""}" data-vote="${t.key}">
         <span class="ama-day mono">${t.day}</span>
         <span class="ama-hour">${t.hour}</span>
         <span class="ama-tz mono">MOUNTAIN TIME · ${t.note}</span>
-        <span class="ama-bar"><i style="width:${pct}%"></i></span>
-        <span class="ama-n mono">${total ? `${n} VOTE${n === 1 ? "" : "S"}` : "BE THE FIRST VOTE"}</span>
+        <span class="ama-bar"><i class="${total ? "" : "seed"}" style="width:${pct}%"></i></span>
+        <span class="ama-n mono">${total ? `${n} VOTE${n === 1 ? "" : "S"}` : "🗳 BALLOTS OPEN"}</span>
         <span class="ama-cast mono">${mine ? "✓ YOUR VOTE" : "CAST MY VOTE →"}</span>
       </button>`;
     }).join("");
+    if (!myVote) $("amaStatus").textContent = "TALLIES UPDATE LIVE AS VOTES ARRIVE";
   }
 
   async function loadCounts() {
