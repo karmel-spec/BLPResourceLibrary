@@ -617,7 +617,7 @@ header + .nl-band .nl-inner { padding: 22px 24px; }
 .pp-badge {
   display: inline-block; vertical-align: 2px; margin-left: 6px;
   font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .5px;
-  background: #14181b; color: #f4f2ec; padding: 2px 6px; border-radius: 2px;
+  background: var(--red); color: #fff; padding: 2px 6px; border-radius: 2px;
 }
 .pp-details { margin: 8px 0 8px 24px; padding: 10px 14px; border-left: 3px solid var(--line); }
 .pp-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; margin-bottom: 8px; }
@@ -677,10 +677,11 @@ header + .nl-band .nl-inner { padding: 22px 24px; }
 
 .vf-badge {
   display: inline-block; vertical-align: 2px; margin-left: 6px;
-  font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .5px;
-  background: #e7efe7; color: #1c7c33; border: 1px solid #b7d6bd; padding: 2px 6px; border-radius: 2px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  background: #1c7c33; color: #fff; border: 1.5px solid #14591f; padding: 3px 9px; border-radius: 2px;
 }
-.vf-badge.big { font-size: 11px; vertical-align: 8px; }
+.vf-badge.big { font-size: 13px; vertical-align: 8px; }
+.person-member { font-size: 10.5px; letter-spacing: .5px; color: #4a545c; margin-top: 3px; }
 .pending-note { border-color: var(--red); background: #fdf9f4; }
 
 /* ---- Legal / terms page ---- */

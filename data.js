@@ -957,7 +957,11 @@ const CONTRIBUTORS = {
   "brigham-larson": {
     name: "Brigham Larson",
     credential: "RPT — Registered Piano Technician",
+    member_of: "Member of the Piano Technicians Guild, USA",
     location: "Utah, USA",
+    // Shop-reported fulfillment stats, shown on the contributor card.
+    downloads_count: 6,
+    shipped_count: 8,
     since: "Tuning, fixing and resurrecting pianos since 1995 · RPT since 2003",
     photo: "https://yt3.googleusercontent.com/ytc/AIdro_mo7kWayVyfmrkSbmAqkBNGcClgH4YEHSCR5vZqX-lv1cA=s900-c-k-c0x00ffffff-no-rj",
     bio: "Brigham has been tuning, fixing and resurrecting pianos since 1995 and has been a Registered Piano Technician since 2003. His shop, Brigham Larson Pianos in Utah, restores heirloom pianos and pioneers digital manufacturing for the trade — reverse-engineering obsolete parts in Fusion 360 and producing them with CNC machining and 3D printing. He founded this library so no technician ever has to solve the same specialized problem twice.",
