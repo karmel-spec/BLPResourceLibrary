@@ -504,8 +504,6 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 
 /* ---- Monthly-update signup band ---- */
 .nl-band { background: #14181b; border-top: 3px solid var(--red); margin-top: 40px; }
-header + .nl-band { margin-top: 0; border-bottom: 3px solid var(--red); }
-header + .nl-band .nl-inner { padding: 22px 24px; }
 .nl-inner {
   max-width: var(--container); margin: 0 auto; padding: 34px 24px;
   display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap;
@@ -992,46 +990,6 @@ header + .nl-band .nl-inner { padding: 22px 24px; }
 .chat-compose textarea:focus { outline: none; border-color: var(--red); }
 .chat-page .fine { margin-top: 8px; }
 header nav a.nav-chat { color: #d8b64e; }
-
-/* ---- AMA broadcast-hour vote band ---- */
-.ama-band { background: var(--red); border-top: 3px solid var(--ink); margin-top: 40px; }
-header + .ama-band { margin-top: 0; border-top: none; }
-.ama-band + .nl-band { margin-top: 0; border-top: 3px solid var(--ink); }
-.ama-band + .nl-band .nl-inner { padding: 22px 24px; }
-.ama-inner { max-width: var(--container); margin: 0 auto; padding: 34px 24px; }
-.ama-copy .dwg { color: #f0c9c2; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 1px; }
-.ama-copy h2 { color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
-.ama-copy p { color: #f3ded9; font-size: 14px; line-height: 1.6; margin-top: 6px; max-width: 640px; }
-.ama-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 18px; }
-.ama-opt { text-align: left; background: #fff; border: 2px solid var(--ink); padding: 14px 14px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; }
-.ama-opt:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 rgba(20,24,27,.45); }
-.ama-opt.mine { outline: 3px solid #14181b; background: #fdf9f4; }
-.ama-day { font-size: 10.5px; letter-spacing: 1.5px; color: var(--red); }
-.ama-hour { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700; line-height: 1; }
-.ama-tz { font-size: 10px; letter-spacing: .5px; color: #6a747c; }
-.ama-bar { height: 6px; background: #e8e4da; margin-top: 8px; }
-.ama-bar i { display: block; height: 100%; background: var(--red); transition: width .4s; }
-.ama-bar i.seed {
-  background: repeating-linear-gradient(45deg, var(--red) 0 6px, #c04a3a 6px 12px);
-  background-size: 200% 100%; animation: ama-pulse 1.8s ease-in-out infinite;
-}
-@keyframes ama-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
-.ama-n { font-size: 10.5px; letter-spacing: 1px; color: #4a545c; margin-top: 4px; }
-.ama-cast { font-size: 11px; letter-spacing: 1px; font-weight: 600; color: var(--red); margin-top: 6px; }
-.ama-opt.mine .ama-cast { color: #1c7c33; }
-.ama-status { color: #ffe9b0; font-size: 11px; letter-spacing: .5px; margin-top: 12px; min-height: 14px; }
-.ama-dwg { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.live-badge {
-  display: inline-flex; align-items: center; gap: 7px;
-  background: #fff; color: var(--red); border: 2px solid var(--ink);
-  font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700;
-  letter-spacing: 3px; line-height: 1; padding: 5px 12px 4px;
-  box-shadow: 3px 3px 0 rgba(20,24,27,.5);
-}
-.live-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); animation: live-blink 1.1s ease-in-out infinite; }
-@keyframes live-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .25; transform: scale(.75); } }
-.ama-admin { margin-top: 10px; font-size: 11px; color: #f0c9c2; }
-.ama-admin a { color: #ffe9b0; }
 
 /* ---- Tags + print-&-ship-only listings ---- */
 .tag-block { margin: 10px 0 4px; }
