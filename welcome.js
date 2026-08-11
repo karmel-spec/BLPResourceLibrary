@@ -83,6 +83,7 @@
     el.hidden = true;
     el.innerHTML = `
       <div class="modal wc-modal">
+        <button class="modal-close" id="wcClose" aria-label="Close">×</button>
         <div class="wc-head mono">MEMBER INTAKE CARD · ONE QUESTION</div>
         <h3 id="wcTitle">Welcome to the library</h3>
         <p class="wc-copy">So we can set up the right view for you — how are you tied
@@ -99,6 +100,15 @@
         <div class="wc-done" id="wcDone" hidden></div>
       </div>`;
     document.body.appendChild(el);
+    // Closing without answering is fine — the card stays away for this visit
+    // and asks again next session (no role = no gating either way).
+    const dismiss = () => {
+      el.hidden = true;
+      try { sessionStorage.setItem("ptl_welcome_skip", "1"); } catch (e) {}
+    };
+    el.querySelector("#wcClose").onclick = dismiss;
+    el.addEventListener("click", (e) => { if (e.target === el) dismiss(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !el.hidden) dismiss(); });
     el.addEventListener("change", () => {
       document.getElementById("wcSave").disabled = !el.querySelector("input[name=wcRole]:checked");
     });
@@ -197,7 +207,9 @@
     if (!user) { document.body.classList.remove("ptl-consumer"); return; }
     const role = await metaRole();
     applyGate(role);
-    if (!role) showCard();
+    let skipped = false;
+    try { skipped = sessionStorage.getItem("ptl_welcome_skip") === "1"; } catch (e) {}
+    if (!role && !skipped) showCard();
     if (await chatAllowed(user)) addChatNavLink();
   });
 })();

@@ -198,7 +198,7 @@ const RESOURCES = [
     by: "brigham-larson", dateAdded: "2026-07-15", tags: ["cnc", "tool"] },
   { id: "BLP-2016", cat: "fixtures", title: "Repinning Hollow Rods",
     maker: "BLP Shop", desc: "Hollow-rod set for repinning work at the bench — a BLP shop tool, ready to reproduce.",
-    formats: ["STEP"], files: {"step": "https://fjyydcsxauwogtgswfss.supabase.co/storage/v1/object/public/models/repinning-hollow-rods.step"},
+    formats: ["STEP", "STL"], files: {"step": "https://fjyydcsxauwogtgswfss.supabase.co/storage/v1/object/public/models/repinning-hollow-rods.step", "stl": "https://fjyydcsxauwogtgswfss.supabase.co/storage/v1/object/public/models/repinning-hollow-rods.stl"}, thumb: "thumbs/repinning-hollow-rods.jpg",
     by: "brigham-larson", dateAdded: "2026-08-11", tags: ["tool", "repinning", "action"] },
   { id: "BLP-1001", cat: "parts", title: "American Hammer Butt",
     maker: "BLP Shop", desc: "American-style upright hammer butt, reverse-engineered for reproduction when originals crumble.",

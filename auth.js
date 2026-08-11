@@ -16,6 +16,16 @@ if (!location.hash) {
   let currentUser = null;              // { name, email, avatar }
   const listeners = [];
 
+  // OAuth returns the session as "#access_token=…". If the page already had a
+  // hash when sign-in started (e.g. "#library", or the bare "#" a previous
+  // login leaves behind), the callback lands as "#library#access_token=…" and
+  // the session parser can't see it — the sign-in silently loops. Repair the
+  // fragment before the client boots.
+  if (/access_token=/.test(location.hash) && !location.hash.startsWith("#access_token")) {
+    const i = location.hash.indexOf("access_token");
+    history.replaceState(null, "", location.pathname + location.search + "#" + location.hash.slice(i));
+  }
+
   const DEMO_USER_KEY = "ptl_demo_user";
   const notify = () => listeners.forEach((fn) => fn(currentUser));
 
@@ -122,7 +132,9 @@ if (!location.hash) {
       if (SUPABASE_READY) {
         await supabase.auth.signInWithOAuth({
           provider: "google",
-          options: { redirectTo: window.location.href },
+          // No hash in the return address — the OAuth callback appends its own
+          // "#access_token=…" fragment and a leftover hash would corrupt it.
+          options: { redirectTo: window.location.href.split("#")[0] },
         });
       } else {
         demoSignIn();
