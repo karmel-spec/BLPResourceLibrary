@@ -504,6 +504,8 @@ footer { background: #14181b; border-top: 3px solid var(--red); margin-top: 30px
 
 /* ---- Monthly-update signup band ---- */
 .nl-band { background: #14181b; border-top: 3px solid var(--red); margin-top: 40px; }
+header + .nl-band { margin-top: 0; border-bottom: 3px solid var(--red); }
+header + .nl-band .nl-inner { padding: 22px 24px; }
 .nl-inner {
   max-width: var(--container); margin: 0 auto; padding: 34px 24px;
   display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap;
