@@ -7,9 +7,9 @@
 <meta name="description" content="A community library of 3D-print and CNC-ready piano parts, shop jigs, and restoration training videos for piano technicians worldwide. Founded by Brigham Larson Pianos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260811134209">
-<link rel="icon" href="icon.svg?v=20260811134209" type="image/svg+xml">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260811134209">
+<link rel="stylesheet" href="styles.css?v=20260811134757">
+<link rel="icon" href="icon.svg?v=20260811134757" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20260811134757">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FJJ4GVNQXK"></script>
 <script>
@@ -47,29 +47,27 @@
   </div>
 </header>
 
-<!-- Monthly update signup -->
-<div class="nl-band" id="newsletter">
-  <div class="nl-inner">
-    <div class="nl-copy">
-      <div class="dwg">COMMUNITY BULLETIN · SENT AS NEW WORK ARRIVES · FREE OF CHARGE</div>
-      <h2>Get the New Acquisitions update list emailed</h2>
-      <p>One plain email whenever there's new work worth sharing — the parts, jigs,
-      and training videos contributors have added since the last bulletin. No fixed
-      schedule, no spam, nothing for sale, unsubscribe anytime.</p>
-    </div>
-    <form class="nl-form" id="nlSignup">
+<!-- Top row: email signup · search · card catalog, three equal panels -->
+<div class="tri-top">
+
+  <section class="tt tt-mail" id="newsletter">
+    <div class="dwg tt-dwg">COMMUNITY BULLETIN · FREE OF CHARGE</div>
+    <h2>Get the New Acquisitions update list emailed</h2>
+    <p>One plain email whenever contributors add new parts, jigs, and training
+    videos. No fixed schedule, no spam, unsubscribe anytime.</p>
+    <form class="nl-form tt-form" id="nlSignup">
       <input type="email" id="nlEmail" placeholder="your@email.com" autocomplete="email" required>
       <button type="submit" id="nlJoin">KEEP ME POSTED</button>
       <span class="nl-msg mono" id="nlMsg"></span>
     </form>
-  </div>
-</div>
+  </section>
 
-<div class="hero">
-  <div class="tb-l">
+  <section class="tt tt-search">
     <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+    <div class="dwg">AN OPEN REBUILDING LIBRARY FOR PIANO TECHNICIANS</div>
     <h1>Solve it once.<br><span>Share it forever.</span></h1>
-    <p>An open rebuilding library for piano technicians — 3D-print and CNC-ready obsolete parts, shop-built jigs and fixtures, and training video from piano rebuilders. Download, reproduce, and keep the craft alive.</p>
+    <p>3D-print and CNC-ready obsolete parts, shop-built jigs and fixtures, and
+    training video from piano rebuilders.</p>
     <div class="search">
       <div class="pre">&gt;_</div>
       <input id="q" type="text" placeholder="Look up a part, maker, or technique…" autocomplete="off">
@@ -79,12 +77,14 @@
       <span class="ts-text">Trusted by technicians in <b>14 countries</b> · <b>1,204</b> downloads</span>
       <button class="trust-toggle" id="trustToggle" hidden></button>
     </div>
-  </div>
-  <div class="tb-r">
+  </section>
+
+  <section class="tt tb-r">
     <div class="lab"><span>CARD CATALOG — <b>INDEX OF HOLDINGS</b></span><span id="cat-updated">REV B</span></div>
     <div class="cardcat" id="cardcat"></div>
     <div class="specs"><span id="stat-files">FILES: —</span><span id="stat-videos">VIDEOS: —</span><span>PROCESS: CNC + PRINT</span></div>
-  </div>
+  </section>
+
 </div>
 
 <div class="shelf-head" id="acqHead">
@@ -125,17 +125,17 @@
   A COMMUNITY RESOURCE — FOUNDED BY <a href="https://www.brighamlarsonpianos.com" target="_blank" rel="noopener">BRIGHAM LARSON PIANOS</a>
 </div>
 
-<script src="config.js?v=20260811134209"></script>
-<script src="data.js?v=20260811134209"></script>
-<script src="auth.js?v=20260811134209"></script>
-<script src="backend.js?v=20260811134209"></script>
-<script src="activity.js?v=20260811134209"></script>
-<script src="feedback.js?v=20260811134209"></script>
-<script src="welcome.js?v=20260811134209"></script>
-<script src="print.js?v=20260811134209"></script>
-<script src="viewer.js?v=20260811134209"></script>
-<script src="ratings.js?v=20260811134209"></script>
-<script src="comments.js?v=20260811134209"></script>
-<script src="app.js?v=20260811134209"></script>
+<script src="config.js?v=20260811134757"></script>
+<script src="data.js?v=20260811134757"></script>
+<script src="auth.js?v=20260811134757"></script>
+<script src="backend.js?v=20260811134757"></script>
+<script src="activity.js?v=20260811134757"></script>
+<script src="feedback.js?v=20260811134757"></script>
+<script src="welcome.js?v=20260811134757"></script>
+<script src="print.js?v=20260811134757"></script>
+<script src="viewer.js?v=20260811134757"></script>
+<script src="ratings.js?v=20260811134757"></script>
+<script src="comments.js?v=20260811134757"></script>
+<script src="app.js?v=20260811134757"></script>
 </body>
 </html>

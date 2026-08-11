@@ -1014,3 +1014,35 @@ header nav a.nav-chat { color: #d8b64e; }
 .ie-modal { max-width: 640px; }
 .ie-fields { padding: 14px 18px 18px; overflow-y: auto; }
 .pp-approve { margin: 6px 0 10px 26px; padding: 10px 12px; border: 1.5px dashed var(--line); background: #fbfaf7; }
+
+/* ---- Tri-top: email signup · search · card catalog share the top equally ---- */
+.tri-top {
+  max-width: var(--container); margin: 24px auto 0; padding: 0 24px;
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: stretch;
+}
+.tt { border: 1.5px solid var(--ink); padding: 22px 24px; position: relative; display: flex; flex-direction: column; }
+.tri-top .tb-r { flex: none; }
+.tt-search { background: rgba(255,255,255,.88); }
+.tt-search h1 { font-size: 34px; }
+.tt-search p { margin-top: 10px; font-size: 13.5px; line-height: 1.55; color: var(--ink-soft); }
+.tt-search .dwg { margin-bottom: 10px; font-size: 10px; }
+.tt-search .search { margin-top: auto; padding-top: 16px; max-width: none; border: none; }
+.tt-search .search .pre, .tt-search .search input, .tt-search .search button { border: 1.5px solid var(--ink); }
+.tt-search .search input { border-left: none; border-right: none; padding: 12px 14px; }
+.tt-search .search button { border-left: none; }
+.tt-mail { background: #14181b; border-color: #14181b; }
+.tt-mail .tt-dwg { color: #8fa1ad; margin-bottom: 10px; font-size: 10px; }
+.tt-mail h2 {
+  color: #fff; font-family: 'Barlow Condensed', sans-serif; font-size: 26px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1;
+}
+.tt-mail p { color: #9db0bc; font-size: 13.5px; line-height: 1.55; margin-top: 10px; }
+.tt-form { margin-top: auto; padding-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.tt-form input { width: 100%; min-width: 0; }
+.tt-form button { width: 100%; }
+.tt-form .nl-msg { margin-top: 0; }
+@media (max-width: 1080px) {
+  .tri-top { grid-template-columns: 1fr 1fr; }
+  .tri-top .tt-search { order: -1; grid-column: 1 / -1; }
+}
+@media (max-width: 680px) { .tri-top { grid-template-columns: 1fr; gap: 14px; } }
